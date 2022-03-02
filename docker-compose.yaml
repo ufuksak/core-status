@@ -1,0 +1,119 @@
+version: '3.7'
+
+volumes:
+  postgres:
+
+services:
+  postgres:
+    image: postgres:12
+    restart: always
+    environment:
+      - POSTGRES_DB=test_messaging
+      - POSTGRES_USER=user_messaging
+      - POSTGRES_PASSWORD=e5YGE3cQ2ysqHesT
+    volumes:
+      - postgres:/var/lib/postgresql
+      - postgres:/var/log/postgresql
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redislabs/redisearch
+    ports:
+      - '6378:6378'
+
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3-management-alpine
+    ports:
+      - 5672:5672
+      - 15672:15672
+
+  localstack:
+    container_name: localstack
+    image: localstack/localstack:0.11.0
+    ports:
+      - '4575:4575'
+      - '4576:4576'
+
+#  messaging-transport-service:
+#    image: messaging-transport-service
+#    ports:
+#      - "9840:9840"
+#    environment:
+#      NAMESPACE: messaging-transport-service-test
+#      NODE_ENV: development
+#      SERVER_PORT: 9840
+#      PUBNUB_PUBLISH_KEY: 'pub-c-5cffb7ac-5697-44e4-bfc4-dcad6bfae55d'
+#      PUBNUB_SUBSCRIBE_KEY: 'sub-c-c8ad602c-7c09-11e9-81d5-56c3556875f9'
+#      AWS_REGION: 'us-east-1'
+#      SQS_ENDPOINT: 'http://localstack:4576'
+
+  messaging-service:
+    image: messaging-legacy-core
+    ports:
+      - "9836:9836"
+    depends_on:
+      - postgres
+      - redis
+      - localstack
+    environment:
+      NAMESPACE: messaging-service-test
+      NODE_ENV: development
+      PUBNUB_SUBSCRIBE_KEY: 'sub-c-252ec7e2-7ca4-11e9-89f1-56e8a30b5f0e'
+      PUBNUB_PUBLISH_KEY: 'pub-c-5cffb7ac-5697-44e4-bfc4-dcad6bfae55d'
+      MESSAGING_TRANSPORT_SERVICE_URL: http://messaging-transport-service:9840
+      SERVER_PORT: 9836
+      DATABASE_CONNECTION_URL: 'postgresql://user_messaging:e5YGE3cQ2ysqHesT@postgres:5432/test_messaging'
+      PUBNUB_SUBSCRIBE_KEY: 'sub-c-252ec7e2-7ca4-11e9-89f1-56e8a30b5f0e'
+      PUBNUB_PUBLISH_KEY: 'pub-c-937068cd-2e67-4c0e-a1eb-3c108d85f9e7'
+      AWS_CLOUDFRONT_ACCESS_KEY_ID: 'aws-id'
+      AWS_CLOUDFRONT_PRIVATE_KEY: 'aws-private-key'
+      DEFAULT_CLIENT_ID: '4cf2c57b-ab68-4415-9b1d-9876df5d307f'
+      AWS_CLOUDFRONT_DOMAIN: 'http://my.cloudfront/'
+      AWS_REGION: 'eu-west-1'
+      SQS_ENDPOINT: 'http://0.0.0.0:4566'
+      SNS_ENDPOINT: 'http://0.0.0.0:4566'
+      DEEPLINK_BASE_URL: 'https://link.dev.global.id'
+      AWS_CHIME_SERVICE_URL: 'https://service.chime.aws.amazon.com/console'
+      AWS_CHIME_KEY_ID: 'aws_chime_key_id'
+      AWS_CHIME_SECRET_KEY: 'aws_chime_secret_key'
+      JWT_PUBLIC_KEY: 'sigsecret'
+      JWT_ISSUER: 'https://iss.uer'
+      SVC_URL_CONTACTS: 'http://contacts:8080'
+      SVC_URL_GROUP: 'http://group-service:9125'
+      SVC_URL_IDENTITY_NAMESPACE: 'http://identity-namespace-service:9992'
+      SVC_URL_KEYSTORE: 'http://keystore-service:9123'
+      SVC_URL_MESSAGING_FILE: 'http://messaging-file-service:9836'
+      SVC_URL_UPLOAD: 'http://upload:8080'
+      REDIS_HOST: 'redis'
+      REDIS_PORT: 6378      
+
+  cockroach_node_1:
+    container_name: cockroach_node_1
+    image: cockroachdb/cockroach:latest
+    volumes:
+      - ./data/node_1:/cockroach/cockroach-data
+    command: start --insecure
+    ports:
+      - "26257:26257"
+      - "8080:8080"
+    networks:
+      cockroachdb_net:
+        aliases:
+          - cockroach_node_1
+
+  cockroach_node_2:
+    container_name: cockroach_node_2
+    image: cockroachdb/cockroach:latest
+    volumes:
+      - ./data/node_2:/cockroach/cockroach-data
+    command: start --insecure --join=cockroach_node_1
+    networks:
+      cockroachdb_net:
+        aliases:
+          - cockroach_node_2
+
+networks:
+  cockroachdb_net:
+    driver: bridge 
