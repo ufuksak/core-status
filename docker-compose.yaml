@@ -34,7 +34,7 @@ services:
     image: localstack/localstack-light:0.14.0
     environment:
       HOSTNAME_EXTERNAL: localstack
-      SERVICES: "sns,sqs"
+      SERVICES: "sns,sqs,s3"
 
   messaging-transport-service:
     image: messaging-transport
@@ -48,10 +48,66 @@ services:
       PUBNUB_SUBSCRIBE_KEY: 'sub-c-c8ad602c-7c09-11e9-81d5-56c3556875f9'
       AWS_REGION: 'us-east-1'
       SQS_ENDPOINT: 'http://localstack:4566'
+      SNS_ENDPOINT: 'http://localstack:4566'
       JWT_PUBLIC_KEY: 'sigsecret'
       JWT_ISSUER: 'https://iss.uer'
       AWS_SECRET_ACCESS_KEY: 'invalid'
       AWS_ACCESS_KEY_ID: 'invalid'
+      DISABLE_DDTRACE: 1
+
+  mysql:
+    container_name: mysql
+    image: mysql:5.7.22
+    command: --sql_mode=NO_ENGINE_SUBSTITUTION
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: test
+      MYSQL_DATABASE: test_keystoreservice
+      MYSQL_USER: root
+      MYSQL_PASSWORD: test
+
+  keystore:
+    image: keystore
+    depends_on:
+      - mysql
+    environment:
+      AWS_ACCESS_KEY_ID: invalid
+      AWS_BUCKET_NAME: dev-bucket
+      AWS_REGION: eu-west-1
+      AWS_SECRET_ACCESS_KEY: invalid
+      AZURE_CLIENT_ID: 89b42340-ea89-47d4-b29c-0ea03236482d
+      AZURE_CLIENT_SECRET: -o_uWZ186Q-m_hXb7Dk7Mj2MKv9n8D03r4
+      AZURE_KEY_VAULT_NAME: gid-dev-groups-vault
+      AZURE_TENANT_ID: 07e42d9d-9529-4908-b3dc-755c9ddae079
+      DATABASE_CONNECTION_URL: mysql://root:test@mysql:3306/test_keystoreservice
+      DEFAULT_REGION: eu-west-1
+      DISABLE_DDTRACE: 1
+      JWT_ISSUER: https://iss.uer
+      JWT_PUBLIC_KEY: sigsecret
+      NAMESPACE: dev
+      NODE_ENV: development
+      SNS_ENDPOINT: http://localstack:4566
+      SQS_ENDPOINT: http://localstack:4566
+      SVC_URL_CONSENT: http://consent-service:9502
+
+  contacts:
+    image: contacts
+    environment:
+      NAMESPACE: core
+      NODE_ENV: development
+      HOSTNAME: http://localhost:9836
+      DATABASE_CONNECTION_URL: postgres://contacts:blanks@postgres:5432/contacts?debug=false&charset=utf8
+      OBFUSCATED_SALT: a_nice_testing_salty
+      AWS_REGION: 'us-east-1'
+      SQS_ENDPOINT: 'http://localstack:4566'
+      SNS_ENDPOINT: 'http://localstack:4566'
+      JWT_PUBLIC_KEY: 'sigsecret'
+      JWT_ISSUER: 'https://iss.uer'
+      AWS_SECRET_ACCESS_KEY: 'invalid'
+      AWS_ACCESS_KEY_ID: 'invalid'
+      DISABLE_DDTRACE: 1
 
   messaging-service:
     image: messaging-legacy-core
@@ -91,7 +147,6 @@ services:
       SVC_URL_GROUP: 'http://group-service:9125'
       SVC_URL_IDENTITY_NAMESPACE: 'http://identity-namespace-service:9992'
       SVC_URL_KEYSTORE: 'http://keystore-service:9123'
-      SVC_URL_MESSAGING_FILE: 'http://messaging-file-service:9836'
       SVC_URL_UPLOAD: 'http://upload:8080'
       REDIS_HOST: 'redis'
       REDIS_PORT: 6379
@@ -123,4 +178,4 @@ services:
 
 networks:
   cockroachdb_net:
-    driver: bridge 
+    driver: bridge
