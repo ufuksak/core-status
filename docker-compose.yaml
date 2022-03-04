@@ -31,20 +31,27 @@ services:
 
   localstack:
     container_name: localstack
-    image: localstack/localstack:0.11.0
+    image: localstack/localstack-light:0.14.0
+    environment:
+      HOSTNAME_EXTERNAL: localstack
+      SERVICES: "sns,sqs"
 
-#  messaging-transport-service:
-#    image: messaging-transport-service
-#    ports:
-#      - "9840:9840"
-#    environment:
-#      NAMESPACE: messaging-transport-service-test
-#      NODE_ENV: development
-#      SERVER_PORT: 9840
-#      PUBNUB_PUBLISH_KEY: 'pub-c-5cffb7ac-5697-44e4-bfc4-dcad6bfae55d'
-#      PUBNUB_SUBSCRIBE_KEY: 'sub-c-c8ad602c-7c09-11e9-81d5-56c3556875f9'
-#      AWS_REGION: 'us-east-1'
-#      SQS_ENDPOINT: 'http://localstack:4576'
+  messaging-transport-service:
+    image: messaging-transport
+    ports:
+      - "9840:9840"
+    environment:
+      NAMESPACE: messaging-transport-service-test
+      NODE_ENV: development
+      SERVER_PORT: 9840
+      PUBNUB_PUBLISH_KEY: 'pub-c-5cffb7ac-5697-44e4-bfc4-dcad6bfae55d'
+      PUBNUB_SUBSCRIBE_KEY: 'sub-c-c8ad602c-7c09-11e9-81d5-56c3556875f9'
+      AWS_REGION: 'us-east-1'
+      SQS_ENDPOINT: 'http://localstack:4566'
+      JWT_PUBLIC_KEY: 'sigsecret'
+      JWT_ISSUER: 'https://iss.uer'
+      AWS_SECRET_ACCESS_KEY: 'invalid'
+      AWS_ACCESS_KEY_ID: 'invalid'
 
   messaging-service:
     image: messaging-legacy-core
@@ -70,8 +77,8 @@ services:
       AWS_CLOUDFRONT_DOMAIN: 'http://my.cloudfront.com/'
       AWS_REGION: 'eu-west-1'
       DISABLE_DDTRACE: 1
-      SQS_ENDPOINT: 'http://localstack:4575'
-      SNS_ENDPOINT: 'http://localstack:4576'
+      SQS_ENDPOINT: 'http://localstack:4566'
+      SNS_ENDPOINT: 'http://localstack:4566'
       DEEPLINK_BASE_URL: 'https://link.dev.global.id'
       AWS_CHIME_SERVICE_URL: 'https://service.chime.aws.amazon.com/console'
       AWS_CHIME_KEY_ID: 'aws_chime_key_id'
