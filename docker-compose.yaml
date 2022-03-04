@@ -14,6 +14,7 @@ services:
     volumes:
       - postgres:/var/lib/postgresql
       - postgres:/var/log/postgresql
+      - ./pg_init.sql:/docker-entrypoint-initdb.d/10-init.sql
     ports:
       - "5432:5432"
 
