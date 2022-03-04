@@ -20,7 +20,7 @@ services:
   redis:
     image: redislabs/redisearch
     ports:
-      - '6378:6378'
+      - '6379:6378'
 
   rabbitmq:
     container_name: rabbitmq
@@ -70,14 +70,17 @@ services:
       AWS_CLOUDFRONT_ACCESS_KEY_ID: 'aws-id'
       AWS_CLOUDFRONT_PRIVATE_KEY: 'aws-private-key'
       DEFAULT_CLIENT_ID: '4cf2c57b-ab68-4415-9b1d-9876df5d307f'
-      AWS_CLOUDFRONT_DOMAIN: 'http://my.cloudfront/'
+      AWS_CLOUDFRONT_DOMAIN: 'http://my.cloudfront.com/'
       AWS_REGION: 'eu-west-1'
-      SQS_ENDPOINT: 'http://0.0.0.0:4566'
-      SNS_ENDPOINT: 'http://0.0.0.0:4566'
+      DISABLE_DDTRACE: 1
+      SQS_ENDPOINT: 'localstack:4566'
+      SNS_ENDPOINT: 'localstack:4566'
       DEEPLINK_BASE_URL: 'https://link.dev.global.id'
       AWS_CHIME_SERVICE_URL: 'https://service.chime.aws.amazon.com/console'
       AWS_CHIME_KEY_ID: 'aws_chime_key_id'
       AWS_CHIME_SECRET_KEY: 'aws_chime_secret_key'
+      AWS_ACCESS_KEY_ID: invalid
+      AWS_SECRET_ACCESS_KEY: invalid
       JWT_PUBLIC_KEY: 'sigsecret'
       JWT_ISSUER: 'https://iss.uer'
       SVC_URL_CONTACTS: 'http://contacts:8080'
@@ -87,7 +90,7 @@ services:
       SVC_URL_MESSAGING_FILE: 'http://messaging-file-service:9836'
       SVC_URL_UPLOAD: 'http://upload:8080'
       REDIS_HOST: 'redis'
-      REDIS_PORT: 6378      
+      REDIS_PORT: 6379
 
   cockroach_node_1:
     container_name: cockroach_node_1
