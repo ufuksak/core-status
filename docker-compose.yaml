@@ -32,9 +32,6 @@ services:
   localstack:
     container_name: localstack
     image: localstack/localstack:0.11.0
-    ports:
-      - '4575:4575'
-      - '4576:4576'
 
 #  messaging-transport-service:
 #    image: messaging-transport-service
@@ -73,8 +70,8 @@ services:
       AWS_CLOUDFRONT_DOMAIN: 'http://my.cloudfront.com/'
       AWS_REGION: 'eu-west-1'
       DISABLE_DDTRACE: 1
-      SQS_ENDPOINT: 'localstack:4566'
-      SNS_ENDPOINT: 'localstack:4566'
+      SQS_ENDPOINT: 'http://localstack:4575'
+      SNS_ENDPOINT: 'http://localstack:4576'
       DEEPLINK_BASE_URL: 'https://link.dev.global.id'
       AWS_CHIME_SERVICE_URL: 'https://service.chime.aws.amazon.com/console'
       AWS_CHIME_KEY_ID: 'aws_chime_key_id'
