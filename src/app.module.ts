@@ -6,6 +6,7 @@ import {RabbitModule} from "./products/modules/rabbit.module";
 import {RABBIT_URI} from "./products/config/config";
 import {ProducerModule} from "./products/modules/producer.module";
 import {ConsumerModule} from "./products/modules/consumer.module";
+import { ChannelModule } from './products/modules/channel.module';
 
 @Module({
     imports: [
@@ -17,17 +18,21 @@ import {ConsumerModule} from "./products/modules/consumer.module";
         }),
         ProducerModule,
         ConsumerModule,
-        ProductsModule, UploadImageModule, TypeOrmModule.forRoot({
-        type: 'postgres',
-        host: 'localhost',
-        port: 26257,
-        username: 'root',
-        password: 'root',
-        database: 'defaultdb',
-        entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        synchronize: true,
-        migrations: ['migrations/*.ts'],
-    })],
+        ProductsModule,
+        UploadImageModule,
+        ChannelModule,
+        TypeOrmModule.forRoot({
+            type: 'postgres',
+            host: 'localhost',
+            port: 26257,
+            username: 'root',
+            password: 'root',
+            database: 'defaultdb',
+            entities: [__dirname + '/**/*.entity{.ts,.js}'],
+            synchronize: true,
+            migrations: ['migrations/*.ts'],
+        })
+    ],
     controllers: [],
     providers: [],
 })
