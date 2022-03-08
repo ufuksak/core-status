@@ -21,7 +21,7 @@ services:
   redis:
     image: redislabs/redisearch
     ports:
-      - '6379:6378'
+      - '6379:6379'
 
   rabbitmq:
     container_name: rabbitmq
@@ -33,6 +33,9 @@ services:
   localstack:
     container_name: localstack
     image: localstack/localstack-light:0.14.0
+    ports:
+      - 4566:4566
+      - 4571:4571
     environment:
       HOSTNAME_EXTERNAL: localstack
       SERVICES: "sns,sqs,s3"
@@ -68,6 +71,16 @@ services:
       MYSQL_DATABASE: test_keystoreservice
       MYSQL_USER: root
       MYSQL_PASSWORD: test
+
+  phpmyadmin:
+    depends_on:
+      - mysql
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - '8081:80'
+    environment:
+      PMA_HOST: mysql
+      MYSQL_ROOT_PASSWORD: root
 
   keystore:
     image: keystore
@@ -186,6 +199,8 @@ services:
 
   contacts:
     image: contacts
+    ports:
+      - "8095:8080"
     environment:
       NAMESPACE: core
       NODE_ENV: development
@@ -235,7 +250,7 @@ services:
       AWS_SECRET_ACCESS_KEY: invalid
       JWT_PUBLIC_KEY: 'sigsecret'
       JWT_ISSUER: 'https://iss.uer'
-      SVC_URL_CONTACTS: 'http://contacts:8080'
+      SVC_URL_CONTACTS: 'http://contacts:8095'
       SVC_URL_GROUP: 'http://group-service:9125'
       SVC_URL_IDENTITY_NAMESPACE: 'http://identity-namespace-service:9992'
       SVC_URL_KEYSTORE: 'http://keystore-service:9123'
@@ -244,31 +259,11 @@ services:
       REDIS_HOST: 'redis'
       REDIS_PORT: 6379
 
-  cockroach_node_1:
-    container_name: cockroach_node_1
-    image: cockroachdb/cockroach:latest
-    volumes:
-      - ./data/node_1:/cockroach/cockroach-data
-    command: start --insecure
+  crdb:
+    image: cockroachdb/cockroach:v19.2.2
     ports:
       - "26257:26257"
-      - "8080:8080"
-    networks:
-      cockroachdb_net:
-        aliases:
-          - cockroach_node_1
-
-  cockroach_node_2:
-    container_name: cockroach_node_2
-    image: cockroachdb/cockroach:latest
+      - "8090:8080"
+    command: start-single-node --insecure
     volumes:
-      - ./data/node_2:/cockroach/cockroach-data
-    command: start --insecure --join=cockroach_node_1
-    networks:
-      cockroachdb_net:
-        aliases:
-          - cockroach_node_2
-
-networks:
-  cockroachdb_net:
-    driver: bridge
+      - "${PWD}/cockroach-data/crdb:/cockroach/cockroach-data"
