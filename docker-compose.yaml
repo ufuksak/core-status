@@ -119,7 +119,7 @@ services:
   identity:
     image: identity-namespace-service
     ports:
-    - '9992:9992'
+      - '9992:9992'
     depends_on:
       - postgres
       - redis
@@ -258,6 +258,7 @@ services:
       SVC_URL_MESSAGING_FILE: 'http://localhost'
       REDIS_HOST: 'redis'
       REDIS_PORT: 6379
+      JWT_AUTH_DISABLED: 1
 
   crdb:
     image: cockroachdb/cockroach:v19.2.2
