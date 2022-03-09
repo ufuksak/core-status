@@ -19,7 +19,7 @@ services:
       - "5432:5432"
 
   redis:
-    image: redislabs/redisearch
+    image: redislabs/redisearch:latest
     ports:
       - '6379:6379'
 
@@ -107,7 +107,7 @@ services:
       SVC_URL_CONSENT: http://consent-service:9502
 
   hydra:
-    image: ghcr.io/globalid/container-images/hydra:latest
+    image: oryd/hydra:v1.10.1-sqlite
     ports:
       - 4444:4444
       - 4445:4445
@@ -232,8 +232,8 @@ services:
       MESSAGING_TRANSPORT_SERVICE_URL: http://messaging-transport-service:9840
       SERVER_PORT: 9836
       DATABASE_CONNECTION_URL: 'postgresql://user_messaging:e5YGE3cQ2ysqHesT@postgres:5432/test_messaging'
-      PUBNUB_SUBSCRIBE_KEY: 'sub-c-252ec7e2-7ca4-11e9-89f1-56e8a30b5f0e'
-      PUBNUB_PUBLISH_KEY: 'pub-c-937068cd-2e67-4c0e-a1eb-3c108d85f9e7'
+#      PUBNUB_SUBSCRIBE_KEY: 'sub-c-252ec7e2-7ca4-11e9-89f1-56e8a30b5f0e'
+#      PUBNUB_PUBLISH_KEY: 'pub-c-937068cd-2e67-4c0e-a1eb-3c108d85f9e7'
       AWS_CLOUDFRONT_ACCESS_KEY_ID: 'aws-id'
       AWS_CLOUDFRONT_PRIVATE_KEY: 'aws-private-key'
       DEFAULT_CLIENT_ID: '4cf2c57b-ab68-4415-9b1d-9876df5d307f'
@@ -261,7 +261,7 @@ services:
       JWT_AUTH_DISABLED: 1
 
   crdb:
-    image: cockroachdb/cockroach:v19.2.2
+    image: cockroachdb/cockroach:latest
     ports:
       - "26257:26257"
       - "8090:8080"
