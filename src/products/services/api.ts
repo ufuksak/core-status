@@ -29,32 +29,32 @@ export class ApiService {
   private readonly client: AxiosInstance
 
   constructor (config: Config) {
-    this.client = ApiService.createHttpClient(config.accessToken)
+    this.client = this.createHttpClient(config.accessToken)
   }
 
   // tslint:disable-next-line:no-any
-  private static getResponseData<T = any> (response: AxiosResponse<T>): T {
+  private getResponseData<T = any> (response: AxiosResponse<T>): T {
     return response.data
   }
 
-  private static createHttpClient (accessToken: string): AxiosInstance {
+  private createHttpClient (accessToken: string): AxiosInstance {
     const config: AxiosRequestConfig = {
       baseURL: API_URL
     }
 
     const instance: AxiosInstance = axios.create(config)
-    instance.interceptors.request.use(ApiService.createInterceptor(accessToken), ApiService.createErrorHandler)
+    instance.interceptors.request.use(this.createInterceptor(accessToken), this.createErrorHandler)
 
     return instance
   }
 
   // istanbul ignore next
   // Is not executed with mocked axios instance
-  private static createInterceptor (
+  private createInterceptor (
     accessToken: string
   ): (value: AxiosRequestConfig) => AxiosRequestConfig | Promise<AxiosRequestConfig> {
     return (request: AxiosRequestConfig): Promise<AxiosRequestConfig> | AxiosRequestConfig => {
-      if (IS_DEBUG) {
+      if (IS_DEBUG && accessToken === '') {
         // tslint:disable-next-line:no-unsafe-any
         request.headers[ApiService.TOKEN_HEADER] = JSON.stringify({
           globalid: process.env.TEST_USER_GLOBALID,
@@ -79,7 +79,7 @@ export class ApiService {
   }
 
   // istanbul ignore next
-  private static createErrorHandler (): Function {
+  private createErrorHandler (): Function {
     return (error: AxiosError): void => {
       // tslint:disable-next-line:no-console
       console.error(error)
@@ -88,7 +88,7 @@ export class ApiService {
   }
 
   public async getSubscriptions (page: number): Promise<SubscriptionResponse> {
-    return ApiService.getResponseData(await this.client.get<SubscriptionResponse>('/subscriptions', {
+    return this.getResponseData(await this.client.get<SubscriptionResponse>('/subscriptions', {
       params: {
         page: page
       }
@@ -96,7 +96,7 @@ export class ApiService {
   }
 
   public async getChannels (page: number = 1, perPage: number = 20): Promise<ChannelsResponse> {
-    return ApiService.getResponseData(await this.client.get<ChannelsResponse>('/channels', {
+    return this.getResponseData(await this.client.get<ChannelsResponse>('/channels', {
       params: {
         page: page,
         per_page: perPage,
@@ -105,15 +105,15 @@ export class ApiService {
   }
 
   public async searchChannels (participants: string[]): Promise<ChannelsResponse> {
-    return ApiService.getResponseData(await this.client.post<ChannelsResponse>('/channels/search', { participants }))
+    return this.getResponseData(await this.client.post<ChannelsResponse>('/channels/search', { participants }))
   }
 
   public async createChannel (channelPayload: ChannelPayload): Promise<Channel> {
-    return ApiService.getResponseData(await this.client.post<Channel>('/channels', channelPayload))
+    return this.getResponseData(await this.client.post<Channel>('/channels', channelPayload))
   }
 
   public async getMessages (channelId: string, page: number = 1, perPage: number = 20): Promise<MessagesResponse> {
-    return ApiService.getResponseData(await this.client.get<MessagesResponse>(`/channels/${channelId}/messages`, {
+    return this.getResponseData(await this.client.get<MessagesResponse>(`/channels/${channelId}/messages`, {
       params: {
         page: page,
         per_page: perPage,
@@ -122,19 +122,19 @@ export class ApiService {
   }
 
   public async sendMessage (messagePayload: MessagePayload): Promise<SendMessageResponse> {
-    return ApiService.getResponseData(await this.client.post<SendMessageResponse>('/messages', messagePayload))
+    return this.getResponseData(await this.client.post<SendMessageResponse>('/messages', messagePayload))
   }
 
   public async setMessageDelivered (messageId: string): Promise<MessageDeliveredResponse> {
-    return ApiService.getResponseData(await this.client.put<MessageDeliveredResponse>(`/messages/${messageId}/delivered`))
+    return this.getResponseData(await this.client.put<MessageDeliveredResponse>(`/messages/${messageId}/delivered`))
   }
 
   public async setMessageSeen (messageId: string): Promise<MessageSeenResponse> {
-    return ApiService.getResponseData(await this.client.put<MessageSeenResponse>(`/messages/${messageId}/seen`))
+    return this.getResponseData(await this.client.put<MessageSeenResponse>(`/messages/${messageId}/seen`))
   }
 
   public async getCounters (page: number = 1, perPage: number = 20): Promise<CountersResponse> {
-    return ApiService.getResponseData(await this.client.get<CountersResponse>('/counters', {
+    return this.getResponseData(await this.client.get<CountersResponse>('/counters', {
       params: {
         page: page,
         per_page: perPage,
@@ -143,15 +143,15 @@ export class ApiService {
   }
 
   public async getUserBlocks (): Promise<BlocksResponse> {
-    return ApiService.getResponseData(await this.client.get<BlocksResponse>(`/messaging/blocked-users`))
+    return this.getResponseData(await this.client.get<BlocksResponse>(`/messaging/blocked-users`))
   }
 
   public async getBlockedUser (userId: string): Promise<BlockedUser> {
-    return ApiService.getResponseData(await this.client.get<BlockedUser>(`/messaging/blocked-users/${userId}`))
+    return this.getResponseData(await this.client.get<BlockedUser>(`/messaging/blocked-users/${userId}`))
   }
 
   public async blockUser (userId: string): Promise<BlockedUser> {
-    return ApiService.getResponseData(await this.client.put<BlockedUser>(`/messaging/blocked-users/${userId}`))
+    return this.getResponseData(await this.client.put<BlockedUser>(`/messaging/blocked-users/${userId}`))
   }
 
   public async unblockUser (userId: string): Promise<void> {

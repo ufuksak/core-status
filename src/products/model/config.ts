@@ -6,6 +6,11 @@ export const IS_DEBUG: boolean = process.env.NODE_ENV === 'debug'
 /**
  * @internal
  */
+export const IS_DEBUG_KEYSTORE: boolean = process.env.NODE_ENV === 'debugkeystore'
+
+/**
+ * @internal
+ */
 export const IS_DEVELOPMENT: boolean = process.env.NODE_ENV === 'development'
 
 /**
@@ -36,9 +41,19 @@ export const DEBUG_API_URL: string = process.env.SDK_CUSTOM_API_URL !== undefine
 /**
  * @internal
  */
+export const DEBUG_KEYSTORE_API_URL: string = process.env.SDK_CUSTOM_API_URL !== undefined ? process.env.SDK_CUSTOM_API_URL : 'http://localhost:9123/v1'
+
+
+/**
+ * @internal
+ */
 export const API_URL: string = ((): string => {
   if (IS_DEBUG) {
     return DEBUG_API_URL
+  }
+
+  if (IS_DEBUG_KEYSTORE) {
+    return DEBUG_KEYSTORE_API_URL
   }
 
   if (IS_DEVELOPMENT) {

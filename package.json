@@ -32,6 +32,7 @@
     "@types/pg": "^7.14.3",
     "amqplib": "^0.8.0",
     "aws-sdk": "^2.1084.0",
+    "micro-kit-atlas": "^9.11.9",
     "pg": "^8.7.3",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.0",

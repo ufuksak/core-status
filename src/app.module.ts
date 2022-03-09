@@ -1,12 +1,13 @@
 import {Module} from '@nestjs/common';
 import {ProductsModule} from "./products/modules/products.module";
 import {TypeOrmModule} from '@nestjs/typeorm';
-import { UploadImageModule } from './products/modules/uploadimage.module';
+import {UploadImageModule} from './products/modules/uploadimage.module';
 import {RabbitModule} from "./products/modules/rabbit.module";
 import {RABBIT_URI} from "./products/config/config";
 import {ProducerModule} from "./products/modules/producer.module";
 import {ConsumerModule} from "./products/modules/consumer.module";
-import { ChannelModule } from './products/modules/channel.module';
+import {ChannelModule} from './products/modules/channel.module';
+import {KeystoreModule} from "./products/modules/keystore.module";
 
 @Module({
     imports: [
@@ -21,6 +22,7 @@ import { ChannelModule } from './products/modules/channel.module';
         ProductsModule,
         UploadImageModule,
         ChannelModule,
+        KeystoreModule,
         TypeOrmModule.forRoot({
             type: 'postgres',
             host: 'localhost',

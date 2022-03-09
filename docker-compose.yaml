@@ -107,7 +107,7 @@ services:
       SVC_URL_CONSENT: http://consent-service:9502
 
   hydra:
-    image: oryd/hydra:v1.10.1-sqlite
+    image: ghcr.io/globalid/container-images/hydra:latest
     ports:
       - 4444:4444
       - 4445:4445
@@ -261,7 +261,7 @@ services:
       JWT_AUTH_DISABLED: 1
 
   crdb:
-    image: cockroachdb/cockroach:latest
+    image: cockroachdb/cockroach:v19.2.2
     ports:
       - "26257:26257"
       - "8090:8080"
