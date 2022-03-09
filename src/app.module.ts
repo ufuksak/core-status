@@ -29,7 +29,7 @@ import { ChannelModule } from './products/modules/channel.module';
             password: 'root',
             database: 'defaultdb',
             entities: [__dirname + '/**/*.entity{.ts,.js}'],
-            synchronize: true,
+            synchronize: false,
             migrations: ['migrations/*.ts'],
         })
     ],
