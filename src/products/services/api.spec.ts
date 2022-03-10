@@ -20,6 +20,7 @@ import {
 import * as mocks from '../../../test/unit/mock'
 import { ApiService } from './api'
 import axios, { AxiosInstance } from 'axios'
+import {ChannelWithParticipants} from "../dto/channel.model";
 
 describe('API Service', () => {
   let service: ApiService
@@ -36,7 +37,7 @@ describe('API Service', () => {
       ...axiosStub,
     })
 
-    service = new ApiService({ accessToken: 'test' })
+    service = new ApiService()
   })
 
   describe('#getSubscriptions', () => {
@@ -113,7 +114,7 @@ describe('API Service', () => {
     it('should create channel', async () => {
       axiosStub.post.resolves({ data: mocks.channelOneMock })
 
-      const response: Channel = await service.createChannel(mocks.channelPayloadMock)
+      const response: ChannelWithParticipants = await service.createChannel('token', mocks.channelPayloadMock)
 
       expect(axiosStub.post).to.be.calledWith('/channels', mocks.channelPayloadMock)
       expect(response).to.deep.equal(mocks.channelOneMock)

@@ -36,7 +36,7 @@ export const DEV_API_URL: string = 'https://dev-api.gidstaging.net/v1'
 /**
  * @internal
  */
-export const DEBUG_API_URL: string = process.env.SDK_CUSTOM_API_URL !== undefined ? process.env.SDK_CUSTOM_API_URL : 'http://localhost:9836/v1'
+export const DEBUG_API_URL: string = process.env.SDK_CUSTOM_API_URL !== undefined ? process.env.SDK_CUSTOM_API_URL : 'http://localhost:9836/v2'
 
 /**
  * @internal

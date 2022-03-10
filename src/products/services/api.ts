@@ -19,6 +19,7 @@ import {
   BlockedUser,
 } from '../model'
 import {Injectable} from "@nestjs/common";
+import {ChannelWithParticipants} from "../dto/channel.model";
 
 @Injectable()
 export class ApiService {
@@ -26,10 +27,11 @@ export class ApiService {
   private static AUTHORIZATION_HEADER: string = 'Authorization'
   private static TOKEN_HEADER: string = 'x-token-data'
 
+  private accessToken : string
   private readonly client: AxiosInstance
 
-  constructor (config: Config) {
-    this.client = this.createHttpClient(config.accessToken)
+  constructor () {
+    this.client = this.createHttpClient()
   }
 
   // tslint:disable-next-line:no-any
@@ -37,24 +39,22 @@ export class ApiService {
     return response.data
   }
 
-  private createHttpClient (accessToken: string): AxiosInstance {
+  private createHttpClient (): AxiosInstance {
     const config: AxiosRequestConfig = {
       baseURL: API_URL
     }
 
     const instance: AxiosInstance = axios.create(config)
-    instance.interceptors.request.use(this.createInterceptor(accessToken), this.createErrorHandler)
+    instance.interceptors.request.use(this.createInterceptor(), this.createErrorHandler)
 
     return instance
   }
 
   // istanbul ignore next
   // Is not executed with mocked axios instance
-  private createInterceptor (
-    accessToken: string
-  ): (value: AxiosRequestConfig) => AxiosRequestConfig | Promise<AxiosRequestConfig> {
+  private createInterceptor (): (value: AxiosRequestConfig) => AxiosRequestConfig | Promise<AxiosRequestConfig> {
     return (request: AxiosRequestConfig): Promise<AxiosRequestConfig> | AxiosRequestConfig => {
-      if (IS_DEBUG && accessToken === '') {
+      if (IS_DEBUG && this.accessToken === '') {
         // tslint:disable-next-line:no-unsafe-any
         request.headers[ApiService.TOKEN_HEADER] = JSON.stringify({
           globalid: process.env.TEST_USER_GLOBALID,
@@ -67,12 +67,12 @@ export class ApiService {
         return request
       }
 
-      if (isEmpty(accessToken)) {
+      if (isEmpty(this.accessToken)) {
         return Promise.reject(new NoAccessTokenError())
       }
 
       // tslint:disable-next-line:no-unsafe-any
-      request.headers[ApiService.AUTHORIZATION_HEADER] = `Bearer ${accessToken}`
+      request.headers[ApiService.AUTHORIZATION_HEADER] = `${this.accessToken}`
 
       return request
     }
@@ -108,8 +108,9 @@ export class ApiService {
     return this.getResponseData(await this.client.post<ChannelsResponse>('/channels/search', { participants }))
   }
 
-  public async createChannel (channelPayload: ChannelPayload): Promise<Channel> {
-    return this.getResponseData(await this.client.post<Channel>('/channels', channelPayload))
+  public async createChannel (token: string, channelPayload: ChannelPayload): Promise<ChannelWithParticipants> {
+    this.accessToken = token;
+    return this.getResponseData(await this.client.post<ChannelWithParticipants>('/channels', channelPayload))
   }
 
   public async getMessages (channelId: string, page: number = 1, perPage: number = 20): Promise<MessagesResponse> {

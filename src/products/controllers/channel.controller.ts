@@ -1,5 +1,5 @@
-import {Body, Controller, Get, Post} from "@nestjs/common";
-import {ChannelDto} from "../dto/channel.model";
+import {Body, Controller, Get, Post, Request} from "@nestjs/common";
+import {AddChannelBody, ChannelWithParticipants} from "../dto/channel.model";
 import {ApiService} from "../services/api";
 
 @Controller('/api/v1/channel')
@@ -9,8 +9,10 @@ export class ChannelController {
     }
 
     @Post()
-    async createChannel(@Body() channel: ChannelDto) {
-        await this.service.createChannel(channel);
+    async createChannel(
+        @Request() req,
+        @Body() channel: AddChannelBody): Promise<ChannelWithParticipants> {
+        return this.service.createChannel(req.headers.authorization, channel);
     }
 
     @Get()
