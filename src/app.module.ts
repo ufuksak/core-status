@@ -8,6 +8,7 @@ import {ProducerModule} from "./products/modules/producer.module";
 import {ConsumerModule} from "./products/modules/consumer.module";
 import {ChannelModule} from './products/modules/channel.module';
 import {KeystoreModule} from "./products/modules/keystore.module";
+import {UsersModule} from "./products/modules/users.module";
 
 @Module({
     imports: [
@@ -23,6 +24,7 @@ import {KeystoreModule} from "./products/modules/keystore.module";
         UploadImageModule,
         ChannelModule,
         KeystoreModule,
+        UsersModule,
         TypeOrmModule.forRoot({
             type: 'postgres',
             host: 'localhost',

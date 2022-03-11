@@ -1,20 +1,20 @@
 import {Column, Entity, PrimaryGeneratedColumn} from "typeorm";
 
-@Entity({name: "product",synchronize: false})
-export class ProductEntity {
+@Entity({name: "notification_status", synchronize: true})
+export class NotificationStatusEntity {
 
     @PrimaryGeneratedColumn()
     id: number;
 
     @Column({nullable: false})
-    title: string;
+    name: string;
 
     @Column({nullable: false})
     description: string;
 
     @Column({nullable: false})
-    price: number;
+    create_app: string;
 
-    @Column({nullable: false})
-    unit: string;
+    @Column({type: 'timestamptz', nullable: true})
+    create_utc: Date;
 }

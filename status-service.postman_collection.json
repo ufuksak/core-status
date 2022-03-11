@@ -315,6 +315,57 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "addUser",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"ufuksakar\",\n    \"pin\": \"pin\",\n    \"name\": \"ufuk\",\n    \"surname\": \"sakar\",\n    \"address_line_1\": \"test address1\",\n    \"address_line_2\": \"address2\",\n    \"city\": \"Istanbul\",\n    \"state_province\": \"-\",\n    \"postal_code\": \"34000\",\n    \"country\": \"Turkey\",\n    \"phone_num\": \"00905557035175\",\n    \"mobile_num\": \"00905557035175\",\n    \"fax_num\": \"-\",\n    \"status\": [\n        {\n            \"title\": \"available\",\n            \"description\": \"description\"\n        },\n        {\n            \"title\": \"not available\",\n            \"description\": \"description\"\n        }\n    ],\n    \"gpsList\": [\n        {\n            \"device_id\": \"1\",\n            \"speed\": 50,\n            \"direction\": 50\n        }\n    ],\n    \"actionList\": [\n        {\n            \"name\": \"userSave\",\n            \"description\": \"user save\"\n        }\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/v1/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getUsers",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/v1/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"users"
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }
