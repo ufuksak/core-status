@@ -1,4 +1,7 @@
-import {Column, Entity, PrimaryGeneratedColumn} from "typeorm";
+import {Column, Entity, OneToOne, PrimaryGeneratedColumn} from "typeorm";
+import {UserEntity} from "./user.entity";
+import {CountryCodeEntity} from "./country_code.entity";
+import {DeviceModelEntity} from "./device_model.entity";
 
 @Entity({name: "device", synchronize: true})
 export class DeviceEntity {
@@ -6,27 +9,54 @@ export class DeviceEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({nullable: false})
-    dvc_id_t_description: string;
+    @Column({nullable: true})
+    description: string;
 
-    @Column({nullable: false})
-    validation_clause: string;
+    @Column({nullable: true})
+    serial_num: string;
 
-    @Column({nullable: false})
-    validation_msg: string;
+    @Column({type: 'timestamptz', nullable: true})
+    activate_utc: Date;
 
-    @Column({nullable: false})
-    update_app: string;
+    @Column({nullable: true})
+    latitude: number;
 
-    @Column({nullable: false})
-    ext_dvc_id_t_desc: string;
+    @Column({nullable: true})
+    longitude: number;
 
-    @Column({nullable: false})
-    ext_dvc_val_clause: string;
+    @Column({nullable: true})
+    enable_gps_flag: number;
 
-    @Column({nullable: false})
-    ext_dvc_val_msg: string;
+    @Column({nullable: true})
+    phone_num: string;
 
-    @Column({nullable: false})
-    ext_dvc_desc: string;
+    @Column({nullable: true})
+    last_ip_address: string;
+
+    @OneToOne(() => UserEntity, user => user.id)
+    last_usr: UserEntity;
+
+    @OneToOne(() => DeviceModelEntity, deviceModel => deviceModel.id)
+    dvc_model: DeviceEntity;
+
+    @Column({nullable: true})
+    min: string;
+
+    @OneToOne(() => CountryCodeEntity, country => country.id)
+    country_code: CountryCodeEntity;
+
+    @OneToOne(() => UserEntity, user => user.id)
+    update_user: UserEntity;
+
+    @Column({nullable: true})
+    ban: boolean;
+
+    @Column({nullable: true})
+    firmware_ver: string;
+
+    @Column({nullable: true})
+    invalid_login_retry_count: number;
+
+    @Column({type: 'timestamptz', nullable: true})
+    dvc_block_utc: Date;
 }
