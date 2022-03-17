@@ -1,10 +1,14 @@
 import axios, {AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse} from 'axios'
 import {NoAccessTokenError} from '../error/authorization'
 import {isEmpty} from '../util/validation'
-import {API_URL, ChannelsResponse, Config, IS_DEBUG} from '../model'
+import {API_URL, IS_DEBUG} from '../model'
 import {Injectable} from "@nestjs/common";
 import {KeystoreDto} from "../dto/keystore.model";
 import {IssueNewKeyPairResponse} from "../response/keystore.response";
+import {KeystoreByMeDto} from "../dto/keystore.byme.model";
+import {KeyPairCreateResponse} from "../response/keystore.byme.response";
+import {KeyPairSearchResponse} from "../response/keystore.search.response";
+import {PostKeyPairSearchBody} from "../dto/keystore.search.model";
 
 @Injectable()
 export class KeystoreService {
@@ -12,7 +16,7 @@ export class KeystoreService {
     private static AUTHORIZATION_HEADER: string = 'Authorization'
     private static TOKEN_HEADER: string = 'x-token-data'
 
-    private accessToken : string
+    private accessToken: string
     private readonly client: AxiosInstance
 
     constructor() {
@@ -71,15 +75,6 @@ export class KeystoreService {
         }
     }
 
-    public async getKeystore(page: number = 1, perPage: number = 20): Promise<IssueNewKeyPairResponse> {
-        return this.getResponseData(await this.client.get<IssueNewKeyPairResponse>('/identity', {
-            params: {
-                page: page,
-                per_page: perPage,
-            }
-        }))
-    }
-
     public async createKeystore(token: string, gid_uuid: string, body: KeystoreDto): Promise<IssueNewKeyPairResponse> {
         this.accessToken = token;
         return this.getResponseData(await this.client.post<IssueNewKeyPairResponse>(
@@ -87,4 +82,16 @@ export class KeystoreService {
             body))
     }
 
+    public async createKeystoreKeyByMe(token: string, gid_uuid: string, body: KeystoreByMeDto): Promise<KeyPairCreateResponse> {
+        this.accessToken = token;
+        return this.getResponseData(await this.client.post<KeyPairCreateResponse>(
+            '/identity/me/keys',
+            body))
+    }
+
+    public async postSearchKeyPairPublic(body: PostKeyPairSearchBody): Promise<KeyPairSearchResponse> {
+        return this.getResponseData(await this.client.post<KeyPairSearchResponse>(
+            '/identity/keys/search',
+            body))
+    }
 }

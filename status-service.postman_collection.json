@@ -263,7 +263,58 @@
 			"response": []
 		},
 		{
-			"name": "createKeystore",
+			"name": "addUser",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"ufuksakar\",\n    \"pin\": \"pin\",\n    \"name\": \"ufuk\",\n    \"surname\": \"sakar\",\n    \"address_line_1\": \"test address1\",\n    \"address_line_2\": \"address2\",\n    \"city\": \"Istanbul\",\n    \"state_province\": \"-\",\n    \"postal_code\": \"34000\",\n    \"country\": \"Turkey\",\n    \"phone_num\": \"00905557035175\",\n    \"mobile_num\": \"00905557035175\",\n    \"fax_num\": \"-\",\n    \"status\": [\n        {\n            \"title\": \"available\",\n            \"description\": \"description\"\n        },\n        {\n            \"title\": \"not available\",\n            \"description\": \"description\"\n        }\n    ],\n    \"gpsList\": [\n        {\n            \"device_id\": \"1\",\n            \"speed\": 50,\n            \"direction\": 50\n        }\n    ],\n    \"actionList\": [\n        {\n            \"name\": \"userSave\",\n            \"description\": \"user save\"\n        }\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/v1/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getUsers",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/v1/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "createKeystoreCoreConsent",
 			"request": {
 				"auth": {
 					"type": "bearer",
@@ -317,13 +368,23 @@
 			"response": []
 		},
 		{
-			"name": "addUser",
+			"name": "createKeyStoreByStatusDb",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJnbG9iYWxpZCI6ImpvaG5kb2UiLCJzdWIiOiJlYTkxYzMwZS02YzI4LTQ3OTQtYjlhMS04ZGRkODQ3MWVhYzAiLCJjbGllbnRfaWQiOiIxNGFmNWE3Yi1kZjJiLTQyZDAtYjFmNC0xMjU4ZDA5MTY5ZWEiLCJzY29wZSI6InB1YmxpYyBrZXlzLm1hbmFnZSIsImdyb3VwcyI6W10sImV4cCI6MTY0NzU0OTI0NCwiaWF0IjoxNjQ3NTQ4NjQ0LCJpc3MiOiJodHRwczovL2lzcy51ZXIifQ.2rmHXpOk8zJZ19kL-DHtOwSMJRGSlgjUJyO-DgBjH_A",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"username\": \"ufuksakar\",\n    \"pin\": \"pin\",\n    \"name\": \"ufuk\",\n    \"surname\": \"sakar\",\n    \"address_line_1\": \"test address1\",\n    \"address_line_2\": \"address2\",\n    \"city\": \"Istanbul\",\n    \"state_province\": \"-\",\n    \"postal_code\": \"34000\",\n    \"country\": \"Turkey\",\n    \"phone_num\": \"00905557035175\",\n    \"mobile_num\": \"00905557035175\",\n    \"fax_num\": \"-\",\n    \"status\": [\n        {\n            \"title\": \"available\",\n            \"description\": \"description\"\n        },\n        {\n            \"title\": \"not available\",\n            \"description\": \"description\"\n        }\n    ],\n    \"gpsList\": [\n        {\n            \"device_id\": \"1\",\n            \"speed\": 50,\n            \"direction\": 50\n        }\n    ],\n    \"actionList\": [\n        {\n            \"name\": \"userSave\",\n            \"description\": \"user save\"\n        }\n    ]\n}",
+					"raw": "{\n  \"public_key\": \"Ut incididuntelit labore\",\n  \"encrypted_private_key\": \"Duis Excepteur culpa reprehenderit esse\",\n  \"purpose\": \"status-db\",\n  \"algorithm_type\": \"rsa\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -331,7 +392,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/api/v1/users",
+					"raw": "http://localhost:3000/api/v1/identity/me/keys",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -340,19 +401,30 @@
 					"path": [
 						"api",
 						"v1",
-						"users"
+						"identity",
+						"me",
+						"keys"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "getUsers",
+			"name": "getKeystoreKey",
 			"request": {
-				"method": "GET",
+				"method": "POST",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"gid_uuid\": [\n    \"ea91c30e-6c28-4794-b9a1-8ddd8471eac0\"\n   ],\n  \"purpose\": \"status-db\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
-					"raw": "http://localhost:3000/api/v1/users",
+					"raw": "http://localhost:3000/api/v1/identity/keys/search",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -361,7 +433,9 @@
 					"path": [
 						"api",
 						"v1",
-						"users"
+						"identity",
+						"keys",
+						"search"
 					]
 				}
 			},
