@@ -1,6 +1,7 @@
-import {Body, Controller, Delete, Get, Param, Post} from "@nestjs/common";
+import {Body, Controller, Delete, Get, Put, Param, Post} from "@nestjs/common";
 import {UserService} from "../services/user.service";
 import {UserDto} from "../dto/user.model";
+import { StatusRequestBody, StatusResponseBody } from "../dto/status.model";
 
 @Controller('/api/v1/users')
 export class UserController {
@@ -27,5 +28,16 @@ export class UserController {
     @Delete('/:id')
     deleteUser(@Param('id') id: string) {
         return this.service.deleteUser(id);
+    }
+
+    @Put('/:id/status')
+    async updateStatus(@Param('id') id: string, @Body() body: StatusRequestBody) : Promise<StatusResponseBody> {
+      const { status_updates } = body;
+
+      const saveStatus = await this.service.saveStatus(id, status_updates);
+
+      return {
+        status_updates: saveStatus
+      };
     }
 }

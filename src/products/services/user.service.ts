@@ -2,6 +2,7 @@ import {Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {UserRepository} from "../repositories/user.repository";
 import {UserDto} from "../dto/user.model";
+import { StatusDto, StatusResponse } from "../dto/status.model";
 
 @Injectable()
 export class UserService {
@@ -24,5 +25,18 @@ export class UserService {
 
     deleteUser = async (id: string) => {
         return await this.userRepo.deleteUser(id);
+    }
+
+    saveStatus = async (id: string, status: StatusDto[]): Promise<StatusResponse[]> => {
+
+      const filteredStatus = status.filter(status => !status.uuid)
+
+      const savedStatuses = await this.userRepo.saveStatus(id, filteredStatus)
+
+      return savedStatuses.map(status => ({
+        ...status,
+        gid_uuid: id
+      }));
+
     }
 }
