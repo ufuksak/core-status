@@ -9,6 +9,7 @@ import {ConsumerModule} from "./products/modules/consumer.module";
 import {ChannelModule} from './products/modules/channel.module';
 import {KeystoreModule} from "./products/modules/keystore.module";
 import {UsersModule} from "./products/modules/users.module";
+import config  from '../ormconfig';
 
 @Module({
     imports: [
@@ -25,17 +26,7 @@ import {UsersModule} from "./products/modules/users.module";
         ChannelModule,
         KeystoreModule,
         UsersModule,
-        TypeOrmModule.forRoot({
-            type: 'postgres',
-            host: 'localhost',
-            port: 26257,
-            username: 'root',
-            password: 'root',
-            database: 'defaultdb',
-            entities: [__dirname + '/**/*.entity{.ts,.js}'],
-            synchronize: false,
-            migrations: ['migrations/*.ts'],
-        })
+        TypeOrmModule.forRoot(config)
     ],
     controllers: [],
     providers: [],
