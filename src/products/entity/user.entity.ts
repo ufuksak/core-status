@@ -48,7 +48,7 @@ export class UserEntity {
     @Column({nullable: true})
     fax_num: string;
 
-    @OneToMany(() => StatusEntity, status => status.user)
+    @OneToMany(() => StatusEntity, status => status.user, { cascade: true })
     status: StatusEntity[];
 
     @Column({type: 'timestamptz', nullable: true})

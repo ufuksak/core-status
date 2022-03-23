@@ -1,8 +1,9 @@
 import {Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {UserRepository} from "../repositories/user.repository";
-import {UserDto} from "../dto/user.model";
 import { StatusDto, StatusResponse } from "../dto/status.model";
+import { StatusEntity } from "../entity/status.entity";
+import { UserEntity } from "../entity/user.entity";
 
 @Injectable()
 export class UserService {
@@ -10,7 +11,7 @@ export class UserService {
     constructor(@InjectRepository(UserRepository) private readonly userRepo: UserRepository) {
     }
 
-    insertUser = async (user: UserDto) => {
+    insertUser = async (user: UserEntity) => {
         await this.userRepo.saveUser(user);
         return user.id;
     }
@@ -28,12 +29,26 @@ export class UserService {
     }
 
     saveStatus = async (id: string, status: StatusDto[]): Promise<StatusResponse[]> => {
+      const statusEntities = status.filter(status => !status.uuid) as StatusEntity[]
 
-      const filteredStatus = status.filter(status => !status.uuid)
+      if (!statusEntities.length){
+        return []
+      }
 
-      const savedStatuses = await this.userRepo.saveStatus(id, filteredStatus)
+      const user = await this.getUserById(id)
 
-      return savedStatuses.map(status => ({
+      if (!user){
+        throw new Error("User not found");
+      }
+
+      user.status = [
+        ...user.status,
+        ...statusEntities
+      ]
+
+      await this.userRepo.saveUser(user);
+
+      return statusEntities.map(status => ({
         ...status,
         gid_uuid: id
       }));

@@ -1,4 +1,4 @@
-import {Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, UpdateDateColumn} from "typeorm";
+import {Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn} from "typeorm";
 import { UserEntity } from "./user.entity";
 
 export enum StatusTypes {
@@ -9,9 +9,7 @@ export enum StatusTypes {
 @Entity({name: "status",synchronize: true})
 export class StatusEntity {
 
-    @PrimaryColumn({
-      type:'uuid'
-    })
+    @PrimaryGeneratedColumn('uuid')
     uuid: string;
 
     @Column({
@@ -22,10 +20,10 @@ export class StatusEntity {
     type: string;
 
     @Column({type: 'timestamptz', nullable: false})
-    recorded_at:Date
+    recorded_at:string
 
     @UpdateDateColumn({ type: "timestamptz" })
-    uploaded_at:Date
+    uploaded_at:string
 
     @Column({nullable: false})
     encrypted_payload: string;

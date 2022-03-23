@@ -1,7 +1,7 @@
 import {Body, Controller, Delete, Get, Put, Param, Post} from "@nestjs/common";
 import {UserService} from "../services/user.service";
-import {UserDto} from "../dto/user.model";
 import { StatusRequestBody, StatusResponseBody } from "../dto/status.model";
+import { UserEntity } from "../entity/user.entity";
 
 @Controller('/api/v1/users')
 export class UserController {
@@ -10,8 +10,9 @@ export class UserController {
     }
 
     @Post()
-    addUsers(@Body() user: UserDto): {} {
-        const generatedId = this.service.insertUser(user);
+    async addUsers(@Body() user: UserEntity) {
+        const generatedId = await this.service.insertUser(user);
+
         return {id: generatedId}
     }
 
