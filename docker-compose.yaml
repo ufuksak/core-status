@@ -267,7 +267,7 @@ services:
       JWT_AUTH_DISABLED: 1
 
   crdb:
-    image: cockroachdb/cockroach:v19.2.2
+    image: cockroachdb/cockroach:v21.2.7
     ports:
       - "26257:26257"
       - "8090:8080"
