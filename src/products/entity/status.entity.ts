@@ -1,4 +1,4 @@
-import {Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn} from "typeorm";
+import {Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, UpdateDateColumn} from "typeorm";
 import { UserEntity } from "./user.entity";
 
 export enum StatusTypes {
@@ -9,7 +9,7 @@ export enum StatusTypes {
 @Entity({name: "status",synchronize: true})
 export class StatusEntity {
 
-    @PrimaryGeneratedColumn('uuid')
+    @PrimaryColumn('uuid')
     uuid: string;
 
     @Column({
