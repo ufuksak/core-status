@@ -314,6 +314,44 @@
 			"response": []
 		},
 		{
+			"name": "updateStatus",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \"status_updates\": [{\n \"type\": \"Available\", \"recorded_at\": \"2022-07-21T09:35:31.820Z\", \"encrypted_payload\": \"some encrypted data \" }]}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/v1/users/:id/status",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"users",
+            ":id",
+            "status"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "743732586557571073"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "createKeystoreCoreConsent",
 			"request": {
 				"auth": {

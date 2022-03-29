@@ -2,6 +2,7 @@ import {Module} from "@nestjs/common";
 import {TypeOrmModule} from "@nestjs/typeorm";
 import {UserEntity} from "../entity/user.entity";
 import {UserRepository} from "../repositories/user.repository";
+import {StatusRepository} from "../repositories/status.repository";
 import {UserController} from "../controllers/user.controller";
 import {UserService} from "../services/user.service";
 import {CountryCodeEntity} from "../entity/country_code.entity";
@@ -12,6 +13,7 @@ import {UserActionEntity} from "../entity/user_action.entity";
 import {RegionEntity} from "../entity/region.entity";
 import {StatusEntity} from "../entity/status.entity";
 import {TimezoneEntity} from "../entity/tz.entity";
+import { StatusService } from "../services/status.service";
 
 @Module({
     imports: [TypeOrmModule.forFeature([
@@ -24,9 +26,14 @@ import {TimezoneEntity} from "../entity/tz.entity";
         StatusEntity,
         TimezoneEntity,
         UserActionEntity,
-        UserRepository])],
+        UserRepository,
+        StatusRepository
+      ])],
     controllers: [UserController],
-    providers: [UserService]
+    providers: [
+      UserService,
+      StatusService
+    ]
 })
 export class UsersModule {
 }
