@@ -73,29 +73,4 @@ describe('UserService', () => {
 
     expect(userRepository.deleteUser).toBeCalledWith(userId);
   });
-
-  describe('saveStatus method', () => {
-    it('should save status', async () => {
-      const userId = uuid();
-      const status = [{ id: uuid() } as any];
-
-      userRepository.getUserById = jest.fn(() => Promise.resolve({ id: userId } as UserEntity));
-      userRepository.saveUser = jest.fn(() => Promise.resolve());
-
-      const response = await service.saveStatus(userId, status);
-
-      expect(response).toEqual(status);
-      expect(status[0].gid_uuid).toEqual(userId);
-    });
-
-    it('should throw error if user not found', async () => {
-      const userId = uuid();
-      const status = [{ id: uuid() } as any];
-
-      userRepository.getUserById = jest.fn(() => null);
-
-      await expect(service.saveStatus(userId, status)).rejects.toThrowError();
-    });
-  })
-
 });

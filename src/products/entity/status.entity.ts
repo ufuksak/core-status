@@ -1,10 +1,6 @@
 import {Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, UpdateDateColumn} from "typeorm";
+import { StatusTypes } from "../dto/status.model";
 import { UserEntity } from "./user.entity";
-
-export enum StatusTypes {
-  AVAILABLE = 'Available',
-  NOT_AVAILABLE = 'Not Available'
-}
 
 @Entity({name: "status",synchronize: true})
 export class StatusEntity {

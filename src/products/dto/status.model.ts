@@ -1,56 +1,41 @@
 
-import { BadRequestException, PipeTransform } from '@nestjs/common';
-import { StatusTypes } from '../entity/status.entity';
+import {
+  IsArray,
+  IsDateString,
+  IsEnum,
+  IsNotEmpty,
+  IsUUID,
+  ValidateNested,
+} from "class-validator";
+import { Type } from "micro-kit-atlas/dist/routing";
 
-export class StatusValidationPipe implements PipeTransform {
-  transform(body: StatusRequestBody) {
-    if (!body) {
-      throw new BadRequestException('Status is required');
-    }
-
-    const { status_updates }  = body;
-
-    if (!status_updates || status_updates.length === 0) {
-      throw new BadRequestException('Status is required');
-    }
-
-    status_updates.forEach(status => {
-      if (!status.uuid) {
-        throw new BadRequestException('Status uuid is required');
-      }
-    });
-
-    const uuids = status_updates.map(status => status.uuid);
-    const uniqueUuids = [...new Set(uuids)];
-
-    if (uuids.length !== uniqueUuids.length) {
-      throw new BadRequestException('Status uuid must be unique');
-    }
-
-    status_updates.forEach(status => {
-      if (!Object.values(StatusTypes).includes(status.type as StatusTypes)) {
-        throw new BadRequestException(`Status type ${status.type} is invalid`);
-      }
-    });
-
-    return body;
-  }
+export enum StatusTypes {
+  AVAILABLE = 'Available',
+  NOT_AVAILABLE = 'Not Available'
 }
-
 
 export class StatusDto {
+  @IsUUID('4')
+  @IsNotEmpty()
+  uuid: string
 
-    constructor(
-        public uuid: string,
-        public type: string,
-        public recorded_at: string,
-        public encrypted_payload: string,
-    ) {
+  @IsNotEmpty()
+  @IsEnum(StatusTypes)
+  type: string
 
-    }
+  @IsDateString()
+  @IsNotEmpty()
+  recorded_at: string
+
+  @IsNotEmpty()
+  encrypted_payload: string
 }
 
-export interface StatusRequestBody {
+export class StatusRequestBody {
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => StatusDto)
   status_updates: StatusDto[]
 }
 
