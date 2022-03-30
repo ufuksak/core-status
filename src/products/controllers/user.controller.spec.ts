@@ -5,10 +5,12 @@ import { v4 as uuid } from 'uuid';
 import { UserDto } from "../dto/user.model";
 import { StatusDto, StatusRequestBody, StatusResponse, StatusResponseBody } from "../dto/status.model";
 import { UserEntity } from '../entity/user.entity';
+import { StatusService } from '../services/status.service';
 
 describe("UserController Unit Tests", () => {
   let userController: UserController;
   let userService: UserService;
+  let statusService: StatusService;
 
   beforeAll(async () => {
 
@@ -24,12 +26,19 @@ describe("UserController Unit Tests", () => {
             deleteUser: jest.fn(() => []),
             saveStatus: jest.fn(() => []),
           }),
+        },
+        {
+          provide: StatusService,
+          useFactory: () => ({
+            save: jest.fn(() => []),
+          }),
         }
       ],
     }).compile();
 
     userController = await module.get<UserController>(UserController);
     userService = await module.get<UserService>(UserService);
+    statusService = await module.get<StatusService>(StatusService);
   })
 
   it('should be defined', () => {
@@ -60,11 +69,10 @@ describe("UserController Unit Tests", () => {
   it('updateStatus method should update user statuses', async () => {
     const userId = uuid();
 
-    userService.saveStatus = jest.fn(async (id: string, statuses: StatusDto[]) => statuses.map(status => ({
+    statusService.save = jest.fn(async (id: string, statuses: StatusDto[]) => statuses.map(status => ({
       ...status,
       gid_uuid: id,
     } as StatusResponse)));
-
 
     const status = {
         uuid:  uuid(),
