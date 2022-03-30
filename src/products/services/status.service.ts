@@ -19,6 +19,7 @@ export class StatusService {
       const result = await this.statusRepo
           .createQueryBuilder()
           .insert()
+          .orIgnore()
           .values(statusEntities).execute();
 
       return result.generatedMaps.map((generatedColumns, index) => ({

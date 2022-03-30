@@ -13,6 +13,7 @@ describe('StatusService', () => {
     queryBuilder = ({
       insert: jest.fn().mockReturnThis(),
       values: jest.fn().mockReturnThis(),
+      orIgnore: jest.fn().mockReturnThis(),
       execute: jest.fn().mockReturnThis(),
     })
 
