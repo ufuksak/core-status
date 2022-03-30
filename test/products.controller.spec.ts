@@ -4,29 +4,33 @@ import {ProductsService} from '../src/products/services/products.service';
 import {ProductEntity} from "../src/products/entity/product.entity";
 import {getRepositoryToken} from "@nestjs/typeorm";
 import {ProductRepository} from "../src/products/repositories/product.repository";
-import {Repository} from "typeorm";
 
 describe('Products Controller', () => {
     let productController: ProductsController;
     let productService: ProductsService;
-    let repo: Repository<ProductEntity>
+    let productRepository: ProductRepository
 
     beforeAll(async () => {
         const module = await Test.createTestingModule({
             imports: [ProductRepository],
             controllers: [ProductsController],
-            providers: [ProductsService, {
-                provide: getRepositoryToken(ProductEntity),
-                useClass: Repository,
-            }, ProductRepository],
+            providers: [
+              ProductsService,
+              {
+                provide: getRepositoryToken(ProductRepository),
+                useFactory: () => ({
+                  getProducts: jest.fn(() => []),
+                }),
+              }
+            ],
         }).compile();
 
         productController = module.get<ProductsController>(ProductsController);
         productService = module.get<ProductsService>(ProductsService);
-        repo = module.get<Repository<ProductEntity>>(getRepositoryToken(ProductEntity));
+        productRepository = module.get(getRepositoryToken(ProductRepository));
     });
 
-    describe('findAll', () => {
+    describe('getAllProducts', () => {
         it('should return all products', async () => {
             const result: ProductEntity[] = [
                 {
@@ -37,7 +41,7 @@ describe('Products Controller', () => {
                     "unit": "$"
                 }
             ];
-            jest.spyOn(repo, 'find').mockResolvedValueOnce(result);
+            jest.spyOn(productRepository, 'getProducts').mockResolvedValueOnce(result);
             jest.spyOn(productService, 'getAllProducts').mockImplementation(() => Promise.resolve(result));
             expect(await productController.getProducts()).toBe(result);
         });
