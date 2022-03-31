@@ -1,13 +1,11 @@
-import {Column, Entity, OneToOne, PrimaryGeneratedColumn} from "typeorm";
+import {Column, Entity, OneToOne} from "typeorm";
 import {UserEntity} from "./user.entity";
 import {DeviceEntity} from "./device.entity";
 import {NotificationStatusEntity} from "./notification_status.entity";
+import {BaseEntity} from "./base.entity";
 
 @Entity({name: "notification", synchronize: true})
-export class NotificationEntity {
-
-    @PrimaryGeneratedColumn()
-    id: number;
+export class NotificationEntity extends BaseEntity {
 
     @OneToOne(() => UserEntity, user => user.id)
     usr_id: UserEntity;

@@ -1,10 +1,11 @@
 import {Column, Entity, PrimaryGeneratedColumn} from "typeorm";
+import {BaseEntity} from "./base.entity";
 
-@Entity({name: "product",synchronize: false})
+@Entity({name: "product",synchronize: true})
 export class ProductEntity {
 
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryGeneratedColumn("uuid")
+    id: string;
 
     @Column({nullable: false})
     title: string;

@@ -85,3 +85,21 @@ Temporary repository for statusdb development, will be renamed once we know wher
 1. Troubleshooting, 
 if any failures are seen like this, try to kill working processes(check the process->  ps -ef|grep tomcat   ->  sudo kill -9 <PID>)
 ERROR: for cockroach_node_1  Cannot start service cockroach_node_1: driver failed programming external connectivity on endpoint cockroach_node_1 (fb748ce3c296b9f43f7b2de6eaa3c6ceb1e4a637db0a5da3802ce728f09e7b0d): Error starting userland proxy: listen tcp4 0.0.0.0:8080: bind: address already in use
+
+### pubnub - typeorm Entity Listeners and Subscribers
+https://github.com/typeorm/typeorm/blob/master/docs/listeners-and-subscribers.md
+
+### running integration and unit tests command
+```
+yarn jest --runInBand
+```
+
+### A sample UT & IT output
+```
+Test Suites: 6 passed, 6 total
+Tests:       35 passed, 35 total
+Snapshots:   0 total
+Time:        3.964s
+Ran all test suites.
+Done in 4.80s.
+```

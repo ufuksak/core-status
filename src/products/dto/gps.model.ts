@@ -3,7 +3,7 @@ import {UserDto} from "./user.model";
 export class GpsDto {
 
     constructor(
-        public id: number,
+        public id: string,
         public device_id: string,
         public user: UserDto,
         public entry_utc: Date,

@@ -1,10 +1,8 @@
-import {Column, Entity, PrimaryGeneratedColumn} from "typeorm";
+import {Column, Entity} from "typeorm";
+import {BaseEntity} from "./base.entity";
 
 @Entity({name: "tz", synchronize: true})
-export class TimezoneEntity {
-
-    @PrimaryGeneratedColumn()
-    id: number;
+export class TimezoneEntity extends BaseEntity {
 
     @Column({nullable: true})
     tz_code: string;

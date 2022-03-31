@@ -1,10 +1,8 @@
-import {Column, Entity, PrimaryGeneratedColumn} from "typeorm";
+import {Column, Entity} from "typeorm";
+import {BaseEntity} from "./base.entity";
 
 @Entity({name: "notification_status", synchronize: true})
-export class NotificationStatusEntity {
-
-    @PrimaryGeneratedColumn()
-    id: number;
+export class NotificationStatusEntity extends BaseEntity {
 
     @Column({nullable: false})
     name: string;

@@ -9,7 +9,9 @@ import {ConsumerModule} from "./products/modules/consumer.module";
 import {ChannelModule} from './products/modules/channel.module';
 import {KeystoreModule} from "./products/modules/keystore.module";
 import {UsersModule} from "./products/modules/users.module";
-import config  from '../ormconfig';
+import config from '../ormconfig';
+import {PotModule} from "./products/modules/pot.module";
+import {ContainerModule} from './products/modules/container.module';
 
 @Module({
     imports: [
@@ -26,6 +28,8 @@ import config  from '../ormconfig';
         ChannelModule,
         KeystoreModule,
         UsersModule,
+        PotModule,
+        ContainerModule,
         TypeOrmModule.forRoot(config)
     ],
     controllers: [],

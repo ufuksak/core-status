@@ -6,11 +6,14 @@ import { StatusEntity } from "../entity/status.entity";
 import { UserDto } from "../dto/user.model";
 import { FindOneOptions } from "typeorm";
 import { UserEntity } from "../entity/user.entity";
+import {UserServiceInterface} from "../repositories/interface/user-service.interface";
+import {BaseService} from "./base.service";
 
 @Injectable()
-export class UserService {
+export class UserService extends BaseService implements UserServiceInterface {
 
     constructor(@InjectRepository(UserRepository) private readonly userRepo: UserRepository) {
+        super();
     }
 
     insertUser = async (user: UserDto) => {

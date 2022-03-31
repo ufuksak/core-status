@@ -62,7 +62,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3000/api/v1/products/740873007224389633",
+					"raw": "http://localhost:3000/api/v1/products/5fb8646e-2418-4da2-9239-06d282f5e0d3",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -72,7 +72,7 @@
 						"api",
 						"v1",
 						"products",
-						"740873007224389633"
+						"5fb8646e-2418-4da2-9239-06d282f5e0d3"
 					]
 				}
 			},
@@ -84,7 +84,7 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3000/api/v1/products/740873007224389633",
+					"raw": "http://localhost:3000/api/v1/products/5fb8646e-2418-4da2-9239-06d282f5e0d3",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -94,7 +94,7 @@
 						"api",
 						"v1",
 						"products",
-						"740873007224389633"
+						"5fb8646e-2418-4da2-9239-06d282f5e0d3"
 					]
 				}
 			},
@@ -413,7 +413,7 @@
 					"bearer": [
 						{
 							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiJ9.eyJnbG9iYWxpZCI6ImpvaG5kb2UiLCJzdWIiOiJlYTkxYzMwZS02YzI4LTQ3OTQtYjlhMS04ZGRkODQ3MWVhYzAiLCJjbGllbnRfaWQiOiIxNGFmNWE3Yi1kZjJiLTQyZDAtYjFmNC0xMjU4ZDA5MTY5ZWEiLCJzY29wZSI6InB1YmxpYyBrZXlzLm1hbmFnZSIsImdyb3VwcyI6W10sImV4cCI6MTY0NzU0OTI0NCwiaWF0IjoxNjQ3NTQ4NjQ0LCJpc3MiOiJodHRwczovL2lzcy51ZXIifQ.2rmHXpOk8zJZ19kL-DHtOwSMJRGSlgjUJyO-DgBjH_A",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJnbG9iYWxpZCI6ImpvaG5kb2UiLCJzdWIiOiJmZGU5ZWU4MS01YzFjLTQwMDktYWZmOC1jYWMwMzM2ZDI3NWYiLCJjbGllbnRfaWQiOiJhY2ZkZDBlMy1kNWFmLTQ3NjktYjgzNC1lMmQ1YWU0NjEyYmMiLCJzY29wZSI6InB1YmxpYyBrZXlzLm1hbmFnZSIsImdyb3VwcyI6W10sImV4cCI6MTY0NzkwMDM0NSwiaWF0IjoxNjQ3ODk5NzQ1LCJpc3MiOiJodHRwczovL2lzcy51ZXIifQ.0y4PKo0fPk2Ws_EjaNhfbG4SH6dJXHj4Jqfw-6ehmSg",
 							"type": "string"
 						}
 					]
@@ -454,7 +454,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"gid_uuid\": [\n    \"ea91c30e-6c28-4794-b9a1-8ddd8471eac0\"\n   ],\n  \"purpose\": \"status-db\"\n}",
+					"raw": "{\n  \"gid_uuid\": [\n    \"fde9ee81-5c1c-4009-aff8-cac0336d275f\"\n   ],\n  \"purpose\": \"status-db\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -474,6 +474,97 @@
 						"identity",
 						"keys",
 						"search"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "addPot",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"description\" : \"test8\",\n    \"soil_sensor_value\": 1,\n    \"plant_length\": 1,\n    \"lamp_status\": 1,\n    \"created_at\": \"2022-07-21T09:35:31.820Z\",\n    \"updated_at\": \"2022-07-21T09:35:31.820Z\",\n    \"container_id\": \"8c1a191a-b74d-49d3-a221-0548f46ffe2d\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/v1/pots",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"pots"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "updatePot",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"description\" : \"test18\",\n    \"soil_sensor_value\": 1,\n    \"plant_length\": 1,\n    \"lamp_status\": 1,\n    \"created_at\": \"2022-07-21T09:35:31.820Z\",\n    \"updated_at\": \"2022-07-21T09:35:31.820Z\",\n    \"container_id\": \"8c1a191a-b74d-49d3-a221-0548f46ffe2d\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/v1/pots/af4b4756-8ed0-417d-a68a-29c895f6417c",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"pots",
+						"af4b4756-8ed0-417d-a68a-29c895f6417c"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "addContainer",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n     \"pots\": [\n         {\n         \"id\" : \"7615f1a4-b134-11ec-b909-0242ac120002\"\n         },\n         {\n         \"id\" : \"85448fb4-b134-11ec-b909-0242ac120002\"\n         }\n         ],\n     \"user\": {\n         \"id\" : \"4f05c340-20db-4fef-9d95-b204044a8ff6\"\n     },\n     \"created_at\": \"2022-07-21T09:35:31.820Z\",\n     \"updated_at\": \"2022-07-21T09:35:31.820Z\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/v1/containers",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"containers"
 					]
 				}
 			},

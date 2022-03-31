@@ -1,13 +1,12 @@
-import {Column, Entity, OneToMany, PrimaryGeneratedColumn} from "typeorm";
+import {Column, Entity, OneToMany} from "typeorm";
 import {GpsEntity} from "./gps.entity";
 import {StatusEntity} from "./status.entity";
 import {UserActionEntity} from "./user_action.entity";
+import {BaseEntity} from "./base.entity";
+import {Container} from "./container.entity";
 
 @Entity({name: "user",synchronize: true})
-export class UserEntity {
-
-    @PrimaryGeneratedColumn()
-    id: number;
+export class UserEntity extends BaseEntity {
 
     @Column({nullable: false})
     username: string;
@@ -65,4 +64,9 @@ export class UserEntity {
 
     @OneToMany(() => UserActionEntity, user_action => user_action.user)
     actionList: UserActionEntity[];
+
+    @OneToMany(type => Container, container => container.user, {
+        cascade: true
+    })
+    containers: Container[];
 }

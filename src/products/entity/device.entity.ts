@@ -1,13 +1,11 @@
-import {Column, Entity, OneToOne, PrimaryGeneratedColumn} from "typeorm";
+import {Column, Entity, OneToOne} from "typeorm";
 import {UserEntity} from "./user.entity";
 import {CountryCodeEntity} from "./country_code.entity";
 import {DeviceModelEntity} from "./device_model.entity";
+import {BaseEntity} from "./base.entity";
 
 @Entity({name: "device", synchronize: true})
-export class DeviceEntity {
-
-    @PrimaryGeneratedColumn()
-    id: number;
+export class DeviceEntity extends BaseEntity {
 
     @Column({nullable: true})
     description: string;

@@ -1,11 +1,13 @@
 import {GpsDto} from "./gps.model";
 import {StatusDto} from "./status.model";
 import {UserActionDto} from "./user_action.model";
+import {BaseEntityInterface} from "../repositories/interface/base-entity.interface";
 
-export class UserDto {
-
+export class UserDto implements BaseEntityInterface{
     constructor(
-        public id: number,
+        public id: string,
+        public created_at: string,
+        public updated_at: string,
         public username: string,
         public pin: string,
         public name: string,
@@ -28,4 +30,6 @@ export class UserDto {
     ) {
 
     }
+
+
 }

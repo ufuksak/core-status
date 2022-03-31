@@ -1,10 +1,8 @@
-import {Column, Entity, PrimaryGeneratedColumn} from "typeorm";
+import {Column, Entity} from "typeorm";
+import {BaseEntity} from "./base.entity";
 
 @Entity({name: "region", synchronize: true})
-export class RegionEntity {
-
-    @PrimaryGeneratedColumn()
-    id: number;
+export class RegionEntity extends BaseEntity {
 
     @Column({nullable: true})
     center_lat: number;

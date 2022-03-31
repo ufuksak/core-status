@@ -15,6 +15,7 @@ const ormConfig: TypeOrmModuleOptions = {
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
   entities: [__dirname + '/**/*.entity{.ts,.js}'],
+  subscribers: [__dirname + '/**/*.subscriber{.ts,.js}'],
   synchronize: false,
   migrations: ['migrations/*.ts'],
   cli: {

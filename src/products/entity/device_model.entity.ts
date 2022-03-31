@@ -1,10 +1,8 @@
-import {Column, Entity, PrimaryGeneratedColumn} from "typeorm";
+import {Column, Entity} from "typeorm";
+import {BaseEntity} from "./base.entity";
 
 @Entity({name: "device_model", synchronize: true})
-export class DeviceModelEntity {
-
-    @PrimaryGeneratedColumn()
-    id: number;
+export class DeviceModelEntity extends BaseEntity {
 
     @Column({nullable: true})
     name: string;

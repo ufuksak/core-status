@@ -1,11 +1,9 @@
-import {Column, Entity, OneToOne, PrimaryGeneratedColumn} from "typeorm";
+import {Column, Entity, OneToOne} from "typeorm";
 import {DeviceModelEntity} from "./device_model.entity";
+import {BaseEntity} from "./base.entity";
 
 @Entity({name: "device_build", synchronize: true})
-export class DeviceBuildEntity {
-
-    @PrimaryGeneratedColumn()
-    id: number;
+export class DeviceBuildEntity extends BaseEntity {
 
     @OneToOne(() => DeviceModelEntity, deviceModel => deviceModel.id)
     dvc_model_id: DeviceModelEntity;

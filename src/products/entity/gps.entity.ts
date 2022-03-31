@@ -1,11 +1,9 @@
-import {Column, Entity, ManyToOne, PrimaryGeneratedColumn} from "typeorm";
+import {Column, Entity, ManyToOne} from "typeorm";
 import {UserEntity} from "./user.entity";
+import {BaseEntity} from "./base.entity";
 
 @Entity({name: "gps",synchronize: true})
-export class GpsEntity {
-
-    @PrimaryGeneratedColumn()
-    id: number;
+export class GpsEntity extends BaseEntity {
 
     @Column({nullable: false})
     device_id: string;

@@ -1,11 +1,9 @@
-import {Column, Entity,ManyToOne, PrimaryGeneratedColumn} from "typeorm";
+import {Column, Entity, ManyToOne} from "typeorm";
 import {UserEntity} from "./user.entity";
+import {BaseEntity} from "./base.entity";
 
-@Entity({name: "user_action",synchronize: true})
-export class UserActionEntity {
-
-    @PrimaryGeneratedColumn()
-    id: number;
+@Entity({name: "user_action", synchronize: true})
+export class UserActionEntity extends BaseEntity {
 
     @Column({nullable: false})
     name: string;
