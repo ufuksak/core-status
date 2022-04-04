@@ -1,15 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { UserService } from './user.service';
-import { UserRepository } from "../repositories/user.repository";
+import { UserService } from '../../src/products/services/user.service';
+import { UserRepository } from "../../src/products/repositories/user.repository";
 import { getRepositoryToken } from "@nestjs/typeorm";
-import { UserDto } from "../dto/user.model";
+import { UserDto } from "../../src/products/dto/user.model";
 import { v4 as uuid } from 'uuid';
-import { UserEntity } from '../entity/user.entity';
+import { UserEntity } from '../../src/products/entity/user.entity';
 
 describe('UserService', () => {
   let service: UserService;
   let userRepository: UserRepository;
-
+  let userList = [];
   beforeEach(async () => {
 
     const module: TestingModule = await Test.createTestingModule({
@@ -18,10 +18,13 @@ describe('UserService', () => {
         {
           provide: getRepositoryToken(UserRepository),
           useFactory: () => ({
-            saveUser: jest.fn(() => []),
-            getUsers: jest.fn(() => []),
-            getUserById: jest.fn(() => { }),
-            deleteUser: jest.fn(() => { }),
+            saveUser: jest.fn(user => {
+              userList.push(user);
+              return user?.id
+            }),
+            getUsers: jest.fn(() => userList),
+            getUserById: jest.fn((id) => userList.find(id)),
+            deleteUser: jest.fn((id) => userList = userList.filter(user => user.id !== id)),
           }),
         }
       ],
@@ -35,13 +38,13 @@ describe('UserService', () => {
   });
 
   it('insertUser method should return id of inserted user', async () => {
-    const userId = uuid();
-    userRepository.saveUser = jest.fn(async (dto) => dto.id = userId);
+    const id = uuid();
+    const userDto = {
+      id
+    } as UserDto;
 
-    const dto = {} as UserDto;
-    const response = await service.insertUser(dto);
-
-    expect(response).toEqual(userId);
+    const response = await service.insertUser(userDto);
+    expect(response).toEqual(id);
   });
 
   it('getAllUsers method should return all users', async () => {

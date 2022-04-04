@@ -1,14 +1,14 @@
 import { SetMetadata } from '@nestjs/common'
-import { Controller } from '@nestjs/common/interfaces'
 import { CallbackMethod, RABBITMQ_SUBSCRIBER, RabbitSubscriberConfig, RabbitSubscriberMetadataConfiguration } from './rabbit.interfaces'
 
-export const RabbitSubscribe = (config: RabbitSubscriberConfig) => {
-  return (target: Controller, propertyKey: string | symbol, descriptor: PropertyDescriptor): void => {
-    SetMetadata<string, RabbitSubscriberMetadataConfiguration>(RABBITMQ_SUBSCRIBER, {
+export const RabbitSubscribe = <T, U extends object>(config: RabbitSubscriberConfig<U>) => {
+  return (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor): void => {
+    SetMetadata<string, RabbitSubscriberMetadataConfiguration<T, U>>(RABBITMQ_SUBSCRIBER, {
       queue: config.queue,
+      options: config.options,
       target: target.constructor.name,
       methodName: propertyKey,
-      callback: <CallbackMethod<unknown>>descriptor.value,
+      callback: <CallbackMethod<T>>descriptor.value,
     })(target, propertyKey, descriptor)
   }
 }

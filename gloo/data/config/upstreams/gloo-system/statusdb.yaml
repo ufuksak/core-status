@@ -1,0 +1,43 @@
+metadata:
+  name: statusdb
+  namespace: gloo-system
+  resourceVersion: "4"
+namespacedStatuses:
+  statuses:
+    gloo-system:
+      reportedBy: gloo
+      state: Accepted
+static:
+  hosts:
+  - addr: host.docker.internal
+    port: 3000
+  serviceSpec:
+    rest:
+      swaggerInfo:
+        url: http://localhost:8080/swagger.json
+      transformations:
+        getUpload:
+          headers:
+            :method:
+              text: GET
+            :path:
+              text: /upload/users/{{ default(user_id, "") }}/file/{{ default(file_id, "") }}
+        postUpload:
+          body: {}
+          headers:
+            :method:
+              text: POST
+            :path:
+              text: /upload/users/{{ default(user_id, "") }}/file
+        modifyUpload:
+          headers:
+            :method:
+              text: PUT
+            :path:
+              text: /upload/users/{{ default(user_id, "") }}/file/{{ default(file_id, "") }}
+        deleteUpload:
+          headers:
+            :method:
+              text: DELETE
+            :path:
+              text: /upload/users/{{ default(user_id, "") }}/file

@@ -1,15 +1,17 @@
 import {Body, Controller, Delete, Get, Put, Param, Post} from "@nestjs/common";
 import {UserService} from "../services/user.service";
 import { StatusRequestBody, StatusResponseBody } from "../dto/status.model";
-import { UserDto } from "../dto/user.model";
 import { StatusService } from "../services/status.service";
+import { UserDto } from "../dto/user.model";
+import {UploadService} from "../services/upload.service";
 
 @Controller('/api/v1/users')
 export class UserController {
 
     constructor(
       private userService: UserService,
-      private statusService: StatusService
+      private statusService: StatusService,
+      private readonly uploadService: UploadService
     ) {}
 
     @Post()
@@ -30,18 +32,24 @@ export class UserController {
     }
 
     @Delete('/:id')
-    deleteUser(@Param('id') id: string) {
+    async deleteUser(@Param('id') id: string) {
+        const user = await this.userService.getUserById(id, {
+            relations: ['fileList']
+        });
+
+        await this.uploadService.deleteManyFromS3(user.fileList);
+
         return this.userService.deleteUser(id);
     }
 
     @Put('/:id/status')
     async updateStatus(@Param('id') id: string, @Body() body: StatusRequestBody) : Promise<StatusResponseBody> {
-      const { status_updates } = body;
+        const {status_updates} = body;
 
-      const saveStatus = await this.statusService.save(id, status_updates);
+        const saveStatus = await this.statusService.save(id, status_updates);
 
-      return {
-        status_updates: saveStatus
-      };
+        return {
+            status_updates: saveStatus
+        };
     }
 }

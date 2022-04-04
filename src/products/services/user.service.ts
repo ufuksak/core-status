@@ -3,11 +3,12 @@ import {InjectRepository} from "@nestjs/typeorm";
 import {UserRepository} from "../repositories/user.repository";
 import { StatusDto, StatusResponse } from "../dto/status.model";
 import { StatusEntity } from "../entity/status.entity";
-import { UserDto } from "../dto/user.model";
 import { FindOneOptions } from "typeorm";
+import { UserDto } from "../dto/user.model";
 import { UserEntity } from "../entity/user.entity";
 import {UserServiceInterface} from "../repositories/interface/user-service.interface";
 import {BaseService} from "./base.service";
+
 
 @Injectable()
 export class UserService extends BaseService implements UserServiceInterface {
@@ -26,6 +27,10 @@ export class UserService extends BaseService implements UserServiceInterface {
     }
 
     getUserById = async (id: string, options?: FindOneOptions<UserEntity>) => {
+        return await this.userRepo.getUserById(id, options);
+    }
+
+    getUserByIdWithRel = async (id: string, options?: FindOneOptions<UserEntity>): Promise<UserEntity> => {
         return await this.userRepo.getUserById(id, options);
     }
 

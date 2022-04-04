@@ -1,0 +1,29 @@
+version: '3.7'
+
+
+services:
+  redis:
+    extends:
+      file: ../../docker-compose.yaml
+      service: redis
+    container_name: redis-int
+
+  rabbitmq:
+    extends:
+      file: ../../docker-compose.yaml
+      service: rabbitmq
+    container_name: rabbitmq-int
+
+  localstack:
+    extends:
+      file: ../../docker-compose.yaml
+      service: localstack
+    container_name: localstack-int
+
+  crdb:
+    extends:
+      file: ../../docker-compose.yaml
+      service: crdb
+    container_name: crdb-int
+    volumes:
+      - "/data"

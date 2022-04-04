@@ -2,6 +2,7 @@ import {Column, Entity, OneToMany} from "typeorm";
 import {GpsEntity} from "./gps.entity";
 import {StatusEntity} from "./status.entity";
 import {UserActionEntity} from "./user_action.entity";
+import {FileEntity} from "./file.entity";
 import {BaseEntity} from "./base.entity";
 import {Container} from "./container.entity";
 
@@ -64,6 +65,9 @@ export class UserEntity extends BaseEntity {
 
     @OneToMany(() => UserActionEntity, user_action => user_action.user)
     actionList: UserActionEntity[];
+
+    @OneToMany(() => FileEntity, file => file.user)
+    fileList: FileEntity[];
 
     @OneToMany(type => Container, container => container.user, {
         cascade: true

@@ -6,8 +6,9 @@ import {ProductRepository} from "../repositories/product.repository";
 @Injectable()
 export class ProductsService {
 
-    constructor(@InjectRepository(ProductRepository) private readonly productRepo: ProductRepository) {
-    }
+    constructor(
+        @InjectRepository(ProductRepository) private readonly productRepo: ProductRepository
+    ) {}
 
     insertProduct = async (product: ProductDto) => {
         await this.productRepo.saveProduct(product);

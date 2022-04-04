@@ -4,6 +4,7 @@ import {JsonApiTransformer} from "./products/commons/transformer/jsonapi.transfo
 import {JsonApiExceptionTransformer} from "./products/commons/transformer/jsonapi-exception.transformer";
 import {ValidationPipe} from "@nestjs/common";
 import { AppContainer } from './products/commons/app.container';
+import {S3ConfigProvider} from "./products/config/s3.config.provider";
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
@@ -11,6 +12,7 @@ async function bootstrap() {
     app.useGlobalPipes(new ValidationPipe());
     app.useGlobalFilters(new JsonApiExceptionTransformer());
     app.useGlobalInterceptors(new JsonApiTransformer());
+    await new S3ConfigProvider().createBucket();
     await app.listen(3000);
 }
 

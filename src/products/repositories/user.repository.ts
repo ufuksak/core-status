@@ -1,6 +1,7 @@
 import {EntityRepository, FindOneOptions, Repository} from "typeorm";
-import { UserDto } from "../dto/user.model";
+import {UserDto} from "../dto/user.model";
 import {UserEntity} from "../entity/user.entity";
+import {NotFoundException} from "@nestjs/common";
 
 @EntityRepository(UserEntity)
 export class UserRepository extends Repository<UserEntity> {
@@ -14,7 +15,11 @@ export class UserRepository extends Repository<UserEntity> {
   }
 
   getUserById = async (id: string, options?: FindOneOptions<UserEntity>) => {
-    return await this.findOneOrFail(id, options);
+    const user = await this.findOne(id, options);
+    if(!user) {
+      throw new NotFoundException('user not found');
+    }
+    return user;
   }
 
   deleteUser = async (id: string) => {

@@ -1,4 +1,4 @@
-import { Controller, Get, Inject, Logger } from '@nestjs/common'
+import {Body, Controller, Get, Inject, Logger} from '@nestjs/common'
 import {QUEUE_NAME} from "../config/config";
 import {RabbitService} from "../services/rabbit.service";
 
@@ -11,11 +11,10 @@ export class ProducerController {
   }
 
   @Get()
-  triggerEvent(): string {
-    const msg = { a: 'test_message' }
-    this.rabbitService.publishMessage(QUEUE_NAME, msg)
-    Logger.log(`Sending message: ${JSON.stringify(msg)}`, 'TRIGGER_EVENT')
+  triggerEvent(@Body() message: string): string {
+    this.rabbitService.publishMessage('', QUEUE_NAME, message)
+    Logger.log(`Sending message: ${JSON.stringify(message)}`, 'TRIGGER_EVENT')
 
-    return `Sent ${JSON.stringify(msg)}`
+    return `Sent ${JSON.stringify(message)}`
   }
 }

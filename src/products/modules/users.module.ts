@@ -13,27 +13,32 @@ import {UserActionEntity} from "../entity/user_action.entity";
 import {RegionEntity} from "../entity/region.entity";
 import {StatusEntity} from "../entity/status.entity";
 import {TimezoneEntity} from "../entity/tz.entity";
+import {UploadImageModule} from "./uploadimage.module";
 import { StatusService } from "../services/status.service";
 
+
 @Module({
-    imports: [TypeOrmModule.forFeature([
-        UserEntity,
-        CountryCodeEntity,
-        DeviceEntity,
-        GpsEntity,
-        NotificationStatusEntity,
-        RegionEntity,
-        StatusEntity,
-        TimezoneEntity,
-        UserActionEntity,
-        UserRepository,
-        StatusRepository
-      ])],
+    imports: [
+        UploadImageModule,
+        TypeOrmModule.forFeature([
+            UserEntity,
+            CountryCodeEntity,
+            DeviceEntity,
+            GpsEntity,
+            NotificationStatusEntity,
+            RegionEntity,
+            StatusEntity,
+            TimezoneEntity,
+            UserActionEntity,
+            UserRepository,
+            StatusRepository
+        ])
+    ],
     controllers: [UserController],
     providers: [
       UserService,
       StatusService
     ]
 })
-export class UsersModule {
-}
+
+export class UsersModule {}

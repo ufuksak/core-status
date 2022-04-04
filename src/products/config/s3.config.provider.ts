@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import * as S3 from 'aws-sdk/clients/s3'
+import {Logger, Injectable} from "@nestjs/common";
+import * as S3 from 'aws-sdk/clients/s3';
 
 @Injectable()
 export class S3ConfigProvider {
@@ -29,9 +29,14 @@ export class S3ConfigProvider {
 
     createBucket(){
         this.getS3().createBucket({ Bucket: 'testbucket' },
-            (err, data) => { console.log(err, data) });
+            (err, data) => {
+            if(err && err.code !== 'BucketAlreadyOwnedByYou') {
+                Logger.error(err);
+            }
+            if(data) {
+                Logger.debug(data);
+            }
+            Logger.debug('bucket init')
+        });
     }
 }
-
-/* Create a bucket (run this once)*/
-//new S3ConfigProvider().createBucket();

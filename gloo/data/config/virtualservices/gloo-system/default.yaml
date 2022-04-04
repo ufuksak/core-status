@@ -1,0 +1,162 @@
+metadata:
+  name: default
+  namespace: gloo-system
+  resourceVersion: "20"
+namespacedStatuses:
+  statuses:
+    gloo-system:
+      reportedBy: gateway
+      state: Accepted
+      subresourceStatuses:
+        '*v1.Proxy.gateway-proxy_gloo-system':
+          reportedBy: gloo
+          state: Accepted
+virtualHost:
+  domains:
+  - '*'
+  routes:
+  - matchers:
+    - methods:
+      - POST
+      prefix: /api/v1/upload
+    options:
+      stagedTransformations:
+        early:
+          requestTransforms:
+          - requestTransformation:
+              transformationTemplate:
+                passthrough: {}
+    routeAction:
+      single:
+        destinationSpec:
+          rest:
+            functionName: postUpload
+            parameters: {}
+        upstream:
+          name: statusdb
+          namespace: gloo-system
+  - matchers:
+    - methods:
+      - PUT
+      prefix: /api/v1/upload
+    options:
+      stagedTransformations:
+        early:
+          requestTransforms:
+          - requestTransformation:
+              transformationTemplate:
+                passthrough: {}
+    routeAction:
+      single:
+        destinationSpec:
+          rest:
+            functionName: modifyUpload
+            parameters: {}
+        upstream:
+          name: statusdb
+          namespace: gloo-system
+  - matchers:
+    - methods:
+      - GET
+      prefix: /api/v1/upload
+    options:
+      stagedTransformations:
+        early:
+          requestTransforms:
+          - requestTransformation:
+              transformationTemplate:
+                passthrough: {}
+    routeAction:
+      single:
+        destinationSpec:
+          rest:
+            functionName: getUpload
+            parameters: {}
+        upstream:
+          name: statusdb
+          namespace: gloo-system
+  - matchers:
+    - methods:
+      - DELETE
+      prefix: /api/v1/upload
+    routeAction:
+      single:
+        destinationSpec:
+          rest:
+            functionName: deleteUpload
+            parameters: {}
+        upstream:
+          name: statusdb
+          namespace: gloo-system
+  - matchers:
+    - methods:
+      - DELETE
+      - GET
+      - PUT
+      - POST
+      prefix: /api/v1/users
+    routeAction:
+      single:
+        upstream:
+          name: statusdb
+          namespace: gloo-system
+  - matchers:
+    - methods:
+      - DELETE
+      - GET
+      - PUT
+      - POST
+      prefix: /api/v1/products
+    routeAction:
+      single:
+        upstream:
+          name: statusdb
+          namespace: gloo-system
+  - matchers:
+    - methods:
+      - DELETE
+      - GET
+      - PUT
+      - POST
+      prefix: /api/v1/channel
+    routeAction:
+      single:
+        upstream:
+          name: statusdb
+          namespace: gloo-system
+  - matchers:
+    - methods:
+      - DELETE
+      - GET
+      - PUT
+      - POST
+      prefix: /api/v1/channel
+    routeAction:
+      single:
+        upstream:
+          name: statusdb
+          namespace: gloo-system
+  - matchers:
+    - methods:
+      - DELETE
+      - GET
+      - PUT
+      - POST
+      prefix: /api/v1/identity
+    routeAction:
+      single:
+        upstream:
+          name: statusdb
+          namespace: gloo-system
+  - matchers:
+    - methods:
+      - DELETE
+      - GET
+      - PUT
+      - POST
+      prefix: /api/v1/producer
+    routeAction:
+      single:
+        upstream:
+          name: statusdb
+          namespace: gloo-system

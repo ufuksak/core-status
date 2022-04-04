@@ -1,11 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { UserController } from './user.controller';
-import { UserService } from '../services/user.service';
+import { UserController } from '../../src/products/controllers/user.controller';
+import { UserService } from '../../src/products/services/user.service';
 import { v4 as uuid } from 'uuid';
-import { UserDto } from "../dto/user.model";
-import { StatusDto, StatusRequestBody, StatusResponse, StatusResponseBody } from "../dto/status.model";
-import { UserEntity } from '../entity/user.entity';
-import { StatusService } from '../services/status.service';
+import { UserDto } from "../../src/products/dto/user.model";
+import { StatusDto, StatusRequestBody, StatusResponse, StatusResponseBody } from "../../src/products/dto/status.model";
+import { UserEntity } from '../../src/products/entity/user.entity';
+import { StatusService } from '../../src/products/services/status.service';
+import {UploadService} from "../../src/products/services/upload.service";
 
 describe("UserController Unit Tests", () => {
   let userController: UserController;
@@ -32,6 +33,10 @@ describe("UserController Unit Tests", () => {
           useFactory: () => ({
             save: jest.fn(() => []),
           }),
+        },
+        {
+          provide: UploadService,
+          useValue: {}
         }
       ],
     }).compile();

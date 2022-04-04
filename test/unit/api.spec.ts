@@ -3,8 +3,8 @@
 // tslint:disable:no-duplicate-imports
 // tslint:disable:max-func-body-length
 
-import { expect } from '../../../test/unit/setup'
-import { resetStubs, SANDBOX, SinonModuleStub, stubModule } from '../../../test/helpers'
+import { expect } from './setup'
+import { resetStubs, SANDBOX, SinonModuleStub, stubModule } from '../helpers'
 import {
   BlockedUser,
   BlocksResponse,
@@ -16,11 +16,11 @@ import {
   MessagesResponse,
   SendMessageResponse,
   SubscriptionResponse,
-} from '../model'
-import * as mocks from '../../../test/unit/mock'
-import { ApiService } from './api'
+} from '../../src/products/model'
+import * as mocks from './mock'
+import { ApiService } from '../../src/products/services/api'
 import axios, { AxiosInstance } from 'axios'
-import {ChannelWithParticipants} from "../dto/channel.model";
+import {ChannelWithParticipants} from "../../src/products/dto/channel.model";
 
 describe('API Service', () => {
   let service: ApiService

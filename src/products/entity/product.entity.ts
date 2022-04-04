@@ -1,5 +1,4 @@
 import {Column, Entity, PrimaryGeneratedColumn} from "typeorm";
-import {BaseEntity} from "./base.entity";
 
 @Entity({name: "product",synchronize: true})
 export class ProductEntity {

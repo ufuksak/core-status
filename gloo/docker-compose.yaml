@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+  gloo:
+    extends:
+      file: ../docker-compose.yaml
+      service: gloo
+    container_name: gloo-dev
+    volumes:
+    - ./data:/data/
+
+  gateway:
+    extends:
+      file: ../docker-compose.yaml
+      service: gateway
+    container_name: gateway-dev
+    volumes:
+    - ./data:/data/
+
+  gateway-proxy:
+    extends:
+      file: ../docker-compose.yaml
+      service: gateway-proxy
+    container_name: gateway-proxy-dev
+    volumes:
+    - ./data/envoy-config.yaml:/config/envoy.yaml:ro
+
+
+
+

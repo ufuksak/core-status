@@ -15,6 +15,12 @@ export const MULTI_CHANNEL_MIN_PARTICIPANTS: number = 3
 
 export const MULTI_CHANNEL_MAX_PARTICIPANTS: number = 37
 
+export const S3_READ_CHUNK_SIZE = 100 * 1024;
+
+export const S3_MAX_FILE_SIZE = 1024 * 1024 * 150;
+
+export const MAX_DB_FILE_SIZE = 2 * 1024;
+
 // eslint-disable-next-line @typescript-eslint/ban-types
 export function ParticipantsLength(): Function {
     // eslint-disable-next-line @typescript-eslint/ban-types
@@ -81,4 +87,12 @@ export function IsNotBlank(): PropertyDecorator {
             }
         })
     }
+}
+
+export function toYyyyMmDd(d: Date): string {
+    const month = d.getMonth() + 1;
+    const day = d.getDate();
+    const frmtdMonth = month < 10 ? `0${month}` : month;
+    const frmtdDay = day < 10 ? `0${day}` : day;
+    return `${d.getFullYear()}-${frmtdMonth}-${frmtdDay}`;
 }

@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { StatusService } from './status.service';
-import { StatusRepository } from "../repositories/status.repository";
+import { StatusService } from '../../src/products/services/status.service';
+import { StatusRepository } from "../../src/products/repositories/status.repository";
 import { getRepositoryToken } from "@nestjs/typeorm";
 import { v4 as uuid } from 'uuid';
 

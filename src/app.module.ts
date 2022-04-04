@@ -16,10 +16,8 @@ import {ContainerModule} from './products/modules/container.module';
 @Module({
     imports: [
         RabbitModule.registerAsync({
-            url: RABBIT_URI,
-            schema: {
-                queues: ['TESTING_QUEUE'],
-            },
+            exchanges: [],
+            url: RABBIT_URI
         }),
         ProducerModule,
         ConsumerModule,

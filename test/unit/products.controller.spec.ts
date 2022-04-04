@@ -1,9 +1,9 @@
 import {Test} from '@nestjs/testing';
-import {ProductsController} from '../src/products/controllers/products.controller';
-import {ProductsService} from '../src/products/services/products.service';
-import {ProductEntity} from "../src/products/entity/product.entity";
+import {ProductsController} from '../../src/products/controllers/products.controller';
+import {ProductsService} from '../../src/products/services/products.service';
+import {ProductEntity} from "../../src/products/entity/product.entity";
 import {getRepositoryToken} from "@nestjs/typeorm";
-import {ProductRepository} from "../src/products/repositories/product.repository";
+import {ProductRepository} from "../../src/products/repositories/product.repository";
 
 describe('Products Controller', () => {
     let productController: ProductsController;
@@ -34,7 +34,7 @@ describe('Products Controller', () => {
         it('should return all products', async () => {
             const result: ProductEntity[] = [
                 {
-                    "id": 2,
+                    "id": "2",
                     "title": "Masterning NestJS",
                     "description": "official book to learn and master NestJS",
                     "price": 23,
