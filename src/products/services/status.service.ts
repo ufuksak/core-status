@@ -28,4 +28,10 @@ export class StatusService {
         gid_uuid: userId,
       })) as StatusResponse[];
     }
+
+    delete = async (userId: string) => {
+        return await this.statusRepo
+            .createQueryBuilder()
+            .delete().andWhere('user_id = \'' + userId + '\'').execute();
+    }
 }

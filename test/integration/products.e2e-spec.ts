@@ -5,54 +5,52 @@ import {ProductsModule} from "../../src/products/modules/products.module";
 import {Repository} from "typeorm";
 import {ProductEntity} from "../../src/products/entity/product.entity";
 import * as supertest from "supertest";
+import config from './ormconfig';
+import {truncateEntity} from "./helpers";
 
-describe('UserController (e2e)', () => {
-    let userRepository: Repository<ProductEntity>;
+describe('ProductController (e2e)', () => {
+    let testRepository: Repository<ProductEntity>;
     let app: INestApplication;
 
     beforeAll(async () => {
+        const configWithEntity = {...config, entities: [ProductEntity]};
         const moduleFixture: TestingModule = await Test.createTestingModule({
             imports: [
                 ProductsModule,
-                TypeOrmModule.forRoot({
-                    type: 'sqlite',
-                    database: ':memory:',
-                    entities: [ProductEntity],
-                    logging: true,
-                    synchronize: true,
-                }),
+                TypeOrmModule.forRoot(configWithEntity),
             ],
         }).compile();
 
         app = moduleFixture.createNestApplication();
         await app.init();
-        userRepository = moduleFixture.get('ProductRepository');
+        testRepository = moduleFixture.get('ProductRepository');
+    });
+
+    beforeEach(async () => {
+        await truncateEntity(ProductEntity);
     });
 
     afterAll(async () => {
         await app.close();
     });
 
-    afterEach(async () => {
-        await userRepository.query('DELETE FROM product');
-    });
-
     describe('GET /api/v1/products', () => {
         it('should return an array of users', async () => {
-            // Pre-populate the DB with some dummy users
-            await userRepository.save([
-                {
-                    title: "test3",
-                    description: "desc3",
-                    price: 150,
-                    unit: "television"
-                },
-                {
-                    title: "test4",
-                    description: "desc4",
-                    price: 150,
-                    unit: "phone"
-                }
+            const data1 = {
+                title: "test3",
+                description: "desc3",
+                price: 150,
+                unit: "television"
+            };
+            const data2 = {
+                title: "test3",
+                description: "desc3",
+                price: 150,
+                unit: "television"
+            };
+            await testRepository.save([
+                data1,
+                data2
             ]);
 
             // Run your end-to-end test
@@ -63,8 +61,8 @@ describe('UserController (e2e)', () => {
                 .expect(200);
 
             expect(body).toEqual([
-                {id: expect.any(String), title: 'test3', description: "desc3", price: 150, unit: "television"},
-                {id: expect.any(String), title: 'test4', description: "desc4", price: 150, unit: "phone"}
+                {...data1, id: expect.any(String)},
+                {...data2, id: expect.any(String)}
             ]);
         });
     });

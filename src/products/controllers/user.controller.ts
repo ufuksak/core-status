@@ -4,6 +4,7 @@ import { StatusRequestBody, StatusResponseBody } from "../dto/status.model";
 import { StatusService } from "../services/status.service";
 import { UserDto } from "../dto/user.model";
 import {UploadService} from "../services/upload.service";
+import {StatusEntity} from "../entity/status.entity";
 
 @Controller('/api/v1/users')
 export class UserController {
@@ -36,8 +37,8 @@ export class UserController {
         const user = await this.userService.getUserById(id, {
             relations: ['fileList']
         });
-
         await this.uploadService.deleteManyFromS3(user.fileList);
+        await this.statusService.delete(id);
 
         return this.userService.deleteUser(id);
     }
