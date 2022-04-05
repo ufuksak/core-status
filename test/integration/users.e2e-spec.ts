@@ -68,6 +68,27 @@ describe('UserController (e2e)', () => {
         ]
     };
 
+    const output1 = {
+        "username": "ufuksakar",
+        "pin": "pin",
+        "name": "ufuk",
+        "surname": "sakar",
+        "address_line_1": "test address1",
+        "address_line_2": "address2",
+        "city": "Istanbul",
+        "state_province": "-",
+        "postal_code": "34000",
+        "country": "Turkey",
+        "phone_num": "00905557035175",
+        "mobile_num": "00905557035175",
+        "fax_num": "-",
+        "created_at": expect.any(String),
+        "updated_at": expect.any(String),
+        "available_utc": null,
+        "last_connection_utc": null,
+        "last_status_utc": null
+    };
+
     beforeAll(async () => {
         const configWithEntity = {
             ...config, entities: [UserEntity,
@@ -122,26 +143,6 @@ describe('UserController (e2e)', () => {
 
     describe('GET /api/v1/users', () => {
         it('should return an array of users', async () => {
-            const output1 = {
-                "username": "ufuksakar",
-                "pin": "pin",
-                "name": "ufuk",
-                "surname": "sakar",
-                "address_line_1": "test address1",
-                "address_line_2": "address2",
-                "city": "Istanbul",
-                "state_province": "-",
-                "postal_code": "34000",
-                "country": "Turkey",
-                "phone_num": "00905557035175",
-                "mobile_num": "00905557035175",
-                "fax_num": "-",
-                "created_at": expect.any(String),
-                "updated_at": expect.any(String),
-                "available_utc": null,
-                "last_connection_utc": null,
-                "last_status_utc": null
-            };
             await testRepository.save([
                 data1
             ]);
@@ -188,6 +189,94 @@ describe('UserController (e2e)', () => {
                 .expect(200);
 
             await verifyDeleted(body, output1);
+        });
+    });
+
+    describe('POST /api/v1/users', () => {
+        it('should verify the user is added', async () => {
+
+            const {body} = await supertest.agent(app.getHttpServer())
+                .post('/api/v1/users')
+                .set('Accept', 'application/json')
+                .send(data1)
+                .expect('Content-Type', /json/)
+                .expect(201);
+
+            expect(body).toEqual({id: expect.any(String)});
+        });
+    });
+
+    async function verifyGetUserById(bodyGetResponse) {
+        const {body} = await supertest.agent(app.getHttpServer())
+            .get('/api/v1/users/' + bodyGetResponse.id)
+            .set('Accept', 'application/json')
+            .expect('Content-Type', /json/)
+            .expect(200);
+
+        expect(body).toEqual({...output1, id: expect.any(String)});
+    }
+
+    describe('GET /api/v1/users/:id', () => {
+        it('should return a specific user', async () => {
+            const {body} = await supertest.agent(app.getHttpServer())
+                .post('/api/v1/users')
+                .set('Accept', 'application/json')
+                .send(data1)
+                .expect('Content-Type', /json/)
+                .expect(201);
+
+            expect(body).toEqual({id: expect.any(String)});
+
+            await verifyGetUserById(body);
+        });
+    });
+
+    async function verifyStatusIsUpdatedByUserId(bodyUserResponse) {
+        const dataStatus = {
+            "uuid": "4f05c340-20db-4fef-9d95-b204044a8ff6",
+            "type": "Available",
+            "recorded_at": "2022-07-21T09:35:31.820Z",
+            "uploaded_at": "2022-07-21T09:35:31.820Z",
+            "encrypted_payload": "payload"
+        };
+
+        const inputStatus = {
+            "status_updates": [
+                dataStatus
+            ]
+        };
+
+        const outputStatusExpected = {
+            "uuid": expect.any(String),
+            "gid_uuid": expect.any(String),
+            "type": "Available",
+            "recorded_at": "2022-07-21T09:35:31.820Z",
+            "encrypted_payload": "payload"
+        };
+        const outputStatusExpectedWithId = {...outputStatusExpected, user_id: bodyUserResponse.id};
+
+        const {body} = await supertest.agent(app.getHttpServer())
+            .put('/api/v1/users/' + bodyUserResponse.id + '/status')
+            .set('Accept', 'application/json')
+            .send(inputStatus)
+            .expect('Content-Type', /json/)
+            .expect(200);
+
+        expect(body).toEqual({"status_updates": [outputStatusExpectedWithId]});
+    }
+
+    describe('PUT /api/v1/users/:id/status', () => {
+        it('should update the status for the specific user', async () => {
+            const {body} = await supertest.agent(app.getHttpServer())
+                .post('/api/v1/users')
+                .set('Accept', 'application/json')
+                .send(data1)
+                .expect('Content-Type', /json/)
+                .expect(201);
+
+            expect(body).toEqual({id: expect.any(String)});
+
+            await verifyStatusIsUpdatedByUserId(body);
         });
     });
 });
