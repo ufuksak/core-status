@@ -7,7 +7,7 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn
 } from "typeorm";
-import {Exclude} from "class-transformer";
+import {classToPlain, Exclude} from "class-transformer";
 import {UserEntity} from "./user.entity";
 
 export enum PayloadType {
@@ -69,4 +69,11 @@ export class FileEntity {
         name: 'user_id'
     })
     user: UserEntity;
+
+    toJSON() {
+        const result = classToPlain(this);
+        result['updated_at'] = this.updated_at.toISOString();
+        result['created_at'] = this.created_at.toISOString();
+        return result;
+    }
 }

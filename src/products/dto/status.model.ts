@@ -1,19 +1,14 @@
-
-import {
-  IsArray,
-  IsDateString,
-  IsEnum,
-  IsNotEmpty,
-  IsUUID,
-  ValidateNested,
-} from "class-validator";
-import { Type } from "micro-kit-atlas/dist/routing";
+import {Message} from "@globalid/nest-amqp";
+import {Type} from "class-transformer";
+import {IsArray, IsDateString, IsEnum, IsNotEmpty, IsUUID, ValidateNested,} from "class-validator";
+import {STATUS_UPDATE_EXCHANGE} from "../config/rabbit";
 
 export enum StatusTypes {
   AVAILABLE = 'Available',
   NOT_AVAILABLE = 'Not Available'
 }
 
+@Message({ name: STATUS_UPDATE_EXCHANGE })
 export class StatusDto {
   @IsUUID('4')
   @IsNotEmpty()

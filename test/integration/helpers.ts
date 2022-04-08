@@ -1,5 +1,5 @@
 import {getConnection} from 'typeorm'
-import {AmqpTestService} from '@globalid/nest-amqp'
+import {AmqpTestService, MessageHandler} from '@globalid/nest-amqp'
 import {JwtService} from '@nestjs/jwt'
 import {mockTokenData, TokenData} from '@globalid/nest-auth'
 

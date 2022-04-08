@@ -7,7 +7,6 @@ import {Repository} from 'typeorm/repository/Repository';
 import {SelectQueryBuilder} from 'typeorm/query-builder/SelectQueryBuilder';
 
 export abstract class BaseService implements BaseServiceInterface {
-
     public repository: Repository<BaseEntityInterface>;
 
     async find(options?: QueryOptions): Promise<BaseEntityInterface[]> {

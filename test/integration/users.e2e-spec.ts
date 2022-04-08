@@ -1,11 +1,8 @@
 import {INestApplication} from "@nestjs/common";
-import {TypeOrmModule} from "@nestjs/typeorm";
 import {Test, TestingModule} from "@nestjs/testing";
-import {UsersModule} from "../../src/products/modules/users.module";
 import {getConnection, Repository} from "typeorm";
 import {UserEntity} from "../../src/products/entity/user.entity";
 import * as supertest from "supertest";
-import config from './ormconfig';
 import {truncateEntity} from "./helpers";
 import {CountryCodeEntity} from "../../src/products/entity/country_code.entity";
 import {DeviceEntity} from "../../src/products/entity/device.entity";
@@ -15,18 +12,37 @@ import {RegionEntity} from "../../src/products/entity/region.entity";
 import {StatusEntity} from "../../src/products/entity/status.entity";
 import {TimezoneEntity} from "../../src/products/entity/tz.entity";
 import {UserActionEntity} from "../../src/products/entity/user_action.entity";
-import {StatusRepository} from "../../src/products/repositories/status.repository";
-import {UserRepository} from "../../src/products/repositories/user.repository";
 import {FileEntity} from "../../src/products/entity/file.entity";
 import {Container} from "../../src/products/entity/container.entity";
 import {Pot} from "../../src/products/entity/pot.entity";
 import {DeviceModelEntity} from "../../src/products/entity/device_model.entity";
-import {PotModule} from "../../src/products/modules/pot.module";
-import {ContainerModule} from "../../src/products/modules/container.module";
+import {MessageHandler} from "@globalid/nest-amqp";
+import waitForExpect from "wait-for-expect";
+import {UserDto} from "../../src/products/dto/user.model";
+import {AppUsersTestModule} from "./app.users.test.module";
+
+class Handlers {
+    collectedMessages: [] = []
+
+    getCollectedMessages(): string[] {
+        return [...this.collectedMessages]
+    }
+
+    clearCollectedMessages(): void {
+        this.collectedMessages = [];
+    }
+
+    @MessageHandler({})
+    async updateAdd(evt: UserDto): Promise<void> {
+        this.collectedMessages.push(evt as never)
+    }
+}
+
 
 describe('UserController (e2e)', () => {
     let testRepository: Repository<UserEntity>;
     let app: INestApplication;
+    let handlers: Handlers = null;
 
     const data1 = {
         "username": "ufuksakar",
@@ -90,34 +106,14 @@ describe('UserController (e2e)', () => {
     };
 
     beforeAll(async () => {
-        const configWithEntity = {
-            ...config, entities: [UserEntity,
-                CountryCodeEntity,
-                DeviceEntity,
-                DeviceModelEntity,
-                GpsEntity,
-                NotificationStatusEntity,
-                RegionEntity,
-                StatusEntity,
-                TimezoneEntity,
-                UserActionEntity,
-                UserRepository,
-                StatusRepository,
-                FileEntity,
-                Container,
-                Pot]
-        };
         const moduleFixture: TestingModule = await Test.createTestingModule({
-            imports: [
-                UsersModule,
-                PotModule,
-                ContainerModule,
-                TypeOrmModule.forRoot(configWithEntity),
-            ],
+            imports: [AppUsersTestModule],
+            providers: [Handlers]
         }).compile();
 
         app = moduleFixture.createNestApplication();
         await app.init();
+        handlers = app.get<Handlers>(Handlers);
         testRepository = getConnection().getRepository(UserEntity);
     });
 
@@ -203,6 +199,12 @@ describe('UserController (e2e)', () => {
                 .expect(201);
 
             expect(body).toEqual({id: expect.any(String)});
+
+            await waitForExpect(() => {
+                expect(handlers.getCollectedMessages()[0]['id']).toEqual(expect.any(String))
+            })
+
+            handlers.clearCollectedMessages();
         });
     });
 

@@ -1,10 +1,11 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { UserService } from '../../src/products/services/user.service';
-import { UserRepository } from "../../src/products/repositories/user.repository";
-import { getRepositoryToken } from "@nestjs/typeorm";
-import { UserDto } from "../../src/products/dto/user.model";
-import { v4 as uuid } from 'uuid';
-import { UserEntity } from '../../src/products/entity/user.entity';
+import {Test, TestingModule} from '@nestjs/testing';
+import {UserService} from '../../src/products/services/user.service';
+import {UserRepository} from "../../src/products/repositories/user.repository";
+import {getRepositoryToken} from "@nestjs/typeorm";
+import {UserDto} from "../../src/products/dto/user.model";
+import {v4 as uuid} from 'uuid';
+import {UserEntity} from '../../src/products/entity/user.entity';
+import {UserPublisher} from "../../src/products/rabbit/user.publisher";
 
 describe('UserService', () => {
   let service: UserService;
@@ -15,6 +16,12 @@ describe('UserService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         UserService,
+        {
+          provide: UserPublisher,
+          useValue: {
+            publishUserUpdate: jest.fn((updated) => {})
+          }
+        },
         {
           provide: getRepositoryToken(UserRepository),
           useFactory: () => ({

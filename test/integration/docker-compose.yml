@@ -1,5 +1,7 @@
 version: '3.7'
 
+volumes:
+  postgres-int:
 
 services:
   redis:
@@ -20,10 +22,12 @@ services:
       service: localstack
     container_name: localstack-int
 
-  crdb:
+  postgres:
     extends:
       file: ../../docker-compose.yaml
-      service: crdb
-    container_name: crdb-int
+      service: postgres
+    container_name: postgres-int
     volumes:
-      - "/data"
+      - postgres-int:/var/lib/postgresql
+      - postgres-int:/var/log/postgresql
+      - ./pg_init.sql:/docker-entrypoint-initdb.d/10-init.sql

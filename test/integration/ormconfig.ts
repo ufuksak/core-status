@@ -14,7 +14,8 @@ const ormConfig: TypeOrmModuleOptions = {
     username: 'user_messaging',
     password: 'e5YGE3cQ2ysqHesT',
     database: 'test_messaging',
-    synchronize: true
+    synchronize: true,
+    dropSchema: true
 };
 
 export default ormConfig;

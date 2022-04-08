@@ -8,17 +8,22 @@ import { UserDto } from "../dto/user.model";
 import { UserEntity } from "../entity/user.entity";
 import {UserServiceInterface} from "../repositories/interface/user-service.interface";
 import {BaseService} from "./base.service";
+import {UserPublisher} from "../rabbit/user.publisher";
 
 
 @Injectable()
 export class UserService extends BaseService implements UserServiceInterface {
 
-    constructor(@InjectRepository(UserRepository) private readonly userRepo: UserRepository) {
+    constructor(
+        @InjectRepository(UserRepository) private readonly userRepo: UserRepository,
+        private readonly publisher: UserPublisher
+    ) {
         super();
     }
 
     insertUser = async (user: UserDto) => {
         await this.userRepo.saveUser(user);
+        await this.publisher.publishUserUpdate(user);
         return user.id;
     }
 

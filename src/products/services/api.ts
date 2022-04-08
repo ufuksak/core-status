@@ -17,7 +17,8 @@ import {
   BlockedUser,
 } from '../model'
 import {Injectable} from "@nestjs/common";
-import {ChannelWithParticipants} from "../dto/channel.model";
+import {AddChannelBody, ChannelWithParticipants} from "../dto/channel.model";
+import {ChannelPublisher} from "../rabbit/channel.publisher";
 
 @Injectable()
 export class ApiService {
@@ -28,7 +29,7 @@ export class ApiService {
   private accessToken : string
   private readonly client: AxiosInstance
 
-  constructor () {
+  constructor (private readonly channelPublisher: ChannelPublisher) {
     this.client = this.createHttpClient()
   }
 
@@ -106,9 +107,11 @@ export class ApiService {
     return this.getResponseData(await this.client.post<ChannelsResponse>('/channels/search', { participants }))
   }
 
-  public async createChannel (token: string, channelPayload: ChannelPayload): Promise<ChannelWithParticipants> {
+  public async createChannel (token: string, channelPayload: AddChannelBody): Promise<ChannelWithParticipants> {
     this.accessToken = token;
-    return this.getResponseData(await this.client.post<ChannelWithParticipants>('/channels', channelPayload))
+    const result = await this.getResponseData(await this.client.post<ChannelWithParticipants>('/channels', channelPayload))
+    await this.channelPublisher.publishChannelUpdate(channelPayload);
+    return result
   }
 
   public async getMessages (channelId: string, page: number = 1, perPage: number = 20): Promise<MessagesResponse> {

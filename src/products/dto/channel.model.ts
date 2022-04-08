@@ -19,6 +19,8 @@ import {
     ValidateNested
 } from "class-validator";
 import {IsArrayOf, IsEnum, IsInstanceOf, OrNull, OrUndefined} from "micro-kit-atlas/routing";
+import {CHANNEL_UPDATE_EXCHANGE} from "../config/rabbit";
+import { Message } from "@globalid/nest-amqp";
 
 export const MAX_MESSAGE_LENGTH: number = 30000
 
@@ -315,6 +317,7 @@ export class Channel implements ChannelDto {
     @IsEnum(() => PrivacyType) privacy_type!: PrivacyType
 }
 
+@Message({ name: CHANNEL_UPDATE_EXCHANGE})
 export class AddChannelBody implements AddChannel {
     @IsArray() @ArrayUnique() @ArrayNotEmpty()
     @IsUUID('4', {each: true})

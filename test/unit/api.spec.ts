@@ -3,12 +3,11 @@
 // tslint:disable:no-duplicate-imports
 // tslint:disable:max-func-body-length
 
-import { expect } from './setup'
-import { resetStubs, SANDBOX, SinonModuleStub, stubModule } from '../helpers'
+import {expect} from './setup'
+import {resetStubs, SANDBOX, SinonModuleStub, stubModule} from '../helpers'
 import {
   BlockedUser,
   BlocksResponse,
-  Channel,
   ChannelsResponse,
   CountersResponse,
   MessageDeliveredResponse,
@@ -18,15 +17,17 @@ import {
   SubscriptionResponse,
 } from '../../src/products/model'
 import * as mocks from './mock'
-import { ApiService } from '../../src/products/services/api'
-import axios, { AxiosInstance } from 'axios'
+import {ApiService} from '../../src/products/services/api'
+import axios, {AxiosInstance} from 'axios'
 import {ChannelWithParticipants} from "../../src/products/dto/channel.model";
+import {Test, TestingModule} from '@nestjs/testing'
+import {ChannelPublisher} from "../../src/products/rabbit/channel.publisher";
 
 describe('API Service', () => {
   let service: ApiService
   let axiosStub: SinonModuleStub<AxiosInstance>
 
-  beforeEach(() => {
+  beforeEach(async () => {
     resetStubs()
 
     axiosStub = stubModule(axios, ['defaults', 'interceptors'])
@@ -37,7 +38,20 @@ describe('API Service', () => {
       ...axiosStub,
     })
 
-    service = new ApiService()
+    // service = new ApiService()
+
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        ApiService,
+        {
+          provide: ChannelPublisher,
+          useValue: {
+            publishChannelUpdate: jest.fn((updated) => {})
+          }
+        },
+      ],
+    }).compile();
+    service = await module.get<ApiService>(ApiService);
   })
 
   describe('#getSubscriptions', () => {

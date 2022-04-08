@@ -9,6 +9,7 @@ import {Readable} from "stream";
 import {FileEntity} from "../../src/products/entity/file.entity";
 import {FindOneOptions} from "typeorm";
 import {UploadService} from "../../src/products/services/upload.service";
+import {UploadPublisher} from "../../src/products/rabbit/uploads.publisher";
 
 
 const mockUserId = "748964969432547329";
@@ -74,6 +75,12 @@ describe('UploadSerivce', () => {
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 UploadService,
+                {
+                    provide: UploadPublisher,
+                    useValue: {
+                        publishUploadUpdate: jest.fn((update) => {})
+                    }
+                },
                 {
                     provide: getRepositoryToken(FileRepository),
                     useValue: {
@@ -189,12 +196,12 @@ describe('UploadSerivce', () => {
                 deleteFile.mockImplementation(async (id) => {
                     const maybeFound = storage[id];
                     if(maybeFound) {
-                        const ret = {
+                        const result = {
                             value: maybeFound,
                             status: 'fulfilled'
                         }
                         delete storage[id];
-                        return ret
+                        return result
                     } else {
                         return {
                             value: {},
@@ -216,19 +223,19 @@ describe('UploadSerivce', () => {
             it('non-existing not deleted', async () => {
                 const randomFile = uuid();
 
-                const ret = await service.deleteMany(mockUserId, [randomFile]);
-                expect(ret.deleted.length)
+                const result = await service.deleteMany(mockUserId, [randomFile]);
+                expect(result.deleted.length)
                     .toEqual(0);
-                expect(ret.notDeleted.length)
+                expect(result.notDeleted.length)
                     .toEqual(1);
             });
 
             it('existing deleted', async () => {
                 const randomFile = uuid();
-                const ret = await service.deleteMany(mockUserId, [smallFileMockId, randomFile]);
-                expect(ret.deleted.length)
+                const result = await service.deleteMany(mockUserId, [smallFileMockId, randomFile]);
+                expect(result.deleted.length)
                     .toEqual(1);
-                expect(ret.notDeleted.length)
+                expect(result.notDeleted.length)
                     .toEqual(1);
             });
         });

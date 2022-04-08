@@ -5,13 +5,14 @@ import {BadRequestException, Logger, NotFoundException} from "@nestjs/common";
 import {Request} from 'express';
 import {S3} from "aws-sdk";
 import {S3ConfigProvider} from "../config/s3.config.provider";
-import {ImageResponseDTO} from "../dto/upload.model";
+import {ImageResponseDTO, UploadDto} from "../dto/upload.model";
 import {FileRepository} from "../repositories/file.repository";
 import {FileEntity, PayloadType} from "../entity/file.entity";
 import {MAX_DB_FILE_SIZE, S3_MAX_FILE_SIZE, S3_READ_CHUNK_SIZE, toYyyyMmDd} from "../util/util";
 import {InteractiveS3Stream} from "../util/interactive-stream";
 import {Readable} from "stream";
 import {UserRepository} from "../repositories/user.repository";
+import {UploadPublisher} from "../rabbit/uploads.publisher";
 
 
 export class UploadService {
@@ -21,7 +22,8 @@ export class UploadService {
 
     constructor(
         @InjectRepository(FileRepository) private readonly fileRepo: FileRepository,
-        @InjectRepository(UserRepository) private readonly userRepo: UserRepository
+        @InjectRepository(UserRepository) private readonly userRepo: UserRepository,
+        private readonly publisher: UploadPublisher
     ) {
         this.s3Provider = new S3ConfigProvider();
         this.s3ReadChunkSize = S3_READ_CHUNK_SIZE;
@@ -116,25 +118,27 @@ export class UploadService {
 
         }
 
-        return this.fileRepo.saveFile(file);
+        const result = await this.fileRepo.saveFile(file);
+        await this.publisher.publishUploadUpdate(result.toJSON() as UploadDto);
+        return result;
     }
 
     async deleteManyFromS3(files: FileEntity[]) : Promise<FileEntity[]> {
-        const ret = [];
+        const result = [];
         await Promise.allSettled(
             files.map(async file => {
                 if(file.type === PayloadType.lockbox) {
                     return this.deleteS3(file.key, file.bucket);
                 }
             })
-        ).then(results => results.forEach(result => {
-            if (result.status === 'fulfilled') {
-                ret.push(result.value);
+        ).then(results => results.forEach(el => {
+            if (el.status === 'fulfilled') {
+                result.push(el.value);
             } else {
-                Logger.error(result.status, result.reason);
+                Logger.error(el.status, el.reason);
             }
         }));
-        return ret;
+        return result;
     }
 
     async deleteMany(user_id: string, ids: string[])

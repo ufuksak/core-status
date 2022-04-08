@@ -4,6 +4,7 @@ import {ProductsService} from '../../src/products/services/products.service';
 import {ProductEntity} from "../../src/products/entity/product.entity";
 import {getRepositoryToken} from "@nestjs/typeorm";
 import {ProductRepository} from "../../src/products/repositories/product.repository";
+import {ProductsPublisher} from "../../src/products/rabbit/products.publisher";
 
 describe('Products Controller', () => {
     let productController: ProductsController;
@@ -12,15 +13,15 @@ describe('Products Controller', () => {
 
     beforeAll(async () => {
         const module = await Test.createTestingModule({
-            imports: [ProductRepository],
             controllers: [ProductsController],
             providers: [
               ProductsService,
+              ProductRepository,
               {
-                provide: getRepositoryToken(ProductRepository),
-                useFactory: () => ({
-                  getProducts: jest.fn(() => []),
-                }),
+                  provide: ProductsPublisher,
+                  useValue: {
+                      publishProductUpdate: jest.fn((update) => {})
+                  }
               }
             ],
         }).compile();

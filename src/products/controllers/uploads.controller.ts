@@ -11,13 +11,12 @@ import {
     Put,
     Query,
     Req,
-    Res,
     StreamableFile,
     UseFilters,
     UseInterceptors
 } from '@nestjs/common';
 import {ApiResponse} from '@nestjs/swagger';
-import {Request, Response} from 'express';
+import {Request} from 'express';
 import {ImageResponseDTO} from '../dto/upload.model';
 import {MassDeleteDto, ParamUserId, ParamUUID4Dto, UploadQueryDto} from "../dto/s3file.model";
 import {UploadService} from "../services/upload.service";
@@ -27,7 +26,7 @@ import {UploadExceptionFilter} from "../util/upload-exception-filter";
 @Controller('/api/v1/upload')
 @UseFilters(UploadExceptionFilter)
 @UseInterceptors(ClassSerializerInterceptor)
-export class UploadImageController {
+export class UploadsController {
 
     constructor(
         private readonly uploadImageService: UploadService

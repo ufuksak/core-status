@@ -7,6 +7,7 @@ export class FileRepository extends Repository<FileEntity> {
 
     saveFile = async (file: FileEntity) : Promise<FileEntity> => {
         await this.save(file);
+        delete file['data'];
         return file;
     }
 

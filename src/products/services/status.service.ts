@@ -2,28 +2,30 @@ import {Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import { StatusDto, StatusResponse } from "../dto/status.model";
 import { StatusRepository } from "../repositories/status.repository";
+import {StatusPublisher} from "../rabbit/status.publisher";
 
 @Injectable()
 export class StatusService {
 
     constructor(
-      @InjectRepository(StatusRepository) private readonly statusRepo: StatusRepository
+      @InjectRepository(StatusRepository) private readonly statusRepo: StatusRepository,
+      private readonly statusPublisher: StatusPublisher
     ) {}
 
-    save = async (userId: string, status: StatusDto[]): Promise<StatusResponse[]> => {
-      const statusEntities = status.map(status => ({
-        ...status,
-        user_id: userId
-      }));
+    save = async (userId: string, statuses: StatusDto[]): Promise<StatusResponse[]> => {
+      for(const status of statuses) {
+          status['user_id'] = userId;
+          await this.statusPublisher.publishStatusUpdate(status);
+      }
 
       const result = await this.statusRepo
           .createQueryBuilder()
           .insert()
           .orIgnore()
-          .values(statusEntities).execute();
+          .values(statuses).execute();
 
       return result.generatedMaps.map((generatedColumns, index) => ({
-        ...statusEntities[index],
+        ...statuses[index],
         uploaded_at: generatedColumns.uploaded_at,
         gid_uuid: userId,
       })) as StatusResponse[];

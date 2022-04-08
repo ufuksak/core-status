@@ -2,7 +2,10 @@ import {GpsDto} from "./gps.model";
 import {StatusDto} from "./status.model";
 import {UserActionDto} from "./user_action.model";
 import {BaseEntityInterface} from "../repositories/interface/base-entity.interface";
+import {USER_UPDATE_EXCHANGE} from "../config/rabbit";
+import {Message} from "@globalid/nest-amqp";
 
+@Message({name: USER_UPDATE_EXCHANGE})
 export class UserDto implements BaseEntityInterface{
     constructor(
         public id: string,

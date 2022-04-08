@@ -1,8 +1,9 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { StatusService } from '../../src/products/services/status.service';
-import { StatusRepository } from "../../src/products/repositories/status.repository";
-import { getRepositoryToken } from "@nestjs/typeorm";
-import { v4 as uuid } from 'uuid';
+import {Test, TestingModule} from '@nestjs/testing';
+import {StatusService} from '../../src/products/services/status.service';
+import {StatusRepository} from "../../src/products/repositories/status.repository";
+import {getRepositoryToken} from "@nestjs/typeorm";
+import {v4 as uuid} from 'uuid';
+import {StatusPublisher} from "../../src/products/rabbit/status.publisher";
 
 describe('StatusService', () => {
   let service: StatusService;
@@ -25,6 +26,12 @@ describe('StatusService', () => {
           useFactory: jest.fn(() => ({
             createQueryBuilder: jest.fn(() => queryBuilder),
           })),
+        },
+        {
+          provide: StatusPublisher,
+          useValue: {
+            publishStatusUpdate: jest.fn((update) => {})
+          }
         }
       ],
     }).compile();
