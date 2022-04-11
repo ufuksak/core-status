@@ -72,11 +72,7 @@ services:
       - mysql:/var/lib/mysql
     ports:
       - "33060:3306"
-    entrypoint:
-      sh -c "
-      echo 'SET GLOBAL sql_mode = 'NO_ENGINE_SUBSTITUTION'; CREATE DATABASE IF NOT EXISTS database_production; CREATE DATABASE IF NOT EXISTS database_development; CREATE DATABASE IF NOT EXISTS database_test; CREATE DATABASE IF NOT EXISTS hydra;' > /docker-entrypoint-initdb.d/init.sql;
-      /usr/local/bin/docker-entrypoint.sh --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --sql-mode='NO_ENGINE_SUBSTITUTION'
-      "
+    entrypoint: sh -c " echo 'SET GLOBAL sql_mode = 'NO_ENGINE_SUBSTITUTION'; CREATE DATABASE IF NOT EXISTS database_production; CREATE DATABASE IF NOT EXISTS database_development; CREATE DATABASE IF NOT EXISTS database_test; CREATE DATABASE IF NOT EXISTS hydra;' > /docker-entrypoint-initdb.d/init.sql; /usr/local/bin/docker-entrypoint.sh --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --sql-mode='NO_ENGINE_SUBSTITUTION' "
 
   phpmyadmin:
     depends_on:
@@ -238,8 +234,8 @@ services:
       MESSAGING_TRANSPORT_SERVICE_URL: http://messaging-transport-service:9840
       SERVER_PORT: 9836
       DATABASE_CONNECTION_URL: 'postgresql://user_messaging:e5YGE3cQ2ysqHesT@postgres:5432/test_messaging'
-#      PUBNUB_SUBSCRIBE_KEY: 'sub-c-252ec7e2-7ca4-11e9-89f1-56e8a30b5f0e'
-#      PUBNUB_PUBLISH_KEY: 'pub-c-937068cd-2e67-4c0e-a1eb-3c108d85f9e7'
+      #      PUBNUB_SUBSCRIBE_KEY: 'sub-c-252ec7e2-7ca4-11e9-89f1-56e8a30b5f0e'
+      #      PUBNUB_PUBLISH_KEY: 'pub-c-937068cd-2e67-4c0e-a1eb-3c108d85f9e7'
       AWS_CLOUDFRONT_ACCESS_KEY_ID: 'aws-id'
       AWS_CLOUDFRONT_PRIVATE_KEY: 'aws-private-key'
       DEFAULT_CLIENT_ID: '4cf2c57b-ab68-4415-9b1d-9876df5d307f'
@@ -299,8 +295,8 @@ services:
 
   gateway-proxy:
     image: ${GLOO_REPO:-quay.io/solo-io}/gloo-envoy-wrapper:${GLOO_VERSION:-1.10.16}
-    entrypoint: ["envoy"]
-    command: ["-c", "/config/envoy.yaml", "--disable-hot-restart"]
+    entrypoint: [ "envoy" ]
+    command: [ "-c", "/config/envoy.yaml", "--disable-hot-restart" ]
     volumes:
       - ./gloo/data/envoy-config.yaml:/config/envoy.yaml:ro
     ports:

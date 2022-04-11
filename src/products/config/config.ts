@@ -11,10 +11,10 @@ export const ROUTING_KEY_RANDOM = 'random-routing-key'
 export const QUEUE_NAME = 'Testing_nest_queue'
 
 export interface TestEvent {
-  meta: {
-    routingKey: string
-    exchange: string
-  }
+    meta: {
+        routingKey: string
+        exchange: string
+    }
 }
 
 
