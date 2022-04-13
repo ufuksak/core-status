@@ -1,3 +1,4 @@
+import {KeystoreModule} from "../../src/products/modules/keystore.module";
 import {UsersModule} from "../../src/products/modules/users.module";
 import {Module} from '@nestjs/common';
 import {PotModule} from "../../src/products/modules/pot.module";
@@ -50,6 +51,7 @@ const configWithEntity = {
         UsersModule,
         PotModule,
         ContainerModule,
+        KeystoreModule,
         TypeOrmModule.forRoot(configWithEntity),
         AmqpModule.forConfig({
             urlOrOpts: RABBIT_URI,

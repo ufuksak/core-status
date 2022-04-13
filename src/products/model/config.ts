@@ -6,7 +6,7 @@ export const IS_DEBUG: boolean = process.env.NODE_ENV === 'debug'
 /**
  * @internal
  */
-export const IS_DEBUG_KEYSTORE: boolean = process.env.NODE_ENV === 'debugkeystore'
+export const IS_DEBUG_KEYSTORE: boolean = (process.env.NODE_ENV === 'debugkeystore' || process.env.NODE_ENV === 'test')
 
 /**
  * @internal

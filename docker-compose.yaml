@@ -22,7 +22,7 @@ services:
   redis:
     image: redislabs/redisearch:latest
     ports:
-      - '6379:6379'
+      - '6378:6379'
 
   rabbitmq:
     container_name: rabbitmq
@@ -66,12 +66,12 @@ services:
     restart: always
     environment:
       - MYSQL_HOST=0.0.0.0
-      - MYSQL_PORT=33060
+      - MYSQL_PORT=33306
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
     volumes:
       - mysql:/var/lib/mysql
     ports:
-      - "33060:3306"
+      - "33306:3306"
     entrypoint: sh -c " echo 'SET GLOBAL sql_mode = 'NO_ENGINE_SUBSTITUTION'; CREATE DATABASE IF NOT EXISTS database_production; CREATE DATABASE IF NOT EXISTS database_development; CREATE DATABASE IF NOT EXISTS database_test; CREATE DATABASE IF NOT EXISTS hydra;' > /docker-entrypoint-initdb.d/init.sql; /usr/local/bin/docker-entrypoint.sh --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --sql-mode='NO_ENGINE_SUBSTITUTION' "
 
   phpmyadmin:
@@ -128,7 +128,7 @@ services:
       - localstack
       - hydra
     environment:
-      - DATABASE_CONNECTION_URL=postgres://identity:passpass@postgres:5432/identity
+      - DATABASE_CONNECTION_URL=postgres://user_messaging:e5YGE3cQ2ysqHesT@postgres:5432/identity
       - DATABASE_LOGGING=0
       - NAMESPACE=DEV
       - NODE_ENV=test
@@ -207,7 +207,7 @@ services:
       NAMESPACE: core
       NODE_ENV: development
       HOSTNAME: http://localhost:9836
-      DATABASE_CONNECTION_URL: postgres://contacts:blanks@postgres:5432/contacts?debug=false&charset=utf8
+      DATABASE_CONNECTION_URL: postgres://user_messaging:e5YGE3cQ2ysqHesT@postgres:5432/contacts?debug=false&charset=utf8
       OBFUSCATED_SALT: a_nice_testing_salty
       AWS_REGION: 'us-east-1'
       SQS_ENDPOINT: 'http://localstack:4566'
@@ -268,8 +268,6 @@ services:
       - "26257:26257"
       - "8090:8080"
     command: start-single-node --insecure
-    volumes:
-      - "${PWD}/cockroach-data/crdb:/cockroach/cockroach-data"
 
   gloo:
     image: ${GLOO_REPO:-quay.io/solo-io}/gloo:${GLOO_VERSION:-1.10.16}
@@ -295,12 +293,12 @@ services:
 
   gateway-proxy:
     image: ${GLOO_REPO:-quay.io/solo-io}/gloo-envoy-wrapper:${GLOO_VERSION:-1.10.16}
-    entrypoint: [ "envoy" ]
-    command: [ "-c", "/config/envoy.yaml", "--disable-hot-restart" ]
+    entrypoint: ["envoy"]
+    command: ["-c", "/config/envoy.yaml", "--disable-hot-restart"]
     volumes:
       - ./gloo/data/envoy-config.yaml:/config/envoy.yaml:ro
     ports:
-      - "8080:8080"
+      - "8099:8080"
       - "8443:8443"
       - "19000:19000"
     restart: always
