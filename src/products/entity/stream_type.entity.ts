@@ -1,0 +1,44 @@
+import {Column, Entity } from "typeorm";
+import {BaseEntity} from "./base.entity";
+import {GrantType} from "./grant.entity";
+
+
+export enum StreamHandling {
+    e2e = 'e2e',
+    direct = 'direct',
+    lockbox = 'lockbox'
+}
+
+export enum Granularity {
+    single = 'single',
+    batch = 'batch'
+}
+
+@Entity({name: "stream_handling", synchronize: true})
+export class StreamTypeEntity extends BaseEntity {
+    @Column({
+        type: 'enum',
+        enum: Granularity
+    })
+    granularity: string;
+
+    @Column({
+        type: 'enum',
+        enum: StreamHandling
+    })
+    stream_handling: string;
+
+    @Column({
+        type: 'boolean'
+    })
+    approximated: boolean;
+
+    @Column('enum', {
+        array: true,
+        enum: Object.values(GrantType)
+    })
+    supported_grants: GrantType[];
+
+    @Column({ unique: true, type: 'uuid' })
+    type: string;
+}
