@@ -9,8 +9,6 @@ export enum GrantType {
 }
 
 export interface GrantProperties {
-    fromDate: string;
-    toDate: string;
     reEncryptionKey: string;
     e2eKey: string;
 }
@@ -23,20 +21,20 @@ export class GrantEntity extends BaseEntity {
     })
     type: GrantType;
 
-    @Column({
-        type: 'jsonb'
-    })
+    @Column({type: 'jsonb'})
     properties: GrantProperties;
 
-    @Column({
-        type: 'uuid'
-    })
+    @Column({type: 'uuid'})
     recipient_id: string;
 
-    @Column({
-        type: 'uuid'
-    })
+    @Column({type: 'uuid'})
     owner_id: string;
+
+    @Column({type: 'timestamptz' })
+    fromDate: string;
+
+    @Column({type: 'timestamptz' })
+    toDate: string;
 
     @ManyToOne(() => StreamEntity, stream => stream.id)
     stream_id: string;

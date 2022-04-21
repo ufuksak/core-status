@@ -10,14 +10,10 @@ export class StreamEntity extends BaseEntity {
     @JoinColumn({ referencedColumnName: 'type' })
     type: string;
 
-    @Column({
-        type: 'uuid'
-    })
+    @Column({type: 'uuid'})
     owner_id: string;
 
-    @Column({
-        type: 'uuid'
-    })
+    @Column({type: 'uuid'})
     keypair_id: string;
 
     @ManyToOne(() => DeviceEntity, device => device.id)

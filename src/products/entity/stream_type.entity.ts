@@ -9,7 +9,7 @@ export enum StreamHandling {
     lockbox = 'lockbox'
 }
 
-export enum Granularity {
+export enum StreamGranularity {
     single = 'single',
     batch = 'batch'
 }
@@ -18,7 +18,7 @@ export enum Granularity {
 export class StreamTypeEntity extends BaseEntity {
     @Column({
         type: 'enum',
-        enum: Granularity
+        enum: StreamGranularity
     })
     granularity: string;
 
@@ -39,6 +39,6 @@ export class StreamTypeEntity extends BaseEntity {
     })
     supported_grants: GrantType[];
 
-    @Column({ unique: true, type: 'uuid' })
+    @Column({ unique: true, type: 'text' })
     type: string;
 }
