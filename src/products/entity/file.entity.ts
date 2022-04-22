@@ -9,6 +9,7 @@ import {
 } from "typeorm";
 import {classToPlain, Exclude} from "class-transformer";
 import {UserEntity} from "./user.entity";
+import {StreamEntity} from "./stream.entity";
 
 export enum PayloadType {
     lockbox = 'lockbox',
@@ -24,6 +25,9 @@ export class FileEntity {
         unique: true
     })
     key: string;
+
+    @ManyToOne(() => StreamEntity, stream => stream.id)
+    stream_id: string;
 
     @Column({
         nullable: true
