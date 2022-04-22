@@ -14,7 +14,7 @@ export enum StreamGranularity {
     batch = 'batch'
 }
 
-@Entity({name: "stream_handling", synchronize: true})
+@Entity({name: "stream_type", synchronize: true})
 export class StreamTypeEntity extends BaseEntity {
     @Column({
         type: 'enum',

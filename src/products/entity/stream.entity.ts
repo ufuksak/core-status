@@ -4,7 +4,7 @@ import {DeviceEntity} from "./device.entity";
 import {StreamTypeEntity} from "./stream_type.entity";
 
 
-@Entity({name: "identity", synchronize: true})
+@Entity({name: "stream", synchronize: true})
 export class StreamEntity extends BaseEntity {
     @ManyToOne(() => StreamTypeEntity, { nullable: false })
     @JoinColumn({ referencedColumnName: 'type' })
