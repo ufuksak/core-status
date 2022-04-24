@@ -21,10 +21,6 @@ export class StreamEntity extends BaseEntity {
     @JoinColumn({ referencedColumnName: 'type' })
     type: string;
 
-    @OneToMany(() => FileEntity, file => file.stream_id, {cascade: true})
-    @JoinTable()
-    uploads: FileEntity[];
-
     @OneToMany(() => GrantEntity, grant => grant.stream_id, {cascade: true})
     @JoinTable()
     grants: GrantEntity[];

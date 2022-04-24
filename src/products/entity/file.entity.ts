@@ -26,9 +26,6 @@ export class FileEntity {
     })
     key: string;
 
-    @ManyToOne(() => StreamEntity, stream => stream.id)
-    stream_id: string;
-
     @Column({
         nullable: true
     })
