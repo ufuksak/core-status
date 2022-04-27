@@ -1,15 +1,12 @@
 import {Module} from '@nestjs/common';
 import {TypeOrmModule} from '@nestjs/typeorm';
 import {UploadImageModule} from '../../src/products/modules/uploadimage.module';
-import {UsersModule} from "../../src/products/modules/users.module";
 import {CONFIG_VALIDATION_SCHEMA, RABBIT_URI} from "../../src/products/config/config";
 import {ConfigModule} from '@nestjs/config';
 import {AmqpModule} from '@globalid/nest-amqp';
 import config from "./ormconfig";
 import {FileEntity} from "../../src/products/entity/file.entity";
 import {FileRepository} from "../../src/products/repositories/file.repository";
-import {UserRepository} from "../../src/products/repositories/user.repository";
-import {UserEntity} from "../../src/products/entity/user.entity";
 import {CountryCodeEntity} from "../../src/products/entity/country_code.entity";
 import {DeviceEntity} from "../../src/products/entity/device.entity";
 import {GpsEntity} from "../../src/products/entity/gps.entity";
@@ -30,14 +27,11 @@ import {GrantEntity} from "../../src/products/entity/grant.entity";
 @Module({
     imports: [
         UploadImageModule,
-        UsersModule,
         TypeOrmModule.forRoot({
             ...config,
             entities: [
                 FileEntity,
                 FileRepository,
-                UserRepository,
-                UserEntity,
                 CountryCodeEntity,
                 DeviceEntity,
                 DeviceModelEntity,
@@ -47,7 +41,6 @@ import {GrantEntity} from "../../src/products/entity/grant.entity";
                 StatusEntity,
                 TimezoneEntity,
                 UserActionEntity,
-                UserRepository,
                 StatusRepository,
                 FileRepository,
                 Container,

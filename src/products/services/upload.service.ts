@@ -11,7 +11,6 @@ import {FileEntity, PayloadType} from "../entity/file.entity";
 import {MAX_DB_FILE_SIZE, S3_MAX_FILE_SIZE, S3_READ_CHUNK_SIZE, toYyyyMmDd} from "../util/util";
 import {InteractiveS3Stream} from "../util/interactive-stream";
 import {Readable} from "stream";
-import {UserRepository} from "../repositories/user.repository";
 import {UploadPublisher} from "../rabbit/uploads.publisher";
 
 
@@ -22,7 +21,6 @@ export class UploadService {
 
     constructor(
         @InjectRepository(FileRepository) private readonly fileRepo: FileRepository,
-        @InjectRepository(UserRepository) private readonly userRepo: UserRepository,
         private readonly publisher: UploadPublisher
     ) {
         this.s3Provider = new S3ConfigProvider();
@@ -31,8 +29,6 @@ export class UploadService {
     }
 
     async get(user_id: string, id: string): Promise<Readable> {
-        await this.userRepo.getUserById(user_id);
-
         const file = await this.fileRepo.getFileByOptions({
             where: {
                 id,
@@ -91,8 +87,6 @@ export class UploadService {
     }
 
     async upload(user_id: string, payloadType: PayloadType, req: Request) : Promise<FileEntity> {
-        await this.userRepo.getUserById(user_id);
-
         const file = new FileEntity();
 
         file.key = `${toYyyyMmDd(new Date())}/${uuidv4()}`;

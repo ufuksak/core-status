@@ -4,11 +4,16 @@ import { StreamRepository } from '../../src/products/repositories/stream.reposit
 import {v4 as uuid} from 'uuid';
 import { KeystoreService } from '../../src/products/services/keystore';
 import * as sinon from 'sinon'
+import {StatusService} from "../../src/products/services/status.service";
+import {StatusRepository} from "../../src/products/repositories/status.repository";
+import {StatusPublisher} from "../../src/products/rabbit/status.publisher";
 
 describe('Status Service', () => {
     let streamService: StreamService;
     let keystoreService;
     let streamRepository;
+    let streamPublisher;
+    let statusRepository;
 
     beforeAll(async () => {
       keystoreService = {
@@ -18,10 +23,20 @@ describe('Status Service', () => {
       streamRepository = {
         verify: jest.fn().mockReturnThis(),
       };
+
+      statusRepository = {
+        verify: jest.fn().mockReturnThis(),
+      };
+
+      streamPublisher = {
+        verify: jest.fn().mockReturnThis(),
+      };
+
         const module = await Test.createTestingModule({
             controllers: [],
             providers: [
               StreamService,
+              StatusService,
               {
                 provide: KeystoreService,
                 useValue: keystoreService
@@ -29,6 +44,14 @@ describe('Status Service', () => {
               {
                 provide: StreamRepository,
                 useValue: streamRepository
+              },
+              {
+                provide: StatusRepository,
+                useValue: statusRepository
+              },
+              {
+                provide: StatusPublisher,
+                useValue: streamPublisher
               }
             ],
         }).compile();

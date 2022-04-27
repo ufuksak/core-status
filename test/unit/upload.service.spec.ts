@@ -3,8 +3,6 @@ import {getRepositoryToken} from "@nestjs/typeorm";
 import {v4 as uuid} from 'uuid';
 import {FileRepository} from "../../src/products/repositories/file.repository";
 import {NotFoundException} from "@nestjs/common";
-import {UserRepository} from "../../src/products/repositories/user.repository";
-import {UserEntity} from "../../src/products/entity/user.entity";
 import {Readable} from "stream";
 import {FileEntity} from "../../src/products/entity/file.entity";
 import {FindOneOptions} from "typeorm";
@@ -88,12 +86,6 @@ describe('UploadSerivce', () => {
                         getFileById,
                         deleteFile
                     }
-                },
-                {
-                    provide: getRepositoryToken(UserRepository),
-                    useValue: {
-                        getUserById
-                    }
                 }
             ],
         }).compile();
@@ -154,12 +146,8 @@ describe('UploadSerivce', () => {
         });
 
         describe('should get db file',() => {
-            let user: UserEntity;
             let file: FileEntity;
             beforeEach(() => {
-                user = new UserEntity();
-                Object.assign(user, userMock)
-                getUserById.mockReturnValue(Promise.resolve(user));
                 file = new FileEntity();
                 Object.assign(file, smallFileMock)
                 getFileByOptions.mockReturnValue(Promise.resolve(smallFileMock));

@@ -1,8 +1,6 @@
 import {Column, Entity, JoinColumn, JoinTable, ManyToOne, OneToMany } from "typeorm";
 import {BaseEntity} from "./base.entity";
-import {DeviceEntity} from "./device.entity";
 import {StreamTypeEntity} from "./stream_type.entity";
-import {FileEntity} from "./file.entity";
 import {GrantEntity} from "./grant.entity";
 
 

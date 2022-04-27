@@ -5,7 +5,6 @@ import {
     OneToMany, CreateDateColumn, UpdateDateColumn,
 } from "typeorm";
 
-import {UserEntity} from "./user.entity";
 import {Pot} from "./pot.entity";
 
 @Entity()
@@ -30,7 +29,4 @@ export class Container {
         cascade: true
     })
     pots: Pot[];
-
-    @ManyToOne(type => UserEntity, user => user.containers)
-    user: UserEntity;
 }

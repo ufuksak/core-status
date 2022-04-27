@@ -8,7 +8,6 @@ import {
     UpdateDateColumn
 } from "typeorm";
 import {classToPlain, Exclude} from "class-transformer";
-import {UserEntity} from "./user.entity";
 import {StreamEntity} from "./stream.entity";
 
 export enum PayloadType {
@@ -62,14 +61,6 @@ export class FileEntity {
 
     @Column()
     user_id: string;
-
-    @ManyToOne(() => UserEntity, user => user.fileList, {
-        onDelete: "CASCADE"
-    })
-    @JoinColumn({
-        name: 'user_id'
-    })
-    user: UserEntity;
 
     toJSON() {
         const result = classToPlain(this);

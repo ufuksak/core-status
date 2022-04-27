@@ -1,9 +1,9 @@
 import {Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, UpdateDateColumn} from "typeorm";
 import {StatusTypes} from "../dto/status.model";
-import {UserEntity} from "./user.entity";
+import {BaseEntity} from "./base.entity";
 
 @Entity({name: "status",synchronize: true})
-export class StatusEntity {
+export class StatusEntity extends BaseEntity {
 
     @PrimaryColumn('uuid')
     uuid: string;
@@ -24,9 +24,6 @@ export class StatusEntity {
     @Column({nullable: false})
     encrypted_payload: string;
 
-    @ManyToOne(() => UserEntity, user => user.status)
-    @JoinColumn({
-      name: 'user_id'
-    })
-    user: UserEntity;
+    @Column({ type: 'uuid'})
+    user_id: string;
 }

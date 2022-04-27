@@ -1,21 +1,9 @@
 import {INestApplication} from "@nestjs/common";
 import {Test, TestingModule} from "@nestjs/testing";
 import * as supertest from "supertest";
-import {AppUsersTestModule} from "./app.users.test.module";
-import {MessageHandler} from "@globalid/nest-amqp";
-import {UserDto} from "../../src/products/dto/user.model";
 import {getAccessToken} from "../getacctoken";
 
 jest.setTimeout(60 * 1000);
-
-class Handlers {
-    collectedMessages: [] = [];
-
-    @MessageHandler({})
-    async updateAdd(evt: UserDto): Promise<void> {
-        this.collectedMessages.push(evt as never);
-    }
-}
 
 describe('KeystoreController (e2e)', () => {
     let app: INestApplication;
@@ -24,8 +12,8 @@ describe('KeystoreController (e2e)', () => {
         process.env.NODE_ENV = 'debugkeystore';
         process.env.SDK_CUSTOM_API_URL = 'http://localhost';
         const moduleFixture: TestingModule = await Test.createTestingModule({
-            imports: [AppUsersTestModule],
-            providers: [Handlers]
+            imports: [],
+            providers: []
         }).compile();
 
         app = moduleFixture.createNestApplication();
@@ -69,7 +57,8 @@ describe('KeystoreController (e2e)', () => {
                 "algorithm_type": "rsa"
             };
 
-            const accessToken = getAccessToken();
+            const scope = 'public keys.manage';
+            const accessToken = getAccessToken(scope);
 
             // Run your end-to-end test
             const {body} = await supertest.agent(app.getHttpServer())

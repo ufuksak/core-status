@@ -7,10 +7,11 @@ import {S3ConfigProvider} from "../../src/products/config/s3.config.provider";
 import {MessageHandler} from "@globalid/nest-amqp";
 import {UploadDto} from "../../src/products/dto/upload.model";
 import waitForExpect from "wait-for-expect";
+import {v4 as uuid} from 'uuid';
 import supertest = require("supertest");
 
 let app: INestApplication;
-let testUserId: string = null;
+let testUserId: string = uuid();
 
 jest.setTimeout(3 * 60 * 1000);
 
@@ -91,18 +92,6 @@ describe('Upload', () => {
         handlers = app.get<Handlers>(Handlers);
         agent = await supertest.agent(server);
         await new S3ConfigProvider().createBucket();
-    });
-
-    describe('POST /api/v1/users', () => {
-        it('user added', async () => {
-            await agent
-                .post('/api/v1/users')
-                .send(userPostBody)
-                .set('Accept', 'application/json')
-                .expect('Content-Type', /json/)
-                .expect(201)
-                .then(res => testUserId = res.body.id);
-        });
     });
 
     describe('POST /api/v1/upload/users/:id/file/:file', () => {

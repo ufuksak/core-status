@@ -1,4 +1,4 @@
-import {Body, Controller, Param, Post, Request} from "@nestjs/common";
+import {Body, Controller, Post, Request} from "@nestjs/common";
 import {KeystoreService} from "../services/keystore";
 import {KeystoreByMeDto} from "../dto/keystore.byme.model";
 import {KeyPairCreateResponse} from "../response/keystore.byme.response";

@@ -2,7 +2,6 @@ import {Module} from '@nestjs/common';
 import {FileEntity} from "../entity/file.entity";
 import {TypeOrmModule} from "@nestjs/typeorm";
 import {FileRepository} from "../repositories/file.repository";
-import {UserRepository} from "../repositories/user.repository";
 import {UploadService} from "../services/upload.service";
 import {UploadsController} from "../controllers/uploads.controller";
 import {UploadPublisher} from "../rabbit/uploads.publisher";
@@ -11,8 +10,7 @@ import {UploadPublisher} from "../rabbit/uploads.publisher";
     imports: [
         TypeOrmModule.forFeature([
             FileEntity,
-            FileRepository,
-            UserRepository
+            FileRepository
         ])
     ],
     controllers: [UploadsController],

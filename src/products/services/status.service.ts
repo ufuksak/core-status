@@ -3,6 +3,7 @@ import {InjectRepository} from "@nestjs/typeorm";
 import { StatusDto, StatusResponse } from "../dto/status.model";
 import { StatusRepository } from "../repositories/status.repository";
 import {StatusPublisher} from "../rabbit/status.publisher";
+import {PG_FOREIGN_KEY_VIOLATION} from "../util/util";
 
 @Injectable()
 export class StatusService {
@@ -19,10 +20,11 @@ export class StatusService {
       }
 
       const result = await this.statusRepo
-          .createQueryBuilder()
-          .insert()
-          .orIgnore()
-          .values(statuses).execute();
+        .createQueryBuilder()
+        .insert()
+        .orIgnore()
+        .values(statuses)
+        .execute();
 
       return result.generatedMaps.map((generatedColumns, index) => ({
         ...statuses[index],

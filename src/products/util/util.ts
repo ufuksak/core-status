@@ -9,6 +9,8 @@ export enum ChannelType {
     GroupCustom = 'GROUP_CUSTOM',
 }
 
+export const PG_FOREIGN_KEY_VIOLATION = 23503;
+
 export const PERSONAL_CHANNEL_PARTICIPANTS: number = 1
 
 export const MULTI_CHANNEL_MIN_PARTICIPANTS: number = 3
