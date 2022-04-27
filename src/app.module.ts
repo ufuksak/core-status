@@ -11,9 +11,11 @@ import { PotModule } from "./products/modules/pot.module";
 import { ContainerModule } from "./products/modules/container.module";
 import { AmqpModule } from "@globalid/nest-amqp";
 import { ConfigModule } from "@nestjs/config";
+import { StatusModule } from "./products/modules/status.module";
 
 @Module({
   imports: [
+    StatusModule,
     ProductsModule,
     UploadImageModule,
     ChannelModule,

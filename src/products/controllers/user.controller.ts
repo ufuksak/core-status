@@ -12,7 +12,6 @@ import { StatusRequestBody, StatusResponseBody } from "../dto/status.model";
 import { StatusService } from "../services/status.service";
 import { UserDto } from "../dto/user.model";
 import { UploadService } from "../services/upload.service";
-import { StatusEntity } from "../entity/status.entity";
 
 @Controller("/api/v1/users")
 export class UserController {
