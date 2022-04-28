@@ -12,13 +12,7 @@ export class UploadQueryDto {
     type: PayloadType
 }
 
-export class ParamUserId {
-    @IsString()
-    @IsNotEmpty()
-    user_id: string;
-}
-
-export class ParamUUID4Dto extends ParamUserId {
+export class ParamUUID4Dto {
     @IsUUID(4)
     file_id: string;
 }

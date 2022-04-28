@@ -50,7 +50,9 @@ export class UploadEntity {
     @UpdateDateColumn()
     updated_at: Date;
 
-    @Column()
+    @Column({
+        type: 'uuid'
+    })
     user_id: string;
 
     toJSON() {

@@ -98,12 +98,14 @@ describe('UploadSerivce', () => {
 
     describe('get file', () => {
         describe('should not get for non existing user',() => {
-            const userNotFoundMsg = 'user not found';
+            const fileNotFoundMsg = 'file not found';
             beforeEach(() => {
                 getUserById.mockImplementation(() => {
-                    throw new NotFoundException(userNotFoundMsg);
+                    throw new NotFoundException(fileNotFoundMsg);
                 });
-                getFileByOptions.mockReturnValue({});
+                getFileByOptions.mockImplementation(() => {
+                    throw new NotFoundException(fileNotFoundMsg)
+                });
             });
 
             it('should not get for non-existing user', async () => {
@@ -116,7 +118,7 @@ describe('UploadSerivce', () => {
                     expect(e instanceof NotFoundException)
                         .toEqual(true);
                     expect(e.message)
-                        .toEqual(userNotFoundMsg);
+                        .toEqual(fileNotFoundMsg);
                 }
             });
         });
@@ -127,7 +129,9 @@ describe('UploadSerivce', () => {
                 getUserById.mockImplementation(() => {
                     throw new NotFoundException(fileNotFoundMsg);
                 });
-                getFileByOptions.mockReturnValue({});
+                getFileByOptions.mockImplementation(() => {
+                    throw new NotFoundException(fileNotFoundMsg)
+                });
             });
 
             it('should not get for non-existing file', async () => {

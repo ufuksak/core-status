@@ -10,6 +10,7 @@ import {KeyPairCreateResponse} from "../response/keystore.byme.response";
 import {KeyPairSearchResponse} from "../response/keystore.search.response";
 import {PostKeyPairSearchBody} from "../dto/keystore.search.model";
 import {KeystorePublisher} from "../rabbit/keystore.publisher";
+import * as process from "process";
 
 @Injectable()
 export class KeystoreService {
@@ -31,7 +32,7 @@ export class KeystoreService {
 
     private createHttpClient(): AxiosInstance {
         const config: AxiosRequestConfig = {
-            baseURL: API_URL
+            baseURL: process.env.SVC_URL_KEYSTORE
         }
 
         const instance: AxiosInstance = axios.create(config)
@@ -87,7 +88,7 @@ export class KeystoreService {
     public async createKeystoreKeyByMe(token: string, body: KeystoreByMeDto): Promise<KeyPairCreateResponse> {
         this.accessToken = token;
         return this.getResponseData(await this.client.post<KeyPairCreateResponse>(
-            '/identity/me/keys',
+            '/v1/identity/me/keys',
             body))
     }
 

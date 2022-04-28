@@ -9,6 +9,14 @@ import {MessageHandler} from '@globalid/nest-amqp';
 import {StatusDto} from "../../src/products/dto/status.model";
 import {StatusRepository} from "../../src/products/repositories/status.repository";
 import {StatusPublisher} from "../../src/products/rabbit/status.publisher";
+import {getAccessToken} from "../getacctoken";
+import {TokenData, TokenModule} from '@globalid/nest-auth';
+import {plainToClass} from 'class-transformer';
+import {JwtService} from '@nestjs/jwt';
+import {ConfigModule} from '@nestjs/config';
+import {CONFIG_VALIDATION_SCHEMA, configuration} from "../../src/products/config/config";
+import {StreamTypeService} from "../../src/products/services/stream_type.service";
+import {StreamTypeRepository} from "../../src/products/repositories/stream_type.repository";
 
 class Handlers {
   collectedMessages: [] = []
@@ -28,57 +36,79 @@ class Handlers {
 }
 
 describe('Status Controller', () => {
-    let statusController: StatusController;
-    let streamService: StreamService;
+  let statusController: StatusController;
+  let streamService: StreamService;
+  let jwtService: JwtService;
 
-    beforeAll(async () => {
-        const module = await Test.createTestingModule({
-            controllers: [StatusController],
-            providers: [
-              StreamService,
-              StatusService,
-              {
-                provide: KeystoreService,
-                useValue: {}
-              },
-              {
-                provide: StreamRepository,
-                useValue: {}
-              },
-              {
-                provide: StatusRepository,
-                useValue: {}
-              },
-              {
-                provide: StatusPublisher,
-                useValue: {}
-              }
-            ],
-        }).compile();
+  beforeAll(async () => {
+    const module = await Test.createTestingModule({
+      imports: [
+        TokenModule,
+        ConfigModule.forRoot({
+          validationSchema: CONFIG_VALIDATION_SCHEMA,
+          validationOptions: {
+            allowUnknown: true,
+            abortEarly: true,
+          },
+          isGlobal: true,
+          load: [configuration]
+        })],
+      controllers: [StatusController],
+      providers: [
+        StreamService,
+        StreamTypeService,
+        StatusService,
+        {
+          provide: KeystoreService,
+          useValue: {}
+        },
+        {
+          provide: StreamRepository,
+          useValue: {}
+        },
+        {
+          provide: StreamTypeRepository,
+          useValue: {}
+        },
+        {
+          provide: StatusRepository,
+          useValue: {}
+        },
+        {
+          provide: StatusPublisher,
+          useValue: {}
+        }
+      ],
+    }).compile();
 
-        statusController = module.get<StatusController>(StatusController);
-        streamService = module.get<StreamService>(StreamService);
+    jwtService = module.get<JwtService>(JwtService);
+    statusController = module.get<StatusController>(StatusController);
+    streamService = module.get<StreamService>(StreamService);
+  });
+
+  describe('createStream', () => {
+    it('should create stream', async () => {
+      const streamId = uuid();
+      streamService.save = jest.fn(async () => streamId);
+
+      const req = {
+        headers: {
+          authorization: 'Bearer token',
+        }
+      }
+      const body = {
+        streamType: 'streamType',
+        encryptedPrivateKey: 'test',
+        publicKey: 'test',
+      }
+
+      const token = getAccessToken();
+      const decodedToken = jwtService.decode(token);
+      const tokenData = plainToClass(TokenData, decodedToken);
+
+      const response = await statusController.createStream(req, tokenData, body);
+
+      expect(response).toEqual(streamId);
     });
-
-    describe('createStream', () => {
-        it('should create stream', async () => {
-            const streamId = uuid();
-            streamService.save = jest.fn(async () =>streamId);
-
-            const req = {
-              headers: {
-                authorization: 'Bearer token',
-              }
-            }
-            const body = {
-              streamType: 'streamType',
-              encryptedPrivateKey: 'test',
-              publicKey: 'test',
-            }
-
-            const response = await statusController.createStream(req, body);
-
-            expect(response).toEqual(streamId);
-        });
-    });
+  });
 });
