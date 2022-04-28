@@ -5,7 +5,7 @@ import {BaseEntity} from "./base.entity";
 @Entity({name: "status",synchronize: true})
 export class StatusEntity extends BaseEntity {
 
-    @Column('uuid')
+    @PrimaryColumn('uuid')
     uuid: string;
 
     @Column({

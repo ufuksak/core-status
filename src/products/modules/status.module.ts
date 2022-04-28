@@ -11,6 +11,8 @@ import {UploadEntity} from "../entity/upload.entity";
 import {UploadRepository} from "../repositories/uploadRepository";
 import {UploadService} from "../services/upload.service";
 import {UploadPublisher} from "../rabbit/uploads.publisher";
+import {StreamTypeRepository} from '../repositories/stream_type.repository';
+import {StreamTypeService} from '../services/stream_type.service';
 
 @Module({
     imports: [
@@ -19,16 +21,18 @@ import {UploadPublisher} from "../rabbit/uploads.publisher";
         StreamRepository,
         StatusRepository,
         UploadEntity,
-        UploadRepository
+        UploadRepository,
+        StreamTypeRepository
       ])
     ],
     controllers: [StatusController],
     providers: [
       StreamService,
+      StreamTypeService,
       StatusPublisher,
       StatusService,
       UploadService,
       UploadPublisher
-    ],
+    ]
 })
 export class StatusModule {}

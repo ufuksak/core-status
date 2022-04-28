@@ -5,7 +5,7 @@ import {CONFIG_VALIDATION_SCHEMA, RABBIT_URI} from "../../src/products/config/co
 import {ConfigModule} from '@nestjs/config';
 import {AmqpModule} from '@globalid/nest-amqp';
 import config from "./ormconfig";
-import {UploadEntity} from "../../src/products/entity/uploadEntity";
+import {UploadEntity} from "../../src/products/entity/upload.entity";
 import {UploadRepository} from "../../src/products/repositories/uploadRepository";
 import {CountryCodeEntity} from "../../src/products/entity/country_code.entity";
 import {DeviceEntity} from "../../src/products/entity/device.entity";

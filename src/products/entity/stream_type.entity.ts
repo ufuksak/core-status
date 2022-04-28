@@ -1,18 +1,7 @@
 import {Column, Entity } from "typeorm";
 import {BaseEntity} from "./base.entity";
-import {GrantType} from "./grant.entity";
-
-
-export enum StreamHandling {
-    e2e = 'e2e',
-    direct = 'direct',
-    lockbox = 'lockbox'
-}
-
-export enum StreamGranularity {
-    single = 'single',
-    batch = 'batch'
-}
+import {GrantType} from "../dto/grand.model";
+import {StreamGranularity, StreamHandling} from "../dto/stream_type.model";
 
 @Entity({name: "stream_type", synchronize: true})
 export class StreamTypeEntity extends BaseEntity {

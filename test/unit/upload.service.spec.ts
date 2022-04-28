@@ -4,7 +4,7 @@ import {v4 as uuid} from 'uuid';
 import {UploadRepository} from "../../src/products/repositories/uploadRepository";
 import {NotFoundException} from "@nestjs/common";
 import {Readable} from "stream";
-import {UploadEntity} from "../../src/products/entity/uploadEntity";
+import {UploadEntity} from "../../src/products/entity/upload.entity";
 import {FindOneOptions} from "typeorm";
 import {UploadService} from "../../src/products/services/upload.service";
 import {UploadPublisher} from "../../src/products/rabbit/uploads.publisher";

@@ -1,5 +1,3 @@
-import {Body, Controller, Get, Put, Request} from "@nestjs/common";
-import {CreateStreamRequestBody} from "../dto/stream.dto";
 import {StreamService} from "../services/stream.service";
 import {StatusRequestBody, StatusResponseBody} from "../dto/status.model";
 import {TokenData, TokenProtected} from "@globalid/nest-auth";
@@ -7,12 +5,20 @@ import {StatusService} from "../services/status.service";
 import {ScopedTokenDataParam} from "../commons/scope.decorator";
 import {STATUS_MANAGE_SCOPE} from "../util/util";
 import {StreamEntity} from "../entity/stream.entity";
+import {Body, Controller, Delete, Get, Param, Post, Put, Request} from "@nestjs/common";
+import {StreamTypeDto} from "../dto/stream_type.model";
+import {StreamTypeEntity} from "../entity/stream_type.entity";
+import {StreamTypeService} from "../services/stream_type.service";
+import {CreateStreamRequestBody} from "../dto/stream.model";
 
 @Controller('/api/v1/statuses')
 export class StatusController {
 
-    constructor(private streamService: StreamService,
-                private statusService: StatusService,) {}
+    constructor(
+      private readonly statusService: StatusService,
+      private readonly streamService: StreamService,
+      private readonly streamTypeService: StreamTypeService
+    ) {}
 
     @Get()
     @TokenProtected()
@@ -50,5 +56,20 @@ export class StatusController {
         const { streamType, encryptedPrivateKey, publicKey } = body;
 
         return this.streamService.save(req.headers.authorization, streamType, encryptedPrivateKey, publicKey)
+    }
+
+    @Get('/streams/types')
+    getStreamTypes(): Promise<StreamTypeEntity[]>{
+        return this.streamTypeService.getAll()
+    }
+
+    @Post('/streams/types')
+    createStreamType(@Body() streamType: StreamTypeDto): Promise<StreamTypeEntity> {
+        return this.streamTypeService.save(streamType)
+    }
+
+    @Delete('/streams/types/:id')
+    deleteStreamType(@Param("id") id: string){
+      return this.streamTypeService.delete(id)
     }
 }
