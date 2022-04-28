@@ -5,8 +5,8 @@ import {CONFIG_VALIDATION_SCHEMA, RABBIT_URI} from "../../src/products/config/co
 import {ConfigModule} from '@nestjs/config';
 import {AmqpModule} from '@globalid/nest-amqp';
 import config from "./ormconfig";
-import {FileEntity} from "../../src/products/entity/file.entity";
-import {FileRepository} from "../../src/products/repositories/file.repository";
+import {UploadEntity} from "../../src/products/entity/uploadEntity";
+import {UploadRepository} from "../../src/products/repositories/uploadRepository";
 import {CountryCodeEntity} from "../../src/products/entity/country_code.entity";
 import {DeviceEntity} from "../../src/products/entity/device.entity";
 import {GpsEntity} from "../../src/products/entity/gps.entity";
@@ -30,8 +30,8 @@ import {GrantEntity} from "../../src/products/entity/grant.entity";
         TypeOrmModule.forRoot({
             ...config,
             entities: [
-                FileEntity,
-                FileRepository,
+                UploadEntity,
+                UploadRepository,
                 CountryCodeEntity,
                 DeviceEntity,
                 DeviceModelEntity,
@@ -42,7 +42,7 @@ import {GrantEntity} from "../../src/products/entity/grant.entity";
                 TimezoneEntity,
                 UserActionEntity,
                 StatusRepository,
-                FileRepository,
+                UploadRepository,
                 Container,
                 Pot,
                 StreamEntity,

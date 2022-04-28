@@ -1,14 +1,5 @@
-import {
-    Column,
-    CreateDateColumn,
-    Entity,
-    JoinColumn,
-    ManyToOne,
-    PrimaryGeneratedColumn,
-    UpdateDateColumn
-} from "typeorm";
+import {Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn} from "typeorm";
 import {classToPlain, Exclude} from "class-transformer";
-import {StreamEntity} from "./stream.entity";
 
 export enum PayloadType {
     lockbox = 'lockbox',
@@ -16,7 +7,7 @@ export enum PayloadType {
 }
 
 @Entity({name: "file", synchronize: true})
-export class FileEntity {
+export class UploadEntity {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 

@@ -77,7 +77,6 @@ export class KeystoreService {
     }
 
     public async createKeystore(token: string, gid_uuid: string, body: KeystoreDto): Promise<IssueNewKeyPairResponse> {
-        this.accessToken = token;
         const result = await this.getResponseData(await this.client.post<IssueNewKeyPairResponse>(
             '/identity/' + gid_uuid + '/keys',
             body));

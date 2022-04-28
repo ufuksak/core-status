@@ -1,10 +1,10 @@
 import {Test, TestingModule} from '@nestjs/testing';
 import {getRepositoryToken} from "@nestjs/typeorm";
 import {v4 as uuid} from 'uuid';
-import {FileRepository} from "../../src/products/repositories/file.repository";
+import {UploadRepository} from "../../src/products/repositories/uploadRepository";
 import {NotFoundException} from "@nestjs/common";
 import {Readable} from "stream";
-import {FileEntity} from "../../src/products/entity/file.entity";
+import {UploadEntity} from "../../src/products/entity/uploadEntity";
 import {FindOneOptions} from "typeorm";
 import {UploadService} from "../../src/products/services/upload.service";
 import {UploadPublisher} from "../../src/products/rabbit/uploads.publisher";
@@ -80,7 +80,7 @@ describe('UploadSerivce', () => {
                     }
                 },
                 {
-                    provide: getRepositoryToken(FileRepository),
+                    provide: getRepositoryToken(UploadRepository),
                     useValue: {
                         getFileByOptions,
                         getFileById,
@@ -146,9 +146,9 @@ describe('UploadSerivce', () => {
         });
 
         describe('should get db file',() => {
-            let file: FileEntity;
+            let file: UploadEntity;
             beforeEach(() => {
-                file = new FileEntity();
+                file = new UploadEntity();
                 Object.assign(file, smallFileMock)
                 getFileByOptions.mockReturnValue(Promise.resolve(smallFileMock));
             });
@@ -198,7 +198,7 @@ describe('UploadSerivce', () => {
                     }
                 });
                 getFileById.mockImplementation(
-                    async (id: string, options?: FindOneOptions<FileEntity>) => {
+                    async (id: string, options?: FindOneOptions<UploadEntity>) => {
                         const maybeRet = storage[id];
                         if(!maybeRet) {
                             throw new NotFoundException('file not found');

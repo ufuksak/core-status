@@ -2,7 +2,7 @@ import {Test, TestingModule} from "@nestjs/testing";
 import {INestApplication} from "@nestjs/common";
 import {AppUploadsTestModule} from "./app.uploads.test.module";
 import * as fs from "fs/promises"
-import {PayloadType} from "../../src/products/entity/file.entity";
+import {PayloadType} from "../../src/products/entity/uploadEntity";
 import {S3ConfigProvider} from "../../src/products/config/s3.config.provider";
 import {MessageHandler} from "@globalid/nest-amqp";
 import {UploadDto} from "../../src/products/dto/upload.model";

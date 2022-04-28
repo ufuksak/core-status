@@ -4,6 +4,7 @@ import { KeystoreByMeDto } from "../dto/keystore.byme.model";
 import { StreamDto } from "../dto/stream.dto";
 import { StreamRepository } from "../repositories/stream.repository";
 import { KeystoreService } from "./keystore";
+import {StreamEntity} from "../entity/stream.entity";
 
 @Injectable()
 export class StreamService {
@@ -12,6 +13,10 @@ export class StreamService {
       @InjectRepository(StreamRepository) private readonly streamRepo: StreamRepository,
       private readonly keystoreService: KeystoreService,
     ) {}
+
+    async getStreams(): Promise<StreamEntity[]> {
+      return this.streamRepo.find({});
+    }
 
     async save(token:string, streamType:string, encryptedPrivateKey:string, publicKey:string) {
       const keystoreDto = {

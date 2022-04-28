@@ -4,6 +4,7 @@ import { StatusDto, StatusResponse } from "../dto/status.model";
 import { StatusRepository } from "../repositories/status.repository";
 import {StatusPublisher} from "../rabbit/status.publisher";
 import {PG_FOREIGN_KEY_VIOLATION} from "../util/util";
+import {StatusEntity} from "../entity/status.entity";
 
 @Injectable()
 export class StatusService {
@@ -12,6 +13,8 @@ export class StatusService {
       @InjectRepository(StatusRepository) private readonly statusRepo: StatusRepository,
       private readonly statusPublisher: StatusPublisher
     ) {}
+
+    getUserStatuses = (user_id: string): Promise<StatusEntity[]> => this.statusRepo.find({user_id});
 
     save = async (userId: string, statuses: StatusDto[]): Promise<StatusResponse[]> => {
       for(const status of statuses) {
