@@ -1,5 +1,5 @@
 import {EntityRepository, FindOneOptions, Repository} from "typeorm";
-import { StreamDto } from "../dto/stream.dto";
+import { StreamDto } from "../dto/stream.model";
 import { StreamEntity } from "../entity/stream.entity";
 
 @EntityRepository(StreamEntity)

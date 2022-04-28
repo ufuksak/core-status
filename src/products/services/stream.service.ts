@@ -1,7 +1,7 @@
 import {Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import { KeystoreByMeDto } from "../dto/keystore.byme.model";
-import { StreamDto } from "../dto/stream.dto";
+import { StreamDto } from "../dto/stream.model";
 import { StreamRepository } from "../repositories/stream.repository";
 import { KeystoreService } from "./keystore";
 

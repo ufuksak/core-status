@@ -133,6 +133,121 @@
       ]
     },
     {
+      "name": "status",
+      "item": [
+        {
+          "name": "createStream",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiJ9.eyJnbG9iYWxpZCI6ImpvaG5kb2UiLCJzdWIiOiJlYTkxYzMwZS02YzI4LTQ3OTQtYjlhMS04ZGRkODQ3MWVhYzAiLCJjbGllbnRfaWQiOiIxNGFmNWE3Yi1kZjJiLTQyZDAtYjFmNC0xMjU4ZDA5MTY5ZWEiLCJzY29wZSI6InB1YmxpYyBrZXlzLm1hbmFnZSIsImdyb3VwcyI6W10sImV4cCI6MTY0NzU0OTI0NCwiaWF0IjoxNjQ3NTQ4NjQ0LCJpc3MiOiJodHRwczovL2lzcy51ZXIifQ.2rmHXpOk8zJZ19kL-DHtOwSMJRGSlgjUJyO-DgBjH_A",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"public_key\": \"Ut incididuntelit labore\",\n  \"encrypted_private_key\": \"Duis Excepteur culpa reprehenderit esse\",\n  \"streamType\": \"test\" \n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{STATUSDB}}/api/v1/status/streams",
+              "host": [
+                "{{STATUSDB}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "status",
+                "streams"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getStreamTypes",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiJ9.eyJnbG9iYWxpZCI6ImpvaG5kb2UiLCJzdWIiOiJlYTkxYzMwZS02YzI4LTQ3OTQtYjlhMS04ZGRkODQ3MWVhYzAiLCJjbGllbnRfaWQiOiIxNGFmNWE3Yi1kZjJiLTQyZDAtYjFmNC0xMjU4ZDA5MTY5ZWEiLCJzY29wZSI6InB1YmxpYyBrZXlzLm1hbmFnZSIsImdyb3VwcyI6W10sImV4cCI6MTY0NzU0OTI0NCwiaWF0IjoxNjQ3NTQ4NjQ0LCJpc3MiOiJodHRwczovL2lzcy51ZXIifQ.2rmHXpOk8zJZ19kL-DHtOwSMJRGSlgjUJyO-DgBjH_A",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{STATUSDB}}/api/v1/status/streams/types",
+              "host": [
+                "{{STATUSDB}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "status",
+                "streams",
+                "types"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "createStreamType",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiJ9.eyJnbG9iYWxpZCI6ImpvaG5kb2UiLCJzdWIiOiJlYTkxYzMwZS02YzI4LTQ3OTQtYjlhMS04ZGRkODQ3MWVhYzAiLCJjbGllbnRfaWQiOiIxNGFmNWE3Yi1kZjJiLTQyZDAtYjFmNC0xMjU4ZDA5MTY5ZWEiLCJzY29wZSI6InB1YmxpYyBrZXlzLm1hbmFnZSIsImdyb3VwcyI6W10sImV4cCI6MTY0NzU0OTI0NCwiaWF0IjoxNjQ3NTQ4NjQ0LCJpc3MiOiJodHRwczovL2lzcy51ZXIifQ.2rmHXpOk8zJZ19kL-DHtOwSMJRGSlgjUJyO-DgBjH_A",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n \"granularity\": \"single\",\n \"stream_handling\": \"lockbox\",\n \"approximated\": true,\n \"supported_grants\": [\"range\"],\n \"type\": \"test\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{STATUSDB}}/api/v1/status/streams/types",
+              "host": [
+                "{{STATUSDB}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "status",
+                "streams",
+                "types"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
       "name": "messagingservice",
       "item": [
         {
