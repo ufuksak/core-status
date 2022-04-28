@@ -5,8 +5,7 @@ import { StreamService } from "../services/stream.service";
 @Controller('/api/v1/status')
 export class StatusController {
 
-    constructor(private streamService: StreamService) {
-    }
+    constructor(private streamService: StreamService) {}
 
     @Put('/streams')
     async createStream(@Request() req, @Body() body: CreateStreamRequestBody): Promise<string> {

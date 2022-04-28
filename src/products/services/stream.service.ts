@@ -13,21 +13,21 @@ export class StreamService {
       private readonly keystoreService: KeystoreService,
     ) {}
 
-    async save(token:string, streamType:string, encryptedPrivateKey:string, publicKey:string) {
+    async save(token: string, streamType: string, encryptedPrivateKey: string, publicKey: string) {
       const keystoreDto = {
         public_key           : publicKey,
         encrypted_private_key: encryptedPrivateKey,
-        purpose: 'status',
-        algorithm_type: 'ec',
+        purpose              : 'status',
+        algorithm_type       : 'ec',
       } as KeystoreByMeDto;
 
-      const kaypair = await this.keystoreService.createKeystoreKeyByMe(token, keystoreDto);
+      const keypair = await this.keystoreService.createKeystoreKeyByMe(token, keystoreDto);
 
       const streamDto = {
-        type: streamType,
-        owner_id: kaypair.client_id,
-        keypair_id: kaypair.uuid,
-        device_id: kaypair.device_id,
+        type      : streamType,
+        owner_id  : keypair.client_id,
+        keypair_id: keypair.uuid,
+        device_id : keypair.device_id,
       } as StreamDto;
 
       const stream = await this.streamRepo.saveStream(streamDto);

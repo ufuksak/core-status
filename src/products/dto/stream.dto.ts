@@ -18,6 +18,7 @@ export class StreamDto {
   @IsNotEmpty()
   keypair_id: string;
 
+  @IsUUID('4')
   @IsNotEmpty()
   device_id: string;
 }
