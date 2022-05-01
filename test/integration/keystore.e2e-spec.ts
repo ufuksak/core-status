@@ -45,16 +45,16 @@ describe('KeystoreController (e2e)', () => {
 
             const output = {
                 "uuid": expect.any(String),
-                "algorithm_type": "rsa",
+                "algorithm_type": "ec",
                 "client_id": null,
                 "gid_uuid": expect.any(String),
                 "status": "confirmed",
                 "public_key": "Ut incididuntelit labore",
                 "encrypted_private_key": "Duis Excepteur culpa reprehenderit esse",
                 "version": expect.any(Number),
-                "tag": "status-db",
+                "tag": "status-stream",
                 "consent_id": null,
-                "purpose": "status-db",
+                "purpose": "status-stream",
                 "external": false,
                 "latest": true,
                 "updated_at": expect.any(String),
@@ -65,8 +65,8 @@ describe('KeystoreController (e2e)', () => {
             const inputData = {
                 "public_key": "Ut incididuntelit labore",
                 "encrypted_private_key": "Duis Excepteur culpa reprehenderit esse",
-                "purpose": "status-db",
-                "algorithm_type": "rsa"
+                "purpose": "status-stream",
+                "algorithm_type": "ec"
             };
 
             const accessToken = getAccessToken();
