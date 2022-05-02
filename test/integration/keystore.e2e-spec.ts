@@ -31,7 +31,6 @@ describe('KeystoreController (e2e)', () => {
 
   describe('POST /api/v1/identity/me/keys', () => {
     it('should return the keystore', async () => {
-
       const output = {
         "uuid": expect.any(String),
         "algorithm_type": "rsa",
