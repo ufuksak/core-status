@@ -12,9 +12,11 @@ import { ContainerModule } from "./products/modules/container.module";
 import { AmqpModule } from "@globalid/nest-amqp";
 import { ConfigModule } from "@nestjs/config";
 import { StatusModule } from "./products/modules/status.module";
+import { TokenModule } from '@globalid/nest-auth'
 
 @Module({
   imports: [
+    TokenModule,
     StatusModule,
     ProductsModule,
     UploadImageModule,

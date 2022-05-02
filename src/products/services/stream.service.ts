@@ -1,3 +1,4 @@
+import { TokenData } from "@globalid/nest-auth";
 import {Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import { KeystoreByMeDto } from "../dto/keystore.byme.model";
@@ -13,11 +14,12 @@ export class StreamService {
       private readonly keystoreService: KeystoreService,
     ) {}
 
-    async save(token: string, streamType: string, encryptedPrivateKey: string, publicKey: string) {
+    async save(token: string, owner_id: string, streamType: string, encryptedPrivateKey: string, publicKey: string) {
+
       const keystoreDto = {
         public_key           : publicKey,
         encrypted_private_key: encryptedPrivateKey,
-        purpose              : 'status',
+        purpose              : 'status-stream',
         algorithm_type       : 'ec',
       } as KeystoreByMeDto;
 
@@ -25,7 +27,7 @@ export class StreamService {
 
       const streamDto = {
         type      : streamType,
-        owner_id  : keypair.client_id,
+        owner_id,
         keypair_id: keypair.uuid,
         device_id : keypair.device_id,
       } as StreamDto;

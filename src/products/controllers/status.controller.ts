@@ -4,17 +4,21 @@ import { StreamTypeDto } from "../dto/stream_type.model";
 import { StreamTypeEntity } from "../entity/stream_type.entity";
 import { StreamService } from "../services/stream.service";
 import { StreamTypeService } from "../services/stream_type.service";
+import { TokenData, TokenDataParam, TokenProtected } from '@globalid/nest-auth'
+import { KeystoreService } from "../services/keystore";
 
 @Controller('/api/v1/status')
 export class StatusController {
 
     constructor(private streamService: StreamService, private streamTypeService: StreamTypeService) {}
 
+    @TokenProtected()
     @Put('/streams')
-    createStream(@Request() req, @Body() body: CreateStreamRequestBody): Promise<string> {
+    async createStream(@Request() req, @TokenDataParam() tokenData: TokenData, @Body() body: CreateStreamRequestBody): Promise<string> {
       const { streamType, encryptedPrivateKey, publicKey } = body;
+      const { client_id: clientId} = tokenData;
 
-      return this.streamService.save(req.headers.authorization, streamType, encryptedPrivateKey, publicKey)
+      return this.streamService.save(req.headers.authorization, clientId, streamType, encryptedPrivateKey, publicKey);
     }
 
     @Get('/streams/types')

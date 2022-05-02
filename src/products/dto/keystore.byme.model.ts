@@ -5,7 +5,7 @@ export enum Purpose {
     'annotations' = 'annotations',
     'device_encryption' = 'device-encryption',
     'status_db' = 'status-db',
-    'status' = 'status'
+    'status_stream' = 'status-stream'
 }
 
 export enum AlgorithmType {
