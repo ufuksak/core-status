@@ -7,6 +7,7 @@ import { StreamTypeService } from '../../src/products/services/stream_type.servi
 import { StreamTypeDto } from 'src/products/dto/stream_type.model';
 import {expect} from './setup';
 import * as sinon from 'sinon';
+import { TokenData } from '@globalid/nest-auth';
 
 describe('Status Controller', () => {
     let statusController: StatusController;
@@ -51,7 +52,11 @@ describe('Status Controller', () => {
               publicKey: 'test',
             }
 
-            const response = await statusController.createStream(req, body);
+            const tokenData = {
+              client_id: uuid(),
+            } as TokenData;
+
+            const response = await statusController.createStream(req, tokenData, body);
 
             expect(response).equal(streamId);
         });
