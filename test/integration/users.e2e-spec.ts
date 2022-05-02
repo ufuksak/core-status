@@ -21,6 +21,8 @@ import waitForExpect from 'wait-for-expect';
 import { UserDto } from '../../src/products/dto/user.model';
 import { AppUsersTestModule } from './app.users.test.module';
 
+jest.setTimeout(3 * 60 * 1000);
+
 class Handlers {
   collectedMessages: [] = [];
 

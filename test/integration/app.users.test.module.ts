@@ -24,6 +24,9 @@ import {StatusRepository} from "../../src/products/repositories/status.repositor
 import {FileEntity} from "../../src/products/entity/file.entity";
 import {Container} from "../../src/products/entity/container.entity";
 import {Pot} from "../../src/products/entity/pot.entity";
+import {StreamEntity} from "../../src/products/entity/stream.entity";
+import {StreamTypeEntity} from "../../src/products/entity/stream_type.entity";
+import {GrantEntity} from "../../src/products/entity/grant.entity";
 
 const configWithEntity = {
     ...config,
@@ -42,7 +45,10 @@ const configWithEntity = {
         StatusRepository,
         FileEntity,
         Container,
-        Pot
+        Pot,
+        StreamEntity,
+        StreamTypeEntity,
+        GrantEntity
     ]
 };
 

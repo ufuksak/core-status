@@ -9,6 +9,7 @@ import {
 } from "typeorm";
 import {classToPlain, Exclude} from "class-transformer";
 import {UserEntity} from "./user.entity";
+import {StreamEntity} from "./stream.entity";
 
 export enum PayloadType {
     lockbox = 'lockbox',
