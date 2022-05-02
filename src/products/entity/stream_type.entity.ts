@@ -1,6 +1,6 @@
 import {Column, Entity } from "typeorm";
 import {BaseEntity} from "./base.entity";
-import {GrantType} from "../dto/grand.model";
+import {GrantType} from "../dto/grant.model";
 import {StreamGranularity, StreamHandling} from "../dto/stream_type.model";
 
 @Entity({name: "stream_type", synchronize: true})

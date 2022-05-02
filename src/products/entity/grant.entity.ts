@@ -1,5 +1,5 @@
 import {Column, Entity, ManyToOne } from "typeorm";
-import { GrantType } from "../dto/grand.model";
+import { GrantType } from "../dto/grant.model";
 import {BaseEntity} from "./base.entity";
 import {StreamEntity} from "./stream.entity";
 

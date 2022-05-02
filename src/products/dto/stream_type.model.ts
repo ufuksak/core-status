@@ -1,5 +1,5 @@
 import { IsArray, IsEnum, IsNotEmpty } from "class-validator";
-import { GrantType } from "./grand.model";
+import { GrantType } from "./grant.model";
 
 export enum StreamHandling {
   e2e = 'e2e',
