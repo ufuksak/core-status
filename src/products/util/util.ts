@@ -9,9 +9,11 @@ export enum ChannelType {
     GroupCustom = 'GROUP_CUSTOM',
 }
 
-export const STATUS_MANAGE_SCOPE = ['status.manage'];
+export const PG_UNIQUE_CONSTRAINT_VIOLATION = '23505';
 
-export const PG_FOREIGN_KEY_VIOLATION = 23503;
+export const PG_FOREIGN_KEY_VIOLATION = '23503';
+
+export const STATUS_MANAGE_SCOPE = ['status.manage', 'keys.manage'];
 
 export const PERSONAL_CHANNEL_PARTICIPANTS: number = 1
 

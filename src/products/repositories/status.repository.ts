@@ -1,9 +1,9 @@
 import {EntityRepository, FindOneOptions, Repository} from "typeorm";
 import { StatusDto } from "../dto/status.model";
-import { StatusEntity } from "../entity/status.entity";
+import { UpdateEntity } from "../entity/update.entity";
 
-@EntityRepository(StatusEntity)
-export class StatusRepository extends Repository<StatusEntity> {
+@EntityRepository(UpdateEntity)
+export class StatusRepository extends Repository<UpdateEntity> {
 
   saveStatus = async (statusDto: StatusDto) => {
     await this.save(statusDto);
@@ -13,7 +13,7 @@ export class StatusRepository extends Repository<StatusEntity> {
     return await this.find();
   }
 
-  getStatusById = async (id: string, options?: FindOneOptions<StatusEntity>) => {
+  getStatusById = async (id: string, options?: FindOneOptions<UpdateEntity>) => {
     return await this.findOneOrFail(id, options);
   }
 

@@ -13,6 +13,8 @@ import {UploadService} from "../services/upload.service";
 import {UploadPublisher} from "../rabbit/uploads.publisher";
 import {StreamTypeRepository} from '../repositories/stream_type.repository';
 import {StreamTypeService} from '../services/stream_type.service';
+import {StreamTypeEntity} from "../entity/stream_type.entity";
+import {StreamTypeNotExistsRule} from "../validators/stream-type.validator";
 
 @Module({
     imports: [
@@ -20,7 +22,6 @@ import {StreamTypeService} from '../services/stream_type.service';
       TypeOrmModule.forFeature([
         StreamRepository,
         StatusRepository,
-        UploadEntity,
         UploadRepository,
         StreamTypeRepository
       ])
@@ -32,7 +33,8 @@ import {StreamTypeService} from '../services/stream_type.service';
       StatusPublisher,
       StatusService,
       UploadService,
-      UploadPublisher
+      UploadPublisher,
+      StreamTypeNotExistsRule
     ]
 })
 export class StatusModule {}

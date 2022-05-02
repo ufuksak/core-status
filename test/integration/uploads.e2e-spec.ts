@@ -1,6 +1,6 @@
 import {Test, TestingModule} from "@nestjs/testing";
 import {INestApplication} from "@nestjs/common";
-import {AppUploadsTestModule} from "./app.uploads.test.module";
+import {AppUploadsTestModule} from "./modules/app.uploads.test.module";
 import * as fs from "fs/promises"
 import {S3ConfigProvider} from "../../src/products/config/s3.config.provider";
 import {MessageHandler} from "@globalid/nest-amqp";

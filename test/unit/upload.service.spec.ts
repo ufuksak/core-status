@@ -36,7 +36,7 @@ const userMock = {
     "actionList": [
         {
             "name": "userSave",
-            "description": "user save"
+            "description": "user create"
         }
     ]
 };

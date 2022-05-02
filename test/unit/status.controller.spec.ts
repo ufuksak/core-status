@@ -17,6 +17,7 @@ import {ConfigModule} from '@nestjs/config';
 import {CONFIG_VALIDATION_SCHEMA, configuration} from "../../src/products/config/config";
 import {StreamTypeService} from "../../src/products/services/stream_type.service";
 import {StreamTypeRepository} from "../../src/products/repositories/stream_type.repository";
+import {StreamEntity} from "../../src/products/entity/stream.entity";
 
 class Handlers {
   collectedMessages: [] = []
@@ -89,7 +90,17 @@ describe('Status Controller', () => {
   describe('createStream', () => {
     it('should create stream', async () => {
       const streamId = uuid();
-      streamService.save = jest.fn(async () => streamId);
+      streamService.create = jest.fn(async () => {
+        return {
+          "id": streamId,
+          "owner_id": "f7b0c885-74d3-4c78-943d-c6cad1e62aaf",
+          "type": "test",
+          "keypair_id": "17503e40-2be9-45a3-adc4-d86915bc908c",
+          "device_id": "6e9e5ec5-e260-43df-a8e1-b3f34b8cb9fb",
+          "created_at": "2022-04-30T19:06:06.669Z",
+          "updated_at": "2022-04-30T19:06:06.669Z"
+        } as StreamEntity;
+      });
 
       const req = {
         headers: {
@@ -97,9 +108,9 @@ describe('Status Controller', () => {
         }
       }
       const body = {
-        streamType: 'streamType',
-        encryptedPrivateKey: 'test',
-        publicKey: 'test',
+        stream_type: 'streamType',
+        encrypted_private_key: 'someValidRandomKey',
+        public_key: 'someValidRandomKey',
       }
 
       const token = getAccessToken();
@@ -108,7 +119,7 @@ describe('Status Controller', () => {
 
       const response = await statusController.createStream(req, tokenData, body);
 
-      expect(response).toEqual(streamId);
+      expect(response.id).toEqual(streamId);
     });
   });
 });

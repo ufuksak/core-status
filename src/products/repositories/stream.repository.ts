@@ -1,4 +1,4 @@
-import {EntityRepository, FindOneOptions, Repository} from "typeorm";
+import {EntityRepository, FindManyOptions, FindOneOptions, Repository} from "typeorm";
 import { StreamDto } from "../dto/stream.model";
 import { StreamEntity } from "../entity/stream.entity";
 
@@ -9,8 +9,8 @@ export class StreamRepository extends Repository<StreamEntity> {
     return this.save(statusDto);
   }
 
-  getStream(): Promise<StreamEntity[]>{
-    return this.find();
+  getStream(options?: FindManyOptions<StreamEntity>): Promise<StreamEntity[]>{
+    return this.find(options || {});
   }
 
   getStreamById(id: string, options?: FindOneOptions<StreamEntity>): Promise<StreamEntity> {

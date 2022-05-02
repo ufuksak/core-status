@@ -2,14 +2,8 @@ import {INestApplication} from "@nestjs/common";
 import {Test, TestingModule} from "@nestjs/testing";
 import * as supertest from "supertest";
 import {getAccessToken} from "../getacctoken";
-import {config} from 'dotenv'
-import {KeystoreModule} from "../../src/products/modules/keystore.module";
-import {CONFIG_VALIDATION_SCHEMA, RABBIT_URI} from "../../src/products/config/config";
-import {AmqpModule} from "@globalid/nest-amqp";
-import {ConfigModule} from "@nestjs/config/dist";
+import {AppKeystoreTestModule} from "./modules/app.keystore.test.module";
 
-
-config()
 jest.setTimeout(60 * 1000);
 
 describe('KeystoreController (e2e)', () => {
@@ -20,20 +14,7 @@ describe('KeystoreController (e2e)', () => {
     process.env.NODE_ENV = 'debugkeystore';
     process.env.SDK_CUSTOM_API_URL = 'http://localhost';
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [KeystoreModule,
-        AmqpModule.forConfig({
-          urlOrOpts: RABBIT_URI,
-          defaultValidationOptions: {classTransform: {enableImplicitConversion: true}, validate: true},
-        }),
-        ConfigModule.forRoot({
-          validationSchema: CONFIG_VALIDATION_SCHEMA,
-          validationOptions: {
-            allowUnknown: true,
-            abortEarly: true,
-          },
-          isGlobal: true
-        })
-      ]
+      imports: [AppKeystoreTestModule]
     }).compile();
 
     app = moduleFixture.createNestApplication();

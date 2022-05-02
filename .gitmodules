@@ -1,0 +1,3 @@
+[submodule "globalid-crypto-library"]
+	path = globalid-crypto-library
+	url = git@github.com:globalid/globalid-crypto-library.git

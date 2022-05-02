@@ -16,7 +16,7 @@ export class KeystoreController {
     async issueNewKeyPairByMe(
         @Request() req,
         @Body() body: KeystoreByMeDto
-    ): Promise<KeyPairCreateResponse> {
+    ) {
         return this.service.createKeystoreKeyByMe(req.headers.authorization, body)
     }
 
