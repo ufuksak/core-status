@@ -4,19 +4,23 @@ import { StreamService } from '../../src/products/services/stream.service';
 import { StreamRepository } from '../../src/products/repositories/stream.repository';
 import {v4 as uuid} from 'uuid';
 import { StreamTypeService } from '../../src/products/services/stream_type.service';
-import { StreamTypeDto } from 'src/products/dto/stream_type.model';
+import { StreamTypeDto } from '../../src/products/dto/stream_type.model';
 import {expect} from './setup';
 import * as sinon from 'sinon';
 import { TokenData } from '@globalid/nest-auth';
+import { GrantDto } from '../../src/products/dto/grant.model';
+import { GrantService } from '../../src/products/services/grant.service';
 
 describe('Status Controller', () => {
     let statusController: StatusController;
     let streamService;
     let streamTypeService;
+    let grantService;
 
     beforeAll(async () => {
       streamService = {};
       streamTypeService = {};
+      grantService = {};
 
       const module = await Test.createTestingModule({
           controllers: [StatusController],
@@ -29,6 +33,10 @@ describe('Status Controller', () => {
             {
               provide: StreamTypeService,
               useValue: streamTypeService
+            },
+            {
+              provide: GrantService,
+              useValue: grantService
             }
           ],
       }).compile();
@@ -60,6 +68,30 @@ describe('Status Controller', () => {
 
             expect(response).equal(streamId);
         });
+    });
+
+    describe('createGrant', () => {
+      it('should create grant', async () => {
+        const streamId = uuid();
+        grantService.save = jest.fn(async () =>streamId);
+
+        const body = {
+          "stream_id": streamId,
+          "recipient_id": uuid(),
+          "properties": {},
+          "fromDate": "2020-01-01T00:00:00.000Z",
+          "toDate": "2020-01-01T00:00:00.000Z",
+          "type": "range",
+        } as GrantDto;
+
+        const tokenData = {
+          client_id: uuid(),
+        } as TokenData;
+
+        const response = await statusController.createGrant(tokenData, body);
+
+        expect(response).equal(streamId);
+      });
     });
 
     describe('getStreamTypes', () => {

@@ -1,8 +1,9 @@
-import { TokenData } from "@globalid/nest-auth";
 import {Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
+import { FindOneOptions } from "typeorm";
 import { KeystoreByMeDto } from "../dto/keystore.byme.model";
 import { StreamDto } from "../dto/stream.model";
+import { StreamEntity } from "../entity/stream.entity";
 import { StreamRepository } from "../repositories/stream.repository";
 import { KeystoreService } from "./keystore";
 
@@ -37,4 +38,7 @@ export class StreamService {
       return stream.id;
     }
 
+    getById(streamId: string, options?: FindOneOptions<StreamEntity>) {
+      return this.streamRepo.getStreamById(streamId, options);
+    }
 }

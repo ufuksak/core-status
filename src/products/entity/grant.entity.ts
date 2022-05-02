@@ -1,12 +1,7 @@
 import {Column, Entity, ManyToOne } from "typeorm";
-import { GrantType } from "../dto/grant.model";
+import { GrantProperties, GrantType } from "../dto/grant.model";
 import {BaseEntity} from "./base.entity";
 import {StreamEntity} from "./stream.entity";
-
-export interface GrantProperties {
-    reEncryptionKey: string;
-    e2eKey: string;
-}
 
 @Entity({name: "grant", synchronize: true})
 export class GrantEntity extends BaseEntity {
@@ -14,7 +9,7 @@ export class GrantEntity extends BaseEntity {
         type: 'enum',
         enum: GrantType
     })
-    type: GrantType;
+    type: string;
 
     @Column({type: 'jsonb'})
     properties: GrantProperties;

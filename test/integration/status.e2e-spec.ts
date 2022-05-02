@@ -158,6 +158,65 @@ describe('StatusController (e2e)', () => {
     });
   });
 
+  describe('PUT /api/v1/status/grants', () => {
+    it('should return the grantId', async () => {
+      const accessToken = getAccessToken();
+
+      const streamType = uuid();
+      const streamTypeData = {
+        granularity     : 'single',
+        stream_handling : 'lockbox',
+        approximated    : true,
+        supported_grants: ['range'],
+        type            : streamType,
+      };
+      const streamData = {
+        "streamType": streamType,
+        "publicKey": "Ut incididuntelit labore",
+        "encryptedPrivateKey": "Duis Excepteur culpa reprehenderit esse",
+      };
+
+      // Run your end-to-end test
+      await supertest.agent(app.getHttpServer())
+        .post('/api/v1/status/streams/types')
+        .set('Accept', 'application/json')
+        .auth(accessToken, {type: "bearer"})
+        .send(streamTypeData)
+        .expect('Content-Type', /json/)
+        .expect(201);
+
+        // Run your end-to-end test
+        const { text: stream_id } = await supertest.agent(app.getHttpServer())
+            .put('/api/v1/status/streams')
+            .set('Accept', 'text/plain')
+            .auth(accessToken, {type: "bearer"})
+            .send(streamData)
+            .expect('Content-Type', /text\/html/)
+            .expect(200);
+
+        const grantData = {
+          "stream_id": stream_id,
+          "recipient_id": uuid(),
+          "properties": {},
+          "fromDate": "2020-01-01T00:00:00.000Z",
+          "toDate": "2020-01-01T00:00:00.000Z",
+          "type": "range",
+        };
+
+        // Run your end-to-end test
+        const { text } = await supertest.agent(app.getHttpServer())
+            .put('/api/v1/status/grants')
+            .set('Accept', 'text/plain')
+            .auth(accessToken, {type: "bearer"})
+            .send(grantData)
+            .expect('Content-Type', /text\/html/)
+            .expect(200);
+
+        expect(typeof text).toBe('string');
+        expect(text).toHaveLength(36);
+    });
+  });
+
   describe('GET /api/v1/status/streams/types', () => {
     it('should get all streamTypes', async () => {
       const accessToken = getAccessToken();
