@@ -1,6 +1,7 @@
 import {IsArray, IsBoolean, IsEnum, IsNotEmpty, MaxLength} from "class-validator";
-import {GrantType, StreamGranularity, StreamHandling} from "./grand.model";
+import {GrantType, StreamGranularity, StreamHandling} from "./grant.model";
 import {StreamTypeAvailable} from "../validators/stream-type.validator";
+
 
 export class StreamTypeDto  {
   @IsEnum(StreamGranularity)

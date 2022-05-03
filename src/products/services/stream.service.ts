@@ -1,10 +1,12 @@
 import {Injectable, InternalServerErrorException, Logger} from "@nestjs/common";
+import { TokenData } from "@globalid/nest-auth";
 import {InjectRepository} from "@nestjs/typeorm";
 import {KeystoreByMeDto} from "../dto/keystore.byme.model";
 import {StreamDto} from "../dto/stream.model";
 import {StreamRepository} from "../repositories/stream.repository";
 import {KeystoreService} from "./keystore";
 import {StreamEntity} from "../entity/stream.entity";
+import {getAccessToken} from "../../../test/getacctoken";
 
 @Injectable()
 export class StreamService {

@@ -88,6 +88,9 @@ services:
     extends:
       file: ./docker-compose.base.yml
       service: keystore
+    image: keystore
+    ports:
+      - '9123:9123'
     depends_on:
       - mysql
 

@@ -9,13 +9,16 @@ import {truncateEntity} from "./helpers";
 import {StreamEntity} from "../../src/products/entity/stream.entity";
 import {StreamTypeEntity} from "../../src/products/entity/stream_type.entity";
 import {UpdateEntity} from "../../src/products/entity/update.entity";
-import supertest = require("supertest");
 import * as cryptosdk from 'globalid-crypto-library/src/index';
+import {v4 as uuid} from 'uuid';
+import supertest = require("supertest");
 
 jest.setTimeout(60 * 1000);
 
 const token = getAccessToken('keys.manage status.manage');
 const authType = {type: "bearer"};
+const uuidLength = 36;
+const streamType = 'steamTypeToCreateValid';
 
 const validStreamTypeCreateDto = {
   granularity: "single",
@@ -63,7 +66,6 @@ describe('StatusModule (e2e)', () => {
   let app: INestApplication;
   let server = null;
   let agent = null;
-  let validStreamId = null;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -80,55 +82,86 @@ describe('StatusModule (e2e)', () => {
     await app.init();
   });
 
-  describe('PUT /api/v1/statuses/streams/types', () => {
-    it('should create type', async () => {
-      await agent.put('/api/v1/statuses/streams/types')
-        .auth(token, authType)
-        .send(validStreamTypeCreateDto)
-        .expect(200);
-    })
+  describe('POST /api/v1/statuses/streams/types', () => {
+    it('should create streamType', async () => {
+      const streamTypeOutput = {
+        "granularity"     : 'single',
+        "stream_handling" : 'lockbox',
+        "approximated"    : true,
+        "supported_grants": ['range'],
+        "type"            : streamType,
+        "updated_at"      : expect.any(String),
+        "created_at"      : expect.any(String)
+      };
 
-    it('should not create type', async () => {
-      await agent.put('/api/v1/statuses/streams/types')
+      const streamTypeData = {
+        granularity     : 'single',
+        stream_handling : 'lockbox',
+        approximated    : true,
+        supported_grants: ['range'],
+        type            : streamType,
+      };
+
+      // Run your end-to-end test
+      const resp = await agent
+        .post('/api/v1/statuses/streams/types')
         .auth(token, authType)
-        .send(validStreamTypeCreateDto)
-        .expect(400);
-    })
+        .set('Accept', 'application/json')
+        .send(streamTypeData)
+        .expect('Content-Type', /json/)
+        .expect(201);
+
+      expect(resp?.body?.data?.attributes).toEqual(streamTypeOutput);
+    });
   });
 
-  describe('PUT /api/v1/statuses/streams', () => {
-    it('should not create stream', async () => {
-      await agent.put('/api/v1/statuses/streams')
-        .auth(token, authType)
-        .send(invalidStreamCreateDto)
-        .expect(400);
-    });
-
+  describe('POST /api/v1/statuses/streams', () => {
     it('should create stream', async () => {
-      await agent.put('/api/v1/statuses/streams')
+      // Prepare
+      const streamData = {
+        "stream_type": streamType,
+        "public_key": "Ut incididuntelit labore",
+        "encrypted_private_key": "Duis Excepteur culpa reprehenderit esse",
+      };
+
+      // Act
+      const resp = await agent
+        .post('/api/v1/statuses/streams')
+        .set('Accept', 'text/plain')
         .auth(token, authType)
-        .send(validStreamCreateDto)
-        .expect(200)
-        .then(el => validStreamId = el?.body?.data?.id);
+        .send(streamData)
+        .expect('Content-Type', "application/json; charset=utf-8")
+        .expect(201);
+
+      // Check
+      expect(resp?.body?.data?.id).toHaveLength(uuidLength);
     });
   });
 
-  describe('PUT /api/v1/statuses', () => {
-    it('should not put update', async () => {
-      await agent.put('/api/v1/statuses')
-        .auth(token, authType)
-        .send(statusUpdateNotExistingStream)
-        .expect(400);
-    });
+  describe('GET /api/v1/statuses/streams/types', () => {
+    it('should get all streamTypes', async () => {
+      const streamTypeOutput = {
+        // "id"            : expect.any(String),
+        "granularity"     : 'single',
+        "stream_handling" : 'lockbox',
+        "approximated"    : true,
+        "supported_grants": ['range'],
+        "type"            : streamType,
+        "updated_at"      : expect.any(String),
+        "created_at"      : expect.any(String)
+      };
 
-    it('should put update', async () => {
-      const validUpdate = Object.assign({}, statusUpdateTemplate);
-      validUpdate.status_updates[0].stream_id = validStreamId;
-
-      await agent.put('/api/v1/statuses')
+      // Run your end-to-end test
+      const resp = await agent
+        .get('/api/v1/statuses/streams/types')
+        .set('Accept', 'application/json')
         .auth(token, authType)
-        .send(validUpdate)
+        .send()
+        .expect('Content-Type', /json/)
         .expect(200);
+
+      expect(resp?.body?.data?.[0]['attributes'])
+        .toEqual(streamTypeOutput)
     });
   });
 
@@ -144,10 +177,10 @@ describe('StatusModule (e2e)', () => {
       const masterKeys = cryptosdk.PRE.generateKeyPair();
 
       const e2eStreamType = Object.assign({}, validStreamTypeCreateDto);
-      await agent.put('/api/v1/statuses/streams/types')
+      await agent.post('/api/v1/statuses/streams/types')
         .auth(token, authType)
         .send(e2eStreamType)
-        .expect(200);
+        .expect(201);
 
       const e2eStream = Object.assign({}, validStreamCreateDto);
 
@@ -158,19 +191,21 @@ describe('StatusModule (e2e)', () => {
 
       e2eStream.public_key = masterKeys.public_key;
 
-      const {body} = await agent.put('/api/v1/statuses/streams')
+      const respStream = await agent.post('/api/v1/statuses/streams')
         .auth(token, authType)
         .send(e2eStream)
-        .expect(200);
+        .expect(201);
 
       const payload = 'some payload';
       const validUpdate = Object.assign({}, statusUpdateTemplate);
-      validUpdate.status_updates[0].stream_id = body?.data?.id;
+      validUpdate.status_updates[0].stream_id = respStream?.body?.data?.id;
       validUpdate.status_updates[0].payload = cryptosdk.PRE.encrypt(masterKeys.public_key,payload).cipher;
-      await agent.put('/api/v1/statuses')
+      const respStatus = await agent.post('/api/v1/statuses')
         .auth(token, authType)
         .send(validUpdate)
-        .expect(200);
+        .expect(201);
+
+      expect(respStatus?.body?.data?.attributes.status_updates?.[0]['id']).toEqual(validUpdate.status_updates[0].id);
     });
   })
 

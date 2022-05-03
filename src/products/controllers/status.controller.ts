@@ -5,7 +5,7 @@ import {StatusService} from "../services/status.service";
 import {ScopedTokenDataParam} from "../commons/scope.decorator";
 import {STATUS_MANAGE_SCOPE} from "../util/util";
 import {StreamEntity} from "../entity/stream.entity";
-import {Body, Controller, Delete, Get, Param, Put, Request} from "@nestjs/common";
+import {Body, Controller, Delete, Get, Param, Post, Put, Request} from "@nestjs/common";
 import {StreamTypeDto} from "../dto/stream_type.model";
 import {StreamTypeEntity} from "../entity/stream_type.entity";
 import {StreamTypeService} from "../services/stream_type.service";
@@ -25,7 +25,7 @@ export class StatusController {
         return this.statusService.getUserStatuses(tokenData.uuid);
     }
 
-    @Put()
+    @Post()
     @TokenProtected()
     async appendStatus(
       @ScopedTokenDataParam(STATUS_MANAGE_SCOPE) tokenData: TokenData,
@@ -43,7 +43,7 @@ export class StatusController {
         return this.streamService.getAll();
     }
 
-    @Put('/streams')
+    @Post('/streams')
     @TokenProtected()
     async createStream(
       @Request() req,
@@ -61,9 +61,11 @@ export class StatusController {
         return this.streamTypeService.getAll()
     }
 
-    @Put('/streams/types')
+    @Post('/streams/types')
     @TokenProtected()
-    async createStreamType(@Body() streamType: StreamTypeDto): Promise<StreamTypeEntity> {
+    async createStreamType(
+      @ScopedTokenDataParam(STATUS_MANAGE_SCOPE) tokenData: TokenData,
+      @Body() streamType: StreamTypeDto): Promise<StreamTypeEntity> {
         return this.streamTypeService.save(streamType)
     }
 

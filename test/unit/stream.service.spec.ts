@@ -75,19 +75,18 @@ describe('Status Service', () => {
     describe('save', () => {
         it('should create stream', async () => {
             const streamId = uuid();
-
-            const token = 'Bearer token';
-            const streamType = 'some';
-            const encryptedPrivateKey = 'test';
-            const publicKey = 'test';
-            const owner_id = uuid();
+            const token = 'Bearer token'
+            const streamType = 'some'
+            const encryptedPrivateKey = 'test'
+            const publicKey = 'test'
+            const client_id = uuid()
 
             const keystore = { client_id: uuid(), uuid: uuid(), device_id: uuid()};
 
             keystoreService.createKeystoreKeyByMe = sinon.spy(() => (keystore));
             streamRepository.saveStream = sinon.spy(() => ({ id: streamId }));
 
-            const response = await streamService.create(owner_id, token, streamType, encryptedPrivateKey, publicKey);
+            const response = await streamService.create(client_id, token, streamType, encryptedPrivateKey, publicKey);
 
             expect(response.id).toEqual(streamId);
 
@@ -100,7 +99,7 @@ describe('Status Service', () => {
 
             expect(streamRepository.saveStream.calledOnce).toBeTruthy();
             expect(streamRepository.saveStream.args[0][0]).toHaveProperty('type', streamType);
-            expect(streamRepository.saveStream.args[0][0]).toHaveProperty('owner_id', owner_id);
+            expect(streamRepository.saveStream.args[0][0]).toHaveProperty('owner_id', client_id);
             expect(streamRepository.saveStream.args[0][0]).toHaveProperty('keypair_id', keystore.uuid);
             expect(streamRepository.saveStream.args[0][0]).toHaveProperty('device_id', keystore.device_id);
         });

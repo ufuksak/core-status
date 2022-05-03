@@ -1,47 +1,34 @@
 import {Test} from '@nestjs/testing';
-import {StatusController} from '../../src/products/controllers/status.controller';
-import {StreamService} from '../../src/products/services/stream.service';
-import {StreamRepository} from '../../src/products/repositories/stream.repository';
+import { StatusController } from '../../src/products/controllers/status.controller';
+import { StreamService } from '../../src/products/services/stream.service';
+import { StreamRepository } from '../../src/products/repositories/stream.repository';
 import {v4 as uuid} from 'uuid';
-import {KeystoreService} from '../../src/products/services/keystore';
+import { StreamTypeService } from '../../src/products/services/stream_type.service';
+import { StreamTypeDto } from 'src/products/dto/stream_type.model';
+import {expect} from './setup';
+import * as sinon from 'sinon';
+import { TokenData, TokenModule } from '@globalid/nest-auth';
+import {CreateStreamRequestBody} from "../../src/products/dto/stream.model";
 import {StatusService} from "../../src/products/services/status.service";
-import {MessageHandler} from '@globalid/nest-amqp';
-import {StatusDto} from "../../src/products/dto/status.model";
 import {StatusRepository} from "../../src/products/repositories/status.repository";
-import {StatusPublisher} from "../../src/products/rabbit/status.publisher";
-import {getAccessToken} from "../getacctoken";
-import {TokenData, TokenModule} from '@globalid/nest-auth';
-import {plainToClass} from 'class-transformer';
-import {JwtService} from '@nestjs/jwt';
-import {ConfigModule} from '@nestjs/config';
-import {CONFIG_VALIDATION_SCHEMA, configuration} from "../../src/products/config/config";
-import {StreamTypeService} from "../../src/products/services/stream_type.service";
 import {StreamTypeRepository} from "../../src/products/repositories/stream_type.repository";
-import {StreamEntity} from "../../src/products/entity/stream.entity";
-
-class Handlers {
-  collectedMessages: [] = []
-
-  getCollectedMessages(): string[] {
-    return [...this.collectedMessages]
-  }
-
-  clearCollectedMessages(): void {
-    this.collectedMessages = [];
-  }
-
-  @MessageHandler({})
-  async updateAdd(evt: StatusDto): Promise<void> {
-    this.collectedMessages.push(evt as never)
-  }
-}
+import {StatusPublisher} from "../../src/products/rabbit/status.publisher";
+import {KeystoreService} from "../../src/products/services/keystore";
+import { ConfigModule } from '@nestjs/config';
+import {CONFIG_VALIDATION_SCHEMA, configuration} from "../../src/products/config/config";
+import {getAccessToken} from "../getacctoken";
 
 describe('Status Controller', () => {
   let statusController: StatusController;
-  let streamService: StreamService;
-  let jwtService: JwtService;
+  let streamService;
+  let statusService;
+  let streamTypeService;
 
   beforeAll(async () => {
+    streamService = {};
+    statusService = {};
+    streamTypeService = {};
+
     const module = await Test.createTestingModule({
       imports: [
         TokenModule,
@@ -56,9 +43,18 @@ describe('Status Controller', () => {
         })],
       controllers: [StatusController],
       providers: [
-        StreamService,
-        StreamTypeService,
-        StatusService,
+        {
+          provide: StreamService,
+          useValue: streamService
+        },
+        {
+          provide: StatusService,
+          useValue: statusService
+        },
+        {
+          provide: StreamTypeService,
+          useValue: streamTypeService
+        },
         {
           provide: KeystoreService,
           useValue: {}
@@ -82,25 +78,13 @@ describe('Status Controller', () => {
       ],
     }).compile();
 
-    jwtService = module.get<JwtService>(JwtService);
     statusController = module.get<StatusController>(StatusController);
-    streamService = module.get<StreamService>(StreamService);
   });
 
   describe('createStream', () => {
     it('should create stream', async () => {
       const streamId = uuid();
-      streamService.create = jest.fn(async () => {
-        return {
-          "id": streamId,
-          "owner_id": "f7b0c885-74d3-4c78-943d-c6cad1e62aaf",
-          "type": "test",
-          "keypair_id": "17503e40-2be9-45a3-adc4-d86915bc908c",
-          "device_id": "6e9e5ec5-e260-43df-a8e1-b3f34b8cb9fb",
-          "created_at": "2022-04-30T19:06:06.669Z",
-          "updated_at": "2022-04-30T19:06:06.669Z"
-        } as StreamEntity;
-      });
+      streamService.create = jest.fn(async () => streamId);
 
       const req = {
         headers: {
@@ -109,17 +93,76 @@ describe('Status Controller', () => {
       }
       const body = {
         stream_type: 'streamType',
-        encrypted_private_key: 'someValidRandomKey',
-        public_key: 'someValidRandomKey',
-      }
+        encrypted_private_key: 'test',
+        public_key: 'test',
+      } as CreateStreamRequestBody;
 
-      const token = getAccessToken();
-      const decodedToken = jwtService.decode(token);
-      const tokenData = plainToClass(TokenData, decodedToken);
+      const tokenData = {
+        client_id: uuid(),
+      } as TokenData;
 
       const response = await statusController.createStream(req, tokenData, body);
 
-      expect(response.id).toEqual(streamId);
+      expect(response).equal(streamId);
+    });
+  });
+
+  describe('getStreamTypes', () => {
+    it('should return all streamTypes', async () => {
+      const streamTypeEntity = {
+        "id": uuid(),
+        "granularity": "single",
+        "stream_handling": "lockbox",
+        "approximated": true,
+      }
+
+      streamTypeService.getAll = sinon.spy(async () => [streamTypeEntity]);
+
+      const response = await statusController.getStreamTypes();
+
+      expect(response).to.deep.equal([streamTypeEntity]);
+
+      expect(streamTypeService.getAll.calledOnce).to.be.true;
+      expect(streamTypeService.getAll.args[0]).to.be.empty;
+    });
+  });
+
+  describe('createStreamType', () => {
+    it('should create streamType', async () => {
+      const streamTypeId = uuid();
+      streamTypeService.save = sinon.spy(async () => ({ id: streamTypeId }));
+
+      const streamType = {
+        granularity: 'single',
+        stream_handling: 'lockbox',
+        approximated: true,
+        supported_grants: ['range'],
+        type: 'test',
+      } as StreamTypeDto;
+
+      const tokenData = {
+        client_id: uuid(),
+      } as TokenData;
+      const response = await statusController.createStreamType(tokenData, streamType);
+
+      expect(response).to.have.property('id', streamTypeId);
+
+      expect(streamTypeService.save.calledOnce).to.be.true;
+      expect(streamTypeService.save.args[0][0]).to.deep.equal(streamType);
+    });
+  });
+
+  describe('deleteStreamType', () => {
+    it('should delete streamType', async () => {
+      const streamTypeId = uuid();
+      streamTypeService.delete = sinon.spy(async () => ({ affected: 1 }));
+
+      const response = await statusController.deleteStreamType(streamTypeId);
+
+      expect(response).to.have.property('affected', 1);
+
+      expect(streamTypeService.delete.calledOnce).to.be.true;
+      expect(streamTypeService.delete.args[0][0]).equal(streamTypeId);
     });
   });
 });
