@@ -82,7 +82,7 @@ describe('StatusModule (e2e)', () => {
     await app.init();
   });
 
-  describe('POST /api/v1/statuses/streams/types', () => {
+  describe('POST /api/v1/status/streams/types', () => {
     it('should create streamType', async () => {
       const streamTypeOutput = {
         "granularity"     : 'single',
@@ -104,7 +104,7 @@ describe('StatusModule (e2e)', () => {
 
       // Run your end-to-end test
       const resp = await agent
-        .post('/api/v1/statuses/streams/types')
+        .post('/api/v1/status/streams/types')
         .auth(token, authType)
         .set('Accept', 'application/json')
         .send(streamTypeData)
@@ -115,7 +115,7 @@ describe('StatusModule (e2e)', () => {
     });
   });
 
-  describe('POST /api/v1/statuses/streams', () => {
+  describe('POST /api/v1/status/streams', () => {
     it('should create stream', async () => {
       // Prepare
       const streamData = {
@@ -126,7 +126,7 @@ describe('StatusModule (e2e)', () => {
 
       // Act
       const resp = await agent
-        .post('/api/v1/statuses/streams')
+        .post('/api/v1/status/streams')
         .set('Accept', 'text/plain')
         .auth(token, authType)
         .send(streamData)
@@ -138,7 +138,7 @@ describe('StatusModule (e2e)', () => {
     });
   });
 
-  describe('GET /api/v1/statuses/streams/types', () => {
+  describe('GET /api/v1/status/streams/types', () => {
     it('should get all streamTypes', async () => {
       const streamTypeOutput = {
         // "id"            : expect.any(String),
@@ -153,7 +153,7 @@ describe('StatusModule (e2e)', () => {
 
       // Run your end-to-end test
       const resp = await agent
-        .get('/api/v1/statuses/streams/types')
+        .get('/api/v1/status/streams/types')
         .set('Accept', 'application/json')
         .auth(token, authType)
         .send()
@@ -173,11 +173,11 @@ describe('StatusModule (e2e)', () => {
         }))
     });
 
-    it('e2e stream', async () => {
+    it('e2e stream create and upload update', async () => {
       const masterKeys = cryptosdk.PRE.generateKeyPair();
 
       const e2eStreamType = Object.assign({}, validStreamTypeCreateDto);
-      await agent.post('/api/v1/statuses/streams/types')
+      await agent.post('/api/v1/status/streams/types')
         .auth(token, authType)
         .send(e2eStreamType)
         .expect(201);
@@ -191,7 +191,7 @@ describe('StatusModule (e2e)', () => {
 
       e2eStream.public_key = masterKeys.public_key;
 
-      const respStream = await agent.post('/api/v1/statuses/streams')
+      const respStream = await agent.post('/api/v1/status/streams')
         .auth(token, authType)
         .send(e2eStream)
         .expect(201);
@@ -200,7 +200,7 @@ describe('StatusModule (e2e)', () => {
       const validUpdate = Object.assign({}, statusUpdateTemplate);
       validUpdate.status_updates[0].stream_id = respStream?.body?.data?.id;
       validUpdate.status_updates[0].payload = cryptosdk.PRE.encrypt(masterKeys.public_key,payload).cipher;
-      const respStatus = await agent.post('/api/v1/statuses')
+      const respStatus = await agent.post('/api/v1/status/upload')
         .auth(token, authType)
         .send(validUpdate)
         .expect(201);

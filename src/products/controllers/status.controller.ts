@@ -11,7 +11,7 @@ import {StreamTypeEntity} from "../entity/stream_type.entity";
 import {StreamTypeService} from "../services/stream_type.service";
 import {CreateStreamRequestBody} from "../dto/stream.model";
 
-@Controller('/api/v1/statuses')
+@Controller('/api/v1/status')
 export class StatusController {
     constructor(
       private readonly statusService: StatusService,
@@ -25,7 +25,7 @@ export class StatusController {
         return this.statusService.getUserStatuses(tokenData.uuid);
     }
 
-    @Post()
+    @Post('/upload')
     @TokenProtected()
     async appendStatus(
       @ScopedTokenDataParam(STATUS_MANAGE_SCOPE) tokenData: TokenData,
