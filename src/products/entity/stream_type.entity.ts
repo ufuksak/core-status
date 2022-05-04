@@ -26,7 +26,7 @@ export class StreamTypeEntity extends BaseEntity {
         array: true,
         enum: Object.values(GrantType)
     })
-    supported_grants: GrantType[];
+    supported_grants: string[];
 
     @Column({ unique: true, type: 'text' })
     type: string;

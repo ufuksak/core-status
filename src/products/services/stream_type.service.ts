@@ -11,8 +11,8 @@ export class StreamTypeService {
       @InjectRepository(StreamTypeRepository) private readonly streamTypeRepo: StreamTypeRepository,
     ) {}
 
-    async getAll(): Promise<StreamTypeEntity[]>{
-      return await this.streamTypeRepo.getStreamTypes();
+    getAll(): Promise<StreamTypeEntity[]>{
+      return this.streamTypeRepo.getStreamTypes();
     };
 
     save(streamType: StreamTypeDto): Promise<StreamTypeEntity>{
