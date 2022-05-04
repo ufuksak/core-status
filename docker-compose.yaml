@@ -85,28 +85,14 @@ services:
       MYSQL_ROOT_PASSWORD: root
 
   keystore:
+    extends:
+      file: ./docker-compose.base.yml
+      service: keystore
     image: keystore
+    ports:
+      - '9123:9123'
     depends_on:
       - mysql
-    environment:
-      AWS_ACCESS_KEY_ID: invalid
-      AWS_BUCKET_NAME: dev-bucket
-      AWS_REGION: eu-west-1
-      AWS_SECRET_ACCESS_KEY: invalid
-      AZURE_CLIENT_ID: 89b42340-ea89-47d4-b29c-0ea03236482d
-      AZURE_CLIENT_SECRET: -o_uWZ186Q-m_hXb7Dk7Mj2MKv9n8D03r4
-      AZURE_KEY_VAULT_NAME: gid-dev-groups-vault
-      AZURE_TENANT_ID: 07e42d9d-9529-4908-b3dc-755c9ddae079
-      DATABASE_CONNECTION_URL: mysql://root:test@mysql:3306/test_keystoreservice
-      DEFAULT_REGION: eu-west-1
-      DISABLE_DDTRACE: 1
-      JWT_ISSUER: https://iss.uer
-      JWT_PUBLIC_KEY: sigsecret
-      NAMESPACE: dev
-      NODE_ENV: development
-      SNS_ENDPOINT: http://localstack:4566
-      SQS_ENDPOINT: http://localstack:4566
-      SVC_URL_CONSENT: http://consent-service:9502
 
   hydra:
     image: ghcr.io/globalid/container-images/hydra:latest
@@ -234,8 +220,8 @@ services:
       MESSAGING_TRANSPORT_SERVICE_URL: http://messaging-transport-service:9840
       SERVER_PORT: 9836
       DATABASE_CONNECTION_URL: 'postgresql://user_messaging:e5YGE3cQ2ysqHesT@postgres:5432/test_messaging'
-      #      PUBNUB_SUBSCRIBE_KEY: 'sub-c-252ec7e2-7ca4-11e9-89f1-56e8a30b5f0e'
-      #      PUBNUB_PUBLISH_KEY: 'pub-c-937068cd-2e67-4c0e-a1eb-3c108d85f9e7'
+#      PUBNUB_SUBSCRIBE_KEY: 'sub-c-252ec7e2-7ca4-11e9-89f1-56e8a30b5f0e'
+#      PUBNUB_PUBLISH_KEY: 'pub-c-937068cd-2e67-4c0e-a1eb-3c108d85f9e7'
       AWS_CLOUDFRONT_ACCESS_KEY_ID: 'aws-id'
       AWS_CLOUDFRONT_PRIVATE_KEY: 'aws-private-key'
       DEFAULT_CLIENT_ID: '4cf2c57b-ab68-4415-9b1d-9876df5d307f'

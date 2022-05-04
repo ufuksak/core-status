@@ -1,12 +1,7 @@
 import {Column, Entity, ManyToOne } from "typeorm";
+import { GrantType } from "../dto/grant.model";
 import {BaseEntity} from "./base.entity";
 import {StreamEntity} from "./stream.entity";
-
-export enum GrantType {
-    range = 'range',
-    all = 'all',
-    latest = 'latest'
-}
 
 export interface GrantProperties {
     reEncryptionKey: string;

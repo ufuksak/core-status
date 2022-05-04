@@ -7,6 +7,7 @@ import {KeystorePublisher} from "../rabbit/keystore.publisher";
     imports: [],
     controllers: [KeystoreController],
     providers: [KeystoreService, KeystorePublisher],
+    exports: [KeystoreService],
 })
 export class KeystoreModule {
 }

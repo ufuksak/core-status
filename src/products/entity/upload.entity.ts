@@ -1,15 +1,5 @@
-import {
-    Column,
-    CreateDateColumn,
-    Entity,
-    JoinColumn,
-    ManyToOne,
-    PrimaryGeneratedColumn,
-    UpdateDateColumn
-} from "typeorm";
+import {Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn} from "typeorm";
 import {classToPlain, Exclude} from "class-transformer";
-import {UserEntity} from "./user.entity";
-import {StreamEntity} from "./stream.entity";
 
 export enum PayloadType {
     lockbox = 'lockbox',
@@ -17,7 +7,7 @@ export enum PayloadType {
 }
 
 @Entity({name: "file", synchronize: true})
-export class FileEntity {
+export class UploadEntity {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
@@ -60,16 +50,10 @@ export class FileEntity {
     @UpdateDateColumn()
     updated_at: Date;
 
-    @Column()
+    @Column({
+        type: 'uuid'
+    })
     user_id: string;
-
-    @ManyToOne(() => UserEntity, user => user.fileList, {
-        onDelete: "CASCADE"
-    })
-    @JoinColumn({
-        name: 'user_id'
-    })
-    user: UserEntity;
 
     toJSON() {
         const result = classToPlain(this);

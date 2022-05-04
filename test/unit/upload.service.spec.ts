@@ -1,12 +1,10 @@
 import {Test, TestingModule} from '@nestjs/testing';
 import {getRepositoryToken} from "@nestjs/typeorm";
 import {v4 as uuid} from 'uuid';
-import {FileRepository} from "../../src/products/repositories/file.repository";
+import {UploadRepository} from "../../src/products/repositories/uploadRepository";
 import {NotFoundException} from "@nestjs/common";
-import {UserRepository} from "../../src/products/repositories/user.repository";
-import {UserEntity} from "../../src/products/entity/user.entity";
 import {Readable} from "stream";
-import {FileEntity} from "../../src/products/entity/file.entity";
+import {UploadEntity} from "../../src/products/entity/upload.entity";
 import {FindOneOptions} from "typeorm";
 import {UploadService} from "../../src/products/services/upload.service";
 import {UploadPublisher} from "../../src/products/rabbit/uploads.publisher";
@@ -38,7 +36,7 @@ const userMock = {
     "actionList": [
         {
             "name": "userSave",
-            "description": "user save"
+            "description": "user create"
         }
     ]
 };
@@ -82,17 +80,11 @@ describe('UploadSerivce', () => {
                     }
                 },
                 {
-                    provide: getRepositoryToken(FileRepository),
+                    provide: getRepositoryToken(UploadRepository),
                     useValue: {
                         getFileByOptions,
                         getFileById,
                         deleteFile
-                    }
-                },
-                {
-                    provide: getRepositoryToken(UserRepository),
-                    useValue: {
-                        getUserById
                     }
                 }
             ],
@@ -106,12 +98,14 @@ describe('UploadSerivce', () => {
 
     describe('get file', () => {
         describe('should not get for non existing user',() => {
-            const userNotFoundMsg = 'user not found';
+            const fileNotFoundMsg = 'file not found';
             beforeEach(() => {
                 getUserById.mockImplementation(() => {
-                    throw new NotFoundException(userNotFoundMsg);
+                    throw new NotFoundException(fileNotFoundMsg);
                 });
-                getFileByOptions.mockReturnValue({});
+                getFileByOptions.mockImplementation(() => {
+                    throw new NotFoundException(fileNotFoundMsg)
+                });
             });
 
             it('should not get for non-existing user', async () => {
@@ -124,7 +118,7 @@ describe('UploadSerivce', () => {
                     expect(e instanceof NotFoundException)
                         .toEqual(true);
                     expect(e.message)
-                        .toEqual(userNotFoundMsg);
+                        .toEqual(fileNotFoundMsg);
                 }
             });
         });
@@ -135,7 +129,9 @@ describe('UploadSerivce', () => {
                 getUserById.mockImplementation(() => {
                     throw new NotFoundException(fileNotFoundMsg);
                 });
-                getFileByOptions.mockReturnValue({});
+                getFileByOptions.mockImplementation(() => {
+                    throw new NotFoundException(fileNotFoundMsg)
+                });
             });
 
             it('should not get for non-existing file', async () => {
@@ -154,13 +150,9 @@ describe('UploadSerivce', () => {
         });
 
         describe('should get db file',() => {
-            let user: UserEntity;
-            let file: FileEntity;
+            let file: UploadEntity;
             beforeEach(() => {
-                user = new UserEntity();
-                Object.assign(user, userMock)
-                getUserById.mockReturnValue(Promise.resolve(user));
-                file = new FileEntity();
+                file = new UploadEntity();
                 Object.assign(file, smallFileMock)
                 getFileByOptions.mockReturnValue(Promise.resolve(smallFileMock));
             });
@@ -210,7 +202,7 @@ describe('UploadSerivce', () => {
                     }
                 });
                 getFileById.mockImplementation(
-                    async (id: string, options?: FindOneOptions<FileEntity>) => {
+                    async (id: string, options?: FindOneOptions<UploadEntity>) => {
                         const maybeRet = storage[id];
                         if(!maybeRet) {
                             throw new NotFoundException('file not found');

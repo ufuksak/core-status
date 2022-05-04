@@ -31,3 +31,23 @@ services:
       - postgres-int:/var/lib/postgresql
       - postgres-int:/var/log/postgresql
       - ./pg_init.sql:/docker-entrypoint-initdb.d/10-init.sql
+
+  mysql:
+    container_name: mysql-int
+    image: mysql:5.7.22
+    command: --sql_mode=NO_ENGINE_SUBSTITUTION
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: test
+      MYSQL_DATABASE: test_keystoreservice
+      MYSQL_USER: root
+      MYSQL_PASSWORD: test
+
+  keystore:
+    extends:
+      file: ../../docker-compose.base.yml
+      service: keystore
+    depends_on:
+      - mysql

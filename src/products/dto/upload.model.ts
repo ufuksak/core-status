@@ -1,6 +1,6 @@
 import {ApiPropertyOptional} from "@nestjs/swagger";
 import {IsEnum, IsISO8601, IsOptional, IsString, IsUUID} from "class-validator";
-import {PayloadType} from "../entity/file.entity";
+import {PayloadType} from "../entity/upload.entity";
 import {UPLOAD_UPDATE_EXCHANGE} from "../config/rabbit";
 import {Message} from "@globalid/nest-amqp";
 import {Type} from "class-transformer";

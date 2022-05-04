@@ -4,12 +4,14 @@ export enum Purpose {
     'signing' = 'signing',
     'annotations' = 'annotations',
     'device_encryption' = 'device-encryption',
-    'status_db' = 'status-db'
+    'status_db' = 'status-db',
+    'status_stream' = 'status-stream'
 }
 
 export enum AlgorithmType {
     'ripple' = 'ripple',
     'rsa' = 'rsa',
+    'ec' = 'ec',
 }
 
 export class KeystoreByMeDto {

@@ -1,0 +1,26 @@
+version: '3.7'
+
+services:
+  keystore:
+    image: keystore
+    environment:
+      AWS_ACCESS_KEY_ID: invalid
+      AWS_BUCKET_NAME: dev-bucket
+      AWS_REGION: eu-west-1
+      AWS_SECRET_ACCESS_KEY: invalid
+      AZURE_CLIENT_ID: 89b42340-ea89-47d4-b29c-0ea03236482d
+      AZURE_CLIENT_SECRET: -o_uWZ186Q-m_hXb7Dk7Mj2MKv9n8D03r4
+      AZURE_KEY_VAULT_NAME: gid-dev-groups-vault
+      AZURE_TENANT_ID: 07e42d9d-9529-4908-b3dc-755c9ddae079
+      DATABASE_CONNECTION_URL: mysql://root:@mysql:3306/test_keystoreservice
+      DEFAULT_REGION: eu-west-1
+      DISABLE_DDTRACE: 1
+      JWT_ISSUER: https://iss.uer
+      JWT_PUBLIC_KEY: sigsecret
+      NAMESPACE: dev
+      NODE_ENV: development
+      SNS_ENDPOINT: http://localstack:4566
+      SQS_ENDPOINT: http://localstack:4566
+      SVC_URL_CONSENT: http://consent-service:9502
+    ports:
+      - 9123:9123
