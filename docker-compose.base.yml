@@ -12,7 +12,7 @@ services:
       AZURE_CLIENT_SECRET: -o_uWZ186Q-m_hXb7Dk7Mj2MKv9n8D03r4
       AZURE_KEY_VAULT_NAME: gid-dev-groups-vault
       AZURE_TENANT_ID: 07e42d9d-9529-4908-b3dc-755c9ddae079
-      DATABASE_CONNECTION_URL: mysql://root:test@mysql:3306/test_keystoreservice
+      DATABASE_CONNECTION_URL: mysql://root:@mysql:3306/test_keystoreservice
       DEFAULT_REGION: eu-west-1
       DISABLE_DDTRACE: 1
       JWT_ISSUER: https://iss.uer
