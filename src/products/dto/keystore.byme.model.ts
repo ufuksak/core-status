@@ -10,7 +10,8 @@ export enum Purpose {
 
 export enum AlgorithmType {
     'ripple' = 'ripple',
-    'rsa' = 'rsa'
+    'rsa' = 'rsa',
+    'ec' = 'ec',
 }
 
 export class KeystoreByMeDto {
