@@ -39,7 +39,7 @@ describe('KeystoreController Unit Tests', () => {
         const dto = {
             "public_key": "Ut incididuntelit labore",
             "encrypted_private_key": "Duis Excepteur culpa reprehenderit esse",
-            "purpose": "encryption",
+            "purpose": "status-stream",
             "algorithm_type": "rsa"
         } as KeystoreByMeDto;
 
