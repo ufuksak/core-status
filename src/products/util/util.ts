@@ -27,6 +27,8 @@ export const S3_MAX_FILE_SIZE = 1024 * 1024 * 150;
 
 export const MAX_DB_FILE_SIZE = 2 * 1024;
 
+export const typeormTimestampFormat = 'YYYY-MM-DD HH:MM:SS';
+
 // eslint-disable-next-line @typescript-eslint/ban-types
 export function ParticipantsLength(): Function {
     // eslint-disable-next-line @typescript-eslint/ban-types

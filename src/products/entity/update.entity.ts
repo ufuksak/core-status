@@ -1,8 +1,11 @@
 import { Exclude } from "class-transformer";
 import {Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryColumn} from "typeorm";
 import {StreamEntity} from "./stream.entity";
+import {UpdateMarkerInterface} from "../dto/status.model";
 
-@Entity({name: "update", synchronize: true})
+export const updateEntityName = "update";
+
+@Entity({name: updateEntityName, synchronize: true})
 export class UpdateEntity {
   @PrimaryColumn('uuid')
   id: string;
@@ -10,14 +13,17 @@ export class UpdateEntity {
   @PrimaryColumn('uuid')
   stream_id: string;
 
-  @Column({type: 'text'})
+  @Column({type: 'text', nullable: true})
   payload: string;
 
   @Column({type: 'timestamptz'})
-  recorded_at: string;
+  recorded_at: Date;
 
   @CreateDateColumn({type: 'timestamptz'})
-  uploaded_at: string;
+  uploaded_at: Date;
+
+  @Column('jsonb')
+  marker: UpdateMarkerInterface;
 
   @Exclude()
   @ManyToOne(() => StreamEntity, stream => stream.updates, {
