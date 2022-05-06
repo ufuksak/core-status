@@ -1,5 +1,4 @@
 import {Column, Entity, ManyToOne} from "typeorm";
-import {UserEntity} from "./user.entity";
 import {NotificationEntity} from "./notification.entity";
 import {BaseEntity} from "./base.entity";
 
@@ -11,9 +10,6 @@ export class UserNotificationEntity extends BaseEntity {
 
     @Column({nullable: true})
     active: number;
-
-    @ManyToOne(() => UserEntity, user => user.id)
-    user: UserEntity;
 
     @Column({nullable: true})
     notification_address: string;

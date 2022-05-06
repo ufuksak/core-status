@@ -1,4 +1,5 @@
-import { IsArray, IsEnum, IsNotEmpty } from "class-validator";
+import { IsArray, IsBoolean, IsEnum, IsNotEmpty, MaxLength } from "class-validator";
+import { StreamTypeAvailable } from "../validators/stream-type.validator";
 import { GrantType } from "./grant.model";
 
 export enum StreamHandling {
@@ -21,12 +22,14 @@ export class StreamTypeDto  {
   @IsNotEmpty()
   stream_handling: string;
 
+  @IsBoolean()
   approximated: boolean;
 
   @IsArray()
   @IsEnum(GrantType, { each: true })
   supported_grants: GrantType[];
 
-  @IsNotEmpty()
+  @StreamTypeAvailable(false)
+  @MaxLength(24)
   type: string;
 }

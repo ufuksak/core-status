@@ -1,5 +1,4 @@
 import {Column, Entity, OneToMany, OneToOne} from "typeorm";
-import {UserEntity} from "./user.entity";
 import {CountryCodeEntity} from "./country_code.entity";
 import {DeviceModelEntity} from "./device_model.entity";
 import {BaseEntity} from "./base.entity";
@@ -31,9 +30,6 @@ export class DeviceEntity extends BaseEntity {
     @Column({nullable: true})
     last_ip_address: string;
 
-    @OneToOne(() => UserEntity, user => user.id)
-    last_usr: UserEntity;
-
     @OneToOne(() => DeviceModelEntity, deviceModel => deviceModel.id)
     dvc_model: DeviceEntity;
 
@@ -42,9 +38,6 @@ export class DeviceEntity extends BaseEntity {
 
     @OneToOne(() => CountryCodeEntity, country => country.id)
     country_code: CountryCodeEntity;
-
-    @OneToOne(() => UserEntity, user => user.id)
-    update_user: UserEntity;
 
     @Column({nullable: true})
     ban: boolean;

@@ -1,6 +1,5 @@
 import {INestApplication} from '@nestjs/common';
 import {ProductsService} from "../services/products.service";
-import {UserService} from "../services/user.service";
 import {PotService} from "../services/pot.service";
 
 /**
@@ -14,7 +13,6 @@ export const AppContainer = {
      * then all services instance will available globally, they will be stored inside this `modules` key
      */
     initContainer: (app: INestApplication) => {
-        AppContainer.container['UserService'] = app.get<ProductsService>(UserService);
         AppContainer.container['PotService'] = app.get<ProductsService>(PotService);
     },
 

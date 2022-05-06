@@ -3,7 +3,7 @@ import { StreamTypeService } from '../../src/products/services/stream_type.servi
 import { StreamTypeRepository } from '../../src/products/repositories/stream_type.repository';
 import {v4 as uuid} from 'uuid';
 import * as sinon from 'sinon'
-import { StreamTypeDto } from 'src/products/dto/stream_type.model';
+import { StreamTypeDto } from '../../src/products/dto/stream_type.model';
 import {expect} from './setup'
 
 describe('Status Type Service', () => {

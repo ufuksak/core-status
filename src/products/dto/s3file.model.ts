@@ -1,6 +1,6 @@
 import {IsNotEmpty, IsString, IsUUID} from "class-validator";
 import {IsEnum} from "micro-kit-atlas/routing";
-import {PayloadType} from "../entity/file.entity";
+import {PayloadType} from "../entity/upload.entity";
 
 export class MassDeleteDto {
     @IsUUID('4',{each:true})
@@ -12,13 +12,7 @@ export class UploadQueryDto {
     type: PayloadType
 }
 
-export class ParamUserId {
-    @IsString()
-    @IsNotEmpty()
-    user_id: string;
-}
-
-export class ParamUUID4Dto extends ParamUserId {
+export class ParamUUID4Dto {
     @IsUUID(4)
     file_id: string;
 }

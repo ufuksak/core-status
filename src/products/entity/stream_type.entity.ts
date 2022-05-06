@@ -1,7 +1,8 @@
-import {Column, Entity } from "typeorm";
+import {Column, Entity, OneToMany} from "typeorm";
 import {BaseEntity} from "./base.entity";
 import {GrantType} from "../dto/grant.model";
-import {StreamGranularity, StreamHandling} from "../dto/stream_type.model";
+import { StreamGranularity, StreamHandling } from "../dto/stream_type.model";
+import {StreamEntity} from "./stream.entity";
 
 @Entity({name: "stream_type", synchronize: true})
 export class StreamTypeEntity extends BaseEntity {
@@ -24,10 +25,13 @@ export class StreamTypeEntity extends BaseEntity {
 
     @Column('enum', {
         array: true,
-        enum: Object.values(GrantType)
+        enum: GrantType
     })
     supported_grants: string[];
 
     @Column({ unique: true, type: 'text' })
     type: string;
+
+    @OneToMany(() => StreamEntity, stream => stream.streamType)
+    streams: StreamEntity[];
 }

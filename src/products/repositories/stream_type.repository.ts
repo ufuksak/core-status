@@ -2,6 +2,7 @@ import {EntityRepository, FindOneOptions, Repository} from "typeorm";
 import { StreamTypeDto } from "../dto/stream_type.model";
 import { StreamTypeEntity } from "../entity/stream_type.entity";
 
+
 @EntityRepository(StreamTypeEntity)
 export class StreamTypeRepository extends Repository<StreamTypeEntity> {
 

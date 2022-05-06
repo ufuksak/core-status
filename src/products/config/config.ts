@@ -22,5 +22,15 @@ export const CONFIG_VALIDATION_SCHEMA: Joi.ObjectSchema = Joi.object({
   RABBITMQ_USER: Joi.string().required(),
   RABBITMQ_PASSWORD: Joi.string().required(),
   RABBITMQ_HOST: Joi.string().required(),
-  RABBITMQ_PORT: Joi.number().required()
-})
+  RABBITMQ_PORT: Joi.number().required(),
+  JWT_PUBLIC_KEY: Joi.string().required(),
+  DB_HOST: Joi.string().required(),
+  DB_PORT: Joi.string().required(),
+  DB_USERNAME: Joi.string().required(),
+  DB_PASSWORD: Joi.string().required(),
+  DB_DATABASE: Joi.string().required()
+});
+
+export const configuration = (): Record<string, unknown> => ({
+  serviceName: 'status-service'
+});

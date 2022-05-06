@@ -1,48 +1,39 @@
 import {Message} from "@globalid/nest-amqp";
 import {Type} from "class-transformer";
-import {IsArray, IsDateString, IsEnum, IsNotEmpty, IsUUID, ValidateNested,} from "class-validator";
+import {IsArray, IsDateString, IsNotEmpty, IsString, IsUUID, ValidateNested,} from "class-validator";
 import {STATUS_UPDATE_EXCHANGE} from "../config/rabbit";
 
-export enum StatusTypes {
-  AVAILABLE = 'Available',
-  NOT_AVAILABLE = 'Not Available'
+export interface StatusResponse {
+  id: string;
+  stream_id: string;
+  payload: string;
+  recorded_at: string;
+}
+
+export interface AddStatusInterface {
+  status_updates: StatusResponse[]
 }
 
 @Message({ name: STATUS_UPDATE_EXCHANGE })
-export class StatusDto {
+export class StatusDto implements StatusResponse {
   @IsUUID('4')
-  @IsNotEmpty()
-  uuid: string
+  id: string;
 
+  @IsUUID('4')
+  stream_id: string;
+
+  @IsString()
   @IsNotEmpty()
-  @IsEnum(StatusTypes)
-  type: string
+  payload: string;
 
   @IsDateString()
   @IsNotEmpty()
-  recorded_at: string
-
-  @IsNotEmpty()
-  encrypted_payload: string
+  recorded_at: string;
 }
 
-export class StatusRequestBody {
-
+export class StatusUpdateDto implements AddStatusInterface {
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => StatusDto)
   status_updates: StatusDto[]
-}
-
-export interface StatusResponse {
-  uuid: string,
-  type: string,
-  recorded_at: string,
-  uploaded_at: string,
-  gid_uuid: string,
-  encrypted_payload: string,
-}
-
-export interface StatusResponseBody {
-  status_updates: StatusResponse[]
 }

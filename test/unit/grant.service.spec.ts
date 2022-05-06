@@ -4,7 +4,7 @@ import * as sinon from 'sinon'
 import {expect} from './setup'
 import { GrantService } from '../../src/products/services/grant.service';
 import { GrantRepository } from '../../src/products/repositories/grant.repository';
-import { GrantDto } from 'src/products/dto/grant.model';
+import { GrantDto } from '../../src/products/dto/grant.model';
 import { TokenData } from '@globalid/nest-auth';
 import { StreamService } from '../../src/products/services/stream.service';
 import { BadRequestException } from '@nestjs/common';

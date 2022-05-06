@@ -6,12 +6,11 @@ import {Request} from 'express';
 import {S3} from "aws-sdk";
 import {S3ConfigProvider} from "../config/s3.config.provider";
 import {ImageResponseDTO, UploadDto} from "../dto/upload.model";
-import {FileRepository} from "../repositories/file.repository";
-import {FileEntity, PayloadType} from "../entity/file.entity";
+import {UploadRepository} from "../repositories/uploadRepository";
+import {UploadEntity, PayloadType} from "../entity/upload.entity";
 import {MAX_DB_FILE_SIZE, S3_MAX_FILE_SIZE, S3_READ_CHUNK_SIZE, toYyyyMmDd} from "../util/util";
 import {InteractiveS3Stream} from "../util/interactive-stream";
 import {Readable} from "stream";
-import {UserRepository} from "../repositories/user.repository";
 import {UploadPublisher} from "../rabbit/uploads.publisher";
 
 
@@ -21,8 +20,7 @@ export class UploadService {
     private readonly s3MaxFileSize: number
 
     constructor(
-        @InjectRepository(FileRepository) private readonly fileRepo: FileRepository,
-        @InjectRepository(UserRepository) private readonly userRepo: UserRepository,
+        @InjectRepository(UploadRepository) private readonly fileRepo: UploadRepository,
         private readonly publisher: UploadPublisher
     ) {
         this.s3Provider = new S3ConfigProvider();
@@ -31,8 +29,6 @@ export class UploadService {
     }
 
     async get(user_id: string, id: string): Promise<Readable> {
-        await this.userRepo.getUserById(user_id);
-
         const file = await this.fileRepo.getFileByOptions({
             where: {
                 id,
@@ -49,7 +45,7 @@ export class UploadService {
         return Readable.from(fileData);
     }
 
-    async update(user_id: string, id: string, payloadType: PayloadType, req: Request) : Promise<FileEntity> {
+    async update(user_id: string, id: string, payloadType: PayloadType, req: Request) : Promise<UploadEntity> {
         let file = null;
         try {
             file = await this.fileRepo.getFileByOptions({
@@ -90,10 +86,8 @@ export class UploadService {
         return this.fileRepo.saveFile(file);
     }
 
-    async upload(user_id: string, payloadType: PayloadType, req: Request) : Promise<FileEntity> {
-        await this.userRepo.getUserById(user_id);
-
-        const file = new FileEntity();
+    async upload(user_id: string, payloadType: PayloadType, req: Request) : Promise<UploadEntity> {
+        const file = new UploadEntity();
 
         file.key = `${toYyyyMmDd(new Date())}/${uuidv4()}`;
         file.type = payloadType;
@@ -123,7 +117,7 @@ export class UploadService {
         return result;
     }
 
-    async deleteManyFromS3(files: FileEntity[]) : Promise<FileEntity[]> {
+    async deleteManyFromS3(files: UploadEntity[]) : Promise<UploadEntity[]> {
         const result = [];
         await Promise.allSettled(
             files.map(async file => {
@@ -142,8 +136,8 @@ export class UploadService {
     }
 
     async deleteMany(user_id: string, ids: string[])
-        : Promise<{deleted: FileEntity[], notDeleted: {message: any}[]}> {
-        const deleted: FileEntity[] = [];
+        : Promise<{deleted: UploadEntity[], notDeleted: {message: any}[]}> {
+        const deleted: UploadEntity[] = [];
         const notDeleted: {message: any}[] = [];
 
         await Promise.allSettled(
@@ -165,7 +159,7 @@ export class UploadService {
         };
     }
 
-    async delete(user_id: string, id: string) : Promise<FileEntity> {
+    async delete(user_id: string, id: string) : Promise<UploadEntity> {
         const file = await this.fileRepo.getFileById(id, {
             where: {
                 user_id
