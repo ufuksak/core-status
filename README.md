@@ -102,6 +102,10 @@ https://github.com/typeorm/typeorm/blob/master/docs/listeners-and-subscribers.md
 yarn jest --runInBand
 ```
 
+### JWT guide
+
+https://global-id.atlassian.net/wiki/spaces/~6234ca1c50cceb00707b7551/pages/2679210017/Status-core+JWT+invoke
+
 ### A sample UT & IT output
 
 ```

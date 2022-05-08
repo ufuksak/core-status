@@ -11,11 +11,11 @@ import {StreamTypeEntity} from "../../src/products/entity/stream_type.entity";
 import {UpdateEntity} from "../../src/products/entity/update.entity";
 import * as cryptosdk from 'globalid-crypto-library/src/index';
 import {v4 as uuid} from 'uuid';
-import supertest = require("supertest");
 import {validationPipeOptions} from "../../src/products/config/validation-pipe.options";
-import {UpdateMarker, UpdateMarkerInterface} from "../../src/products/dto/status.model";
+import {StatusUpdateDto, UpdateMarker} from "../../src/products/dto/status.model";
+import supertest = require("supertest");
 
-jest.setTimeout(60 * 1000);
+jest.setTimeout(3 * 60 * 1000);
 
 const token = getAccessToken('keys.manage status.manage');
 const authType = {type: "bearer"};
@@ -36,53 +36,56 @@ const validStreamCreateDto = {
   stream_type: validStreamTypeCreateDto.type
 };
 
-const invalidStreamCreateDto = {
-  public_key: "Ut incididuntelit labore",
-  encrypted_private_key: "Duis Excepteur culpa repreаddsfdsfhenderit esse",
-  stream_type: validStreamTypeCreateDto.type + 'random'
-};
-
-const statusUpdateNotExistingStream = {
-  status_updates: [
-    {
-      id: "9ad205e8-fde8-4853-94dc-911ffc35b31e",
-      stream_id: "25d3f674-733b-4f3c-9e99-23084d5928ca",
-      recorded_at: "2022-04-28T23:05:46.944Z",
-      payload: "someValidPayload"
-    }
-  ]
-}
-
-const statusUpdateTemplate = {
+const statusUpdateTemplate: StatusUpdateDto = {
   status_updates: [
     {
       id: "9ad205e8-fde8-4853-94dc-911ffc35b31e",
       stream_id: "",
       recorded_at: "2022-04-28T23:05:46.944Z",
-      payload: "someValidPayload"
+      payload: "someValidPayload",
+      marker: {
+        started: true,
+        frequency: '15m',
+        stopped: null
+      }
     }
   ]
 }
 
-const multipleStatusUpdateTemplate = {
+const multipleStatusUpdateTemplate: StatusUpdateDto = {
   status_updates: [
     {
       id: "9ad205e8-fde8-4853-94dc-981ffc35b31e",
       stream_id: "",
       recorded_at: "2022-04-26T23:05:46.944Z",
-      payload: "someValidPayload"
+      payload: "someValidPayload",
+      marker: {
+        started: true,
+        frequency: '15m',
+        stopped: null
+      }
     },
     {
       id: "9ad205e8-fde8-4853-94dc-981ffc35b31b",
       stream_id: "",
       recorded_at: "2022-04-27T23:05:46.944Z",
-      payload: "someValidPayload"
+      payload: "someValidPayload",
+      marker: {
+        started: null,
+        frequency: null,
+        stopped: null
+      }
     },
     {
       id: "9ad205e8-fde8-4853-94dc-981ffc35b31c",
       stream_id: "",
       recorded_at: "2022-04-28T23:05:46.944Z",
-      payload: "someValidPayload"
+      payload: "someValidPayload",
+      marker: {
+        started: null,
+        frequency: null,
+        stopped: true
+      }
     }
   ]
 }
@@ -166,7 +169,6 @@ describe('StatusModule (e2e)', () => {
   describe('GET /api/v1/status/streams/types', () => {
     it('should get all streamTypes', async () => {
       const streamTypeOutput = {
-        // "id"            : expect.any(String),
         "granularity"     : 'single',
         "stream_handling" : 'lockbox',
         "approximated"    : true,
@@ -251,7 +253,7 @@ describe('StatusModule (e2e)', () => {
 
     it('mutliple deleted nonexisting skiped', async () => {
       // Prepare
-      const {statusUpdateId, randomUUID, validStatusUpdates, streamId: stream_id} =
+      const {randomUUID, validStatusUpdates, streamId: stream_id} =
         await prepareAndTestStatusDelete();
       const ids = validStatusUpdates.status_updates.map(el => el.id);
       ids.push(randomUUID);
@@ -287,7 +289,7 @@ describe('StatusModule (e2e)', () => {
 
     it('multiple deleted by range', async () => {
       // Prepare
-      const {statusUpdateId, randomUUID, validStatusUpdates, streamId: stream_id} =
+      const {validStatusUpdates, streamId: stream_id} =
         await prepareAndTestStatusDelete();
 
       const [first, second] = validStatusUpdates.status_updates;

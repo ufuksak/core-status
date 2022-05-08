@@ -176,7 +176,6 @@ describe('Upload', () => {
     });
 
     afterAll(async () => {
-        await agent.close
         await app.close();
     });
 })

@@ -9,6 +9,7 @@ import {
   IsOptional,
   IsString,
   IsUUID,
+  Matches,
   ValidateNested
 } from "class-validator";
 import {STATUS_UPDATE_EXCHANGE} from "../config/rabbit";
@@ -70,6 +71,7 @@ export class UpdateMarkerCreateDto implements UpdateMarkerCreate {
 
   @IsOptional()
   @IsString()
+  @Matches(/\d+[mhs]/)
   frequency: string | null;
 }
 

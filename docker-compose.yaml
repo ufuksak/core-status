@@ -84,15 +84,15 @@ services:
       PMA_HOST: mysql
       MYSQL_ROOT_PASSWORD: root
 
-#  keystore:
-#    extends:
-#      file: ./docker-compose.base.yml
-#      service: keystore
-#    image: keystore
-#    ports:
-#      - '9123:9123'
-#    depends_on:
-#      - mysql
+  keystore:
+    extends:
+      file: ./docker-compose.base.yml
+      service: keystore
+    image: keystore
+    ports:
+      - '9123:9123'
+    depends_on:
+      - mysql
 
   hydra:
     image: ghcr.io/globalid/container-images/hydra:latest

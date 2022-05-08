@@ -154,14 +154,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{STATUSDB}}/api/v1/statuses/streams",
+							"raw": "{{STATUSDB}}/api/v1/status/streams",
 							"host": [
 								"{{STATUSDB}}"
 							],
 							"path": [
 								"api",
 								"v1",
-								"statuses",
+								"status",
 								"streams"
 							]
 						}
@@ -184,14 +184,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{STATUSDB}}/api/v1/statuses/streams/types",
+							"raw": "{{STATUSDB}}/api/v1/status/streams/types",
 							"host": [
 								"{{STATUSDB}}"
 							],
 							"path": [
 								"api",
 								"v1",
-								"statuses",
+								"status",
 								"streams",
 								"types"
 							]
@@ -215,14 +215,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{STATUSDB}}/api/v1/statuses/streams",
+							"raw": "{{STATUSDB}}/api/v1/status/streams",
 							"host": [
 								"{{STATUSDB}}"
 							],
 							"path": [
 								"api",
 								"v1",
-								"statuses",
+								"status",
 								"streams"
 							]
 						}
@@ -293,14 +293,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{STATUSDB}}/api/v1/statuses/streams/types",
+							"raw": "{{STATUSDB}}/api/v1/status/streams/types",
 							"host": [
 								"{{STATUSDB}}"
 							],
 							"path": [
 								"api",
 								"v1",
-								"statuses",
+								"status",
 								"streams",
 								"types"
 							]
@@ -325,7 +325,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"status_updates\": [\n        {\n            \"id\": \"1f4e9b27-68a2-43a1-a96f-160ecdbdd429\",\n            \"stream_id\": \"35450de5-53d7-4b0a-9963-9d74830d0012\",\n            \"recorded_at\": \"2022-05-05T20:50:40.650Z\",\n            \"payload\": \"blablabla\",\n            \"marker\": {\n                \"started\": true,\n                \"nonemae\": \"\"\n\n            }\n        }\n    ]\n}",
+							"raw": "{\n    \"status_updates\": [\n        {\n            \"id\": \"1f4e9b27-68a2-43a1-a96f-160ecdbdd430\",\n            \"stream_id\": \"01ff5449-bcb1-408c-b882-a51c21d31e78\",\n            \"recorded_at\": \"2022-05-05T20:50:40.650Z\",\n            \"payload\": \"blablabla\",\n            \"marker\": {\n                \"started\": true,\n                \"frequency\": \"15m\"\n\n            }\n        }\n    ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -362,14 +362,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{STATUSDB}}/api/v1/statuses",
+							"raw": "{{STATUSDB}}/api/v1/status",
 							"host": [
 								"{{STATUSDB}}"
 							],
 							"path": [
 								"api",
 								"v1",
-								"statuses"
+								"status"
 							]
 						}
 					},
@@ -400,14 +400,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{STATUSDB}}/api/v1/statuses",
+							"raw": "{{STATUSDB}}/api/v1/status",
 							"host": [
 								"{{STATUSDB}}"
 							],
 							"path": [
 								"api",
 								"v1",
-								"statuses"
+								"status"
 							]
 						}
 					},
@@ -438,14 +438,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{STATUSDB}}/api/v1/statuses/update/range",
+							"raw": "{{STATUSDB}}/api/v1/status/update/range",
 							"host": [
 								"{{STATUSDB}}"
 							],
 							"path": [
 								"api",
 								"v1",
-								"statuses",
+								"status",
 								"update",
 								"range"
 							]
@@ -478,14 +478,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{STATUSDB}}/api/v1/statuses/1f4e9b27-68a2-43a1-a96f-160ecdbdd352",
+							"raw": "{{STATUSDB}}/api/v1/status/1f4e9b27-68a2-43a1-a96f-160ecdbdd352",
 							"host": [
 								"{{STATUSDB}}"
 							],
 							"path": [
 								"api",
 								"v1",
-								"statuses",
+								"status",
 								"1f4e9b27-68a2-43a1-a96f-160ecdbdd352"
 							]
 						}
@@ -1045,7 +1045,7 @@
 		},
 		{
 			"key": "TOKEN",
-			"value": "eyJhbGciOiJIUzI1NiJ9.eyJnbG9iYWxpZCI6ImpvaG5kb2UiLCJzdWIiOiI3MzZiYzliYi02OTJiLTRmOTYtYjlhMS1jZjFjMDEyODlhYzQiLCJjbGllbnRfaWQiOiI0N2E4M2FjNS01ODdiLTRjNWUtOTJjMy1lYTU3ODgwZDcxYWYiLCJzY29wZSI6ImtleXMubWFuYWdlIHN0YXR1cy5tYW5hZ2UiLCJncm91cHMiOltdLCJleHAiOjE2NTE3ODAyMjMsImlhdCI6MTY1MTY5MzgyMywiaXNzIjoiaHR0cHM6Ly9pc3MudWVyIn0.o2qFJH4A8bx7VeEl1gLzIhmoLhMdXwdbfab902nG5qc",
+			"value": "eyJhbGciOiJIUzI1NiJ9.eyJnbG9iYWxpZCI6ImpvaG5kb2UiLCJzdWIiOiJjOWI4ZjQ1My1hOWMwLTQ2NjYtODNhOC1kMjJkZDQyN2Y0NmQiLCJjbGllbnRfaWQiOiJhYjg2NzVkZi02Yzc1LTRmNjAtOGQ5Mi0yYTI2YmFjZmUxMzgiLCJzY29wZSI6ImtleXMubWFuYWdlIHN0YXR1cy5tYW5hZ2UiLCJncm91cHMiOltdLCJleHAiOjE2NTIxMDA1MjAsImlhdCI6MTY1MjAxNDEyMCwiaXNzIjoiaHR0cHM6Ly9pc3MudWVyIn0.2SVJn5Y63Z7nGeX9ivVolxKqXcA-teSkGLN--SE7nAo",
 			"type": "default"
 		}
 	]
