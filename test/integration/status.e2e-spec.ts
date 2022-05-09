@@ -110,64 +110,79 @@ describe('StatusModule (e2e)', () => {
     await app.init();
   });
 
-  describe('POST /api/v1/status/streams/types', () => {
-    it('should create streamType', async () => {
-      const streamTypeOutput = {
-        "granularity"     : 'single',
-        "stream_handling" : 'lockbox',
-        "approximated"    : true,
-        "supported_grants": ['range'],
-        "type"            : streamType,
-        "updated_at"      : expect.any(String),
-        "created_at"      : expect.any(String)
-      };
-
-      const streamTypeData = {
-        granularity     : 'single',
-        stream_handling : 'lockbox',
-        approximated    : true,
-        supported_grants: ['range'],
-        type            : streamType,
-      };
-
-      // Run your end-to-end test
-      const resp = await agent
-        .post('/api/v1/status/streams/types')
-        .auth(token, authType)
-        .set('Accept', 'application/json')
-        .send(streamTypeData)
-        .expect('Content-Type', /json/)
-        .expect(201);
-
-      expect(resp?.body?.data?.attributes).toEqual(streamTypeOutput);
-    });
+  beforeEach(async () => {
+    await Promise.all([UpdateEntity, StreamEntity, StreamTypeEntity]
+      .map(el => truncateEntity(el))
+    );
   });
+
+  const createStreamTypeAndExpect = async () => {
+    const streamTypeOutput = {
+      "granularity"     : 'single',
+      "stream_handling" : 'lockbox',
+      "approximated"    : true,
+      "supported_grants": ['range'],
+      "type"            : streamType,
+      "updated_at"      : expect.any(String),
+      "created_at"      : expect.any(String)
+    };
+
+    const streamTypeData = {
+      granularity     : 'single',
+      stream_handling : 'lockbox',
+      approximated    : true,
+      supported_grants: ['range'],
+      type            : streamType,
+    };
+
+    // Run your end-to-end test
+    const resp = await agent
+      .post('/api/v1/status/streams/types')
+      .auth(token, authType)
+      .set('Accept', 'application/json')
+      .send(streamTypeData)
+      .expect('Content-Type', /json/)
+      .expect(201);
+
+    expect(resp?.body?.data?.attributes).toEqual(streamTypeOutput);
+  }
+
+  describe('POST /api/v1/status/streams/types', () => {
+    it('should create streamType', async () => createStreamTypeAndExpect());
+  });
+
+  const createStreamAndExpect = async () => {
+    // prepare
+    const streamData = {
+      "stream_type": streamType,
+      "public_key": "Ut incididuntelit labore",
+      "encrypted_private_key": "Duis Excepteur culpa reprehenderit esse",
+    };
+
+    // Act
+    const resp = await agent
+      .post('/api/v1/status/streams')
+      .set('Accept', 'text/plain')
+      .auth(token, authType)
+      .send(streamData)
+      .expect('Content-Type', "application/json; charset=utf-8")
+      .expect(201);
+
+    // Check
+    expect(resp?.body?.data?.id).toHaveLength(uuidLength);
+  };
 
   describe('POST /api/v1/status/streams', () => {
     it('should create stream', async () => {
-      // Prepare
-      const streamData = {
-        "stream_type": streamType,
-        "public_key": "Ut incididuntelit labore",
-        "encrypted_private_key": "Duis Excepteur culpa reprehenderit esse",
-      };
-
-      // Act
-      const resp = await agent
-        .post('/api/v1/status/streams')
-        .set('Accept', 'text/plain')
-        .auth(token, authType)
-        .send(streamData)
-        .expect('Content-Type', "application/json; charset=utf-8")
-        .expect(201);
-
-      // Check
-      expect(resp?.body?.data?.id).toHaveLength(uuidLength);
+      await createStreamTypeAndExpect();
+      await createStreamAndExpect();
     });
   });
 
   describe('GET /api/v1/status/streams/types', () => {
     it('should get all streamTypes', async () => {
+      await createStreamTypeAndExpect();
+      await createStreamAndExpect();
       const streamTypeOutput = {
         "granularity"     : 'single',
         "stream_handling" : 'lockbox',
@@ -193,8 +208,8 @@ describe('StatusModule (e2e)', () => {
   });
 
   const prepareAndTestStatusDelete = async () => {
-    await truncateEntity(UpdateEntity);
-
+    await createStreamTypeAndExpect();
+    await createStreamAndExpect();
     const resp = await agent
       .get('/api/v1/status/streams')
       .set('Accept', 'application/json')
@@ -322,8 +337,30 @@ describe('StatusModule (e2e)', () => {
         .expect(200);
 
       const getByRangeResponseAfterCleaned = await getByRange();
-      const matchedAfterCleaned = getByRangeResponseAfterCleaned.body?.data?.map(el => ({id: el.id}));
-      expect(matchedAfterCleaned.length).toEqual(2);
+      const matchedAfterCleaned = getByRangeResponseAfterCleaned.body?.data?.map(el => ({
+        id: el.id,
+        ...el.attributes
+      }));
+
+      expect(matchedAfterCleaned).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: matched[0].id,
+            payload: null,
+            marker: expect.objectContaining({
+              deleted: true
+            })
+          }),
+          expect.objectContaining({
+            id: matched[1].id,
+            payload: null,
+            marker: expect.objectContaining({
+              deleted: true
+            })
+          })
+        ])
+      );
+
     })
   });
 
