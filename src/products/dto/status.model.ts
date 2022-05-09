@@ -1,7 +1,55 @@
 import {Message} from "@globalid/nest-amqp";
-import {Type} from "class-transformer";
-import {IsArray, IsDateString, IsNotEmpty, IsString, IsUUID, ValidateNested,} from "class-validator";
+import {Transform, Type} from "class-transformer";
+import {
+  IsArray,
+  IsBoolean,
+  IsDateString,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Matches,
+  ValidateNested
+} from "class-validator";
 import {STATUS_UPDATE_EXCHANGE} from "../config/rabbit";
+
+export interface GetUserStatusesInterface {
+  from: number;
+  to: number;
+}
+
+export class GetUserStatusesParams implements GetUserStatusesInterface {
+  @IsOptional()
+  @Transform(({ value }) => parseInt(value))
+  @IsInt()
+  from: number;
+
+  @IsOptional()
+  @Transform(({ value }) => parseInt(value))
+  @IsInt()
+  to: number;
+}
+
+export interface UpdateMarkerCreate {
+  started: boolean,
+  stopped: boolean,
+  frequency: string
+}
+
+export interface UpdateMarkerInterface {
+  started: boolean | null,
+  stopped: boolean | null,
+  frequency: string | null,
+  deleted: boolean | null
+}
+
+export class UpdateMarker implements UpdateMarkerInterface {
+  started: boolean | null;
+  stopped: boolean | null;
+  frequency: string | null;
+  deleted: boolean | null;
+}
 
 export interface StatusResponse {
   id: string;
@@ -12,6 +60,21 @@ export interface StatusResponse {
 
 export interface AddStatusInterface {
   status_updates: StatusResponse[]
+}
+
+export class UpdateMarkerCreateDto implements UpdateMarkerCreate {
+  @IsOptional()
+  @IsBoolean()
+  started: boolean | null;
+
+  @IsOptional()
+  @IsBoolean()
+  stopped: boolean | null;
+
+  @IsOptional()
+  @IsString()
+  @Matches(/\d+[mhs]/)
+  frequency: string | null;
 }
 
 @Message({ name: STATUS_UPDATE_EXCHANGE })
@@ -29,6 +92,10 @@ export class StatusDto implements StatusResponse {
   @IsDateString()
   @IsNotEmpty()
   recorded_at: string;
+
+  @ValidateNested()
+  @Type(() => UpdateMarkerCreateDto)
+  marker: UpdateMarkerCreateDto;
 }
 
 export class StatusUpdateDto implements AddStatusInterface {

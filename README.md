@@ -1,6 +1,4 @@
-# temp-status-db
-
-Temporary repository for statusdb development, will be renamed once we know where and how to deploy it.
+# core-status
 
 ### Local development Environment
 
@@ -88,6 +86,9 @@ Temporary repository for statusdb development, will be renamed once we know wher
    Starting temp-status-db_keystore_1                    ... done
    ```
 
+1. git submodule init && git submodule update &&  cd ./globalid-crypto-library && npm i
+
+
 1. Troubleshooting,
    if any failures are seen like this, try to kill working processes(check the process-> ps -ef|grep tomcat -> sudo kill -9 <PID>)
    ERROR: for cockroach_node_1 Cannot start service cockroach_node_1: driver failed programming external connectivity on endpoint cockroach_node_1 (fb748ce3c296b9f43f7b2de6eaa3c6ceb1e4a637db0a5da3802ce728f09e7b0d): Error starting userland proxy: listen tcp4 0.0.0.0:8080: bind: address already in use
@@ -101,6 +102,15 @@ https://github.com/typeorm/typeorm/blob/master/docs/listeners-and-subscribers.md
 ```
 yarn jest --runInBand
 ```
+
+### JWT
+```
+npm run tools:jwt --scope 'scopes' // optional  --scope argument can be defined ‘keys.manage status.manage’ by default
+```
+
+Full doc:
+
+https://global-id.atlassian.net/wiki/spaces/~6234ca1c50cceb00707b7551/pages/2679210017/Status-core+JWT+invoke
 
 ### A sample UT & IT output
 

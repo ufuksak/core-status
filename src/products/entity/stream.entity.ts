@@ -5,7 +5,9 @@ import {GrantEntity} from "./grant.entity";
 import {UpdateEntity} from "./update.entity";
 
 
-@Entity({name: 'stream', synchronize: true})
+export const streamEntityName = 'stream';
+
+@Entity({name: streamEntityName, synchronize: true})
 export class StreamEntity extends BaseEntity {
     @Column('uuid')
     owner_id: string;

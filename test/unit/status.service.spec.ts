@@ -80,7 +80,12 @@ describe('StatusService', () => {
         id: expectedStatusId,
         stream_id: streamId,
         recorded_at: "2022-04-28T23:05:46.944Z",
-        payload: "mockPayload"
+        payload: "mockPayload",
+        marker: {
+          started: true,
+          stopped: false,
+          frequency: '15m'
+        }
       }];
 
       queryBuilder.execute = jest.fn(() => ({

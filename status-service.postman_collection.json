@@ -146,7 +146,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"public_key\": \"Ut incididuntelit labore\",\n  \"encrypted_private_key\": \"Duis Excepteur culpa repreаddsfdsfhenderit esse\",\n  \"stream_type\": \"test2132313\" \n}",
+							"raw": "{\n  \"public_key\": \"Ut incididuntelit labore\",\n  \"encrypted_private_key\": \"Duis Excepteur culpa repreаddsfdsfhenderit esse\",\n  \"stream_type\": \"test2132331\" \n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -154,14 +154,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{STATUSDB}}/api/v1/statuses/streams",
+							"raw": "{{STATUSDB}}/api/v1/status/streams",
 							"host": [
 								"{{STATUSDB}}"
 							],
 							"path": [
 								"api",
 								"v1",
-								"statuses",
+								"status",
 								"streams"
 							]
 						}
@@ -184,14 +184,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{STATUSDB}}/api/v1/statuses/streams/types",
+							"raw": "{{STATUSDB}}/api/v1/status/streams/types",
 							"host": [
 								"{{STATUSDB}}"
 							],
 							"path": [
 								"api",
 								"v1",
-								"statuses",
+								"status",
 								"streams",
 								"types"
 							]
@@ -215,15 +215,54 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{STATUSDB}}/api/v1/statuses/streams",
+							"raw": "{{STATUSDB}}/api/v1/status/streams",
 							"host": [
 								"{{STATUSDB}}"
 							],
 							"path": [
 								"api",
 								"v1",
-								"statuses",
+								"status",
 								"streams"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getUserStatuses",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{STATUSDB}}/api/v1/status?from=1648587040650&to=1648673440650",
+							"host": [
+								"{{STATUSDB}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"status"
+							],
+							"query": [
+								{
+									"key": "from",
+									"value": "1648587040650"
+								},
+								{
+									"key": "to",
+									"value": "1648673440650"
+								}
 							]
 						}
 					},
@@ -254,14 +293,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{STATUSDB}}/api/v1/statuses/streams/types",
+							"raw": "{{STATUSDB}}/api/v1/status/streams/types",
 							"host": [
 								"{{STATUSDB}}"
 							],
 							"path": [
 								"api",
 								"v1",
-								"statuses",
+								"status",
 								"streams",
 								"types"
 							]
@@ -286,7 +325,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"status_updates\": [\n        {\n            \"id\": \"9ad205e8-fde8-4853-94dc-911ffc35b31e\",\n            \"stream_id\": \"25d3f674-733b-4f3c-9e99-23084d5928ca\",\n            \"recorded_at\": \"2022-04-28T23:05:46.944Z\",\n            \"payload\": \"blablabla\" \n        },\n        {\n            \"id\": \"9ad205e8-fde8-4853-94dc-911ffc451312\",\n            \"stream_id\": \"25d3f674-733b-4f3c-9e99-23084d5928c7\",\n            \"recorded_at\": \"2022-04-28T23:05:46.944Z\",\n            \"payload\": \"blablabla\" \n        },\n        {\n            \"id\": \"9ad205e8-fde8-4853-94dc-911ffc45b31e\",\n            \"stream_id\": \"25d3f674-733b-4f3c-9e99-23084d5928c1\",\n            \"recorded_at\": \"2022-04-28T23:05:46.944Z\",\n            \"payload\": \"blablabla\" \n        }\n    ]\n}",
+							"raw": "{\n    \"status_updates\": [\n        {\n            \"id\": \"1f4e9b27-68a2-43a1-a96f-160ecdbdd430\",\n            \"stream_id\": \"01ff5449-bcb1-408c-b882-a51c21d31e78\",\n            \"recorded_at\": \"2022-05-05T20:50:40.650Z\",\n            \"payload\": \"blablabla\",\n            \"marker\": {\n                \"started\": true,\n                \"frequency\": \"15m\"\n\n            }\n        }\n    ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -294,14 +333,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{STATUSDB}}/api/v1/statuses",
+							"raw": "{{STATUSDB}}/api/v1/status",
 							"host": [
 								"{{STATUSDB}}"
 							],
 							"path": [
 								"api",
 								"v1",
-								"statuses"
+								"status"
 							]
 						}
 					},
@@ -323,14 +362,131 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{STATUSDB}}/api/v1/statuses",
+							"raw": "{{STATUSDB}}/api/v1/status",
 							"host": [
 								"{{STATUSDB}}"
 							],
 							"path": [
 								"api",
 								"v1",
-								"statuses"
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "removeUpdates",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"ids\": [\"1f4e9b27-68a2-43a1-a96f-160ecdbdd355\", \"1f4e9b27-68a2-43a1-a96f-160ecdbdd362\"],\n    \"stream_id\": \"35450de5-53d7-4b0a-9963-9d74830d0012\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{STATUSDB}}/api/v1/status",
+							"host": [
+								"{{STATUSDB}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "removeUpdatesByRange",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"from\": \"2022-05-04T20:50:40.650Z\",\n    \"to\": \"2022-05-06T20:50:40.650Z\",\n    \"stream_id\": \"35450de5-53d7-4b0a-9963-9d74830d0012\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{STATUSDB}}/api/v1/status/update/range",
+							"host": [
+								"{{STATUSDB}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"status",
+								"update",
+								"range"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "removeUpdate",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"stream_id\": \"35450de5-53d7-4b0a-9963-9d74830d0012\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{STATUSDB}}/api/v1/status/1f4e9b27-68a2-43a1-a96f-160ecdbdd352",
+							"host": [
+								"{{STATUSDB}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"status",
+								"1f4e9b27-68a2-43a1-a96f-160ecdbdd352"
 							]
 						}
 					},
@@ -889,7 +1045,7 @@
 		},
 		{
 			"key": "TOKEN",
-			"value": "eyJhbGciOiJIUzI1NiJ9.eyJnbG9iYWxpZCI6ImpvaG5kb2UiLCJzdWIiOiJlOGVhNzJiZi04YjU0LTRhZGUtOTIyNS0yOWU4YjE3ZjQyZjciLCJjbGllbnRfaWQiOiI0ZmQ1NzNjYy04ZTJiLTRjZmEtODIyYi02MzZmMWVkNjBhMDkiLCJzY29wZSI6ImtleXMubWFuYWdlIHN0YXR1cy5tYW5hZ2UiLCJncm91cHMiOltdLCJleHAiOjE2NTE1MjA0MTUsImlhdCI6MTY1MTQzNDAxNiwiaXNzIjoiaHR0cHM6Ly9pc3MudWVyIn0.nbdwl9ZxZ618BaQe7xUdnVhmNCp5TOgeCNtoIXU0CuU",
+			"value": "eyJhbGciOiJIUzI1NiJ9.eyJnbG9iYWxpZCI6ImpvaG5kb2UiLCJzdWIiOiJjOWI4ZjQ1My1hOWMwLTQ2NjYtODNhOC1kMjJkZDQyN2Y0NmQiLCJjbGllbnRfaWQiOiJhYjg2NzVkZi02Yzc1LTRmNjAtOGQ5Mi0yYTI2YmFjZmUxMzgiLCJzY29wZSI6ImtleXMubWFuYWdlIHN0YXR1cy5tYW5hZ2UiLCJncm91cHMiOltdLCJleHAiOjE2NTIxMDA1MjAsImlhdCI6MTY1MjAxNDEyMCwiaXNzIjoiaHR0cHM6Ly9pc3MudWVyIn0.2SVJn5Y63Z7nGeX9ivVolxKqXcA-teSkGLN--SE7nAo",
 			"type": "default"
 		}
 	]

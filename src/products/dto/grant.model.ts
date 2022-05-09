@@ -1,4 +1,5 @@
-import { IsDateString, IsEnum, IsNotEmpty, IsUUID } from "class-validator";
+import { Type } from "class-transformer";
+import { IsDateString, IsEnum, IsNotEmpty, IsString, IsUUID, ValidateNested } from "class-validator";
 
 export enum GrantType {
   range = 'range',
@@ -7,7 +8,10 @@ export enum GrantType {
 }
 
 export class GrantProperties {
+  @IsString()
   reEncryptionKey: string;
+
+  @IsString()
   e2eKey: string;
 }
 
@@ -16,6 +20,8 @@ export class GrantDto {
   @IsNotEmpty()
   type: string;
 
+  @ValidateNested()
+  @Type(() => GrantProperties)
   properties: GrantProperties;
 
   @IsUUID('4')

@@ -65,7 +65,7 @@ describe('Upload', () => {
         await new S3ConfigProvider().createBucket();
     });
 
-    describe('POST /api/v1/uploads/users/file/:file', () => {
+    describe('POST /api/v1/uploads/users/file', () => {
         it('lockbox posted', async () => {
             const response = await agent.post(`/api/v1/uploads/users/file?type=lockbox`)
               .set('Authorization', `Bearer ${token}`)
@@ -176,7 +176,6 @@ describe('Upload', () => {
     });
 
     afterAll(async () => {
-        await agent.close
         await app.close();
     });
 })

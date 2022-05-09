@@ -5,27 +5,42 @@ import {
   ValidatorConstraint,
   ValidatorConstraintInterface
 } from "class-validator";
-import {Injectable, InternalServerErrorException} from "@nestjs/common";
+import {ConflictException, Injectable, InternalServerErrorException, Logger, NotFoundException} from "@nestjs/common";
 import {StreamTypeRepository} from "../repositories/stream_type.repository";
 
 @Injectable()
 @ValidatorConstraint({ name: 'StreamTypeAvailable', async: true })
 export class StreamTypeNotExistsRule implements ValidatorConstraintInterface {
-  constructor(private readonly streamTypeRepo: StreamTypeRepository) {}
+  private logger = new Logger(StreamTypeNotExistsRule.name);
+  constructor(
+    private readonly streamTypeRepo: StreamTypeRepository
+  ) {}
 
   async validate(type: string, args: ValidationArguments) {
+    let maybeFound = null;
     try {
-      const maybeFound = await this.streamTypeRepo.findOne({
+      maybeFound = await this.streamTypeRepo.findOne({
         where: {
           type
         }
       });
-
-      const shouldBe = args.constraints[0];
-      return shouldBe ? !!maybeFound : !maybeFound;
     } catch (e) {
+      this.logger.error(`stream type db error ${e}`);
       throw new InternalServerErrorException();
     }
+
+    const shouldBe = args.constraints[0];
+    if(shouldBe) {
+      if(!maybeFound) {
+        throw new NotFoundException('stream type not found');
+      }
+    } else {
+      if(maybeFound) {
+        throw new ConflictException('stream already exists');
+      }
+    }
+
+    return true;
   }
 
   defaultMessage(args: ValidationArguments) {

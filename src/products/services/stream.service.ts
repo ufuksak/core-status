@@ -1,11 +1,11 @@
 import {Injectable, InternalServerErrorException, Logger} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
-import { FindOneOptions } from "typeorm";
+import {StreamDto} from "../dto/stream.model";
+import {StreamRepository} from "../repositories/stream.repository";
+import {KeystoreService} from "./keystore";
+import {StreamEntity} from "../entity/stream.entity";
+import {FindOneOptions} from "typeorm";
 import {AlgorithmType, KeystoreByMeDto, Purpose} from '../dto/keystore.byme.model'
-import { StreamDto } from "../dto/stream.model";
-import { StreamEntity } from "../entity/stream.entity";
-import { StreamRepository } from "../repositories/stream.repository";
-import { KeystoreService } from "./keystore";
 
 @Injectable()
 export class StreamService {

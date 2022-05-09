@@ -1,9 +1,9 @@
-import { TokenData } from "@globalid/nest-auth";
+import {TokenData} from "@globalid/nest-auth";
 import {BadRequestException, Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
-import { GrantDto } from "../dto/grant.model";
-import { GrantRepository } from "../repositories/grant.repository";
-import { StreamService } from "./stream.service";
+import {GrantDto} from "../dto/grant.model";
+import {GrantRepository} from "../repositories/grant.repository";
+import {StreamService} from "./stream.service";
 
 @Injectable()
 export class GrantService {
