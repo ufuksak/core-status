@@ -1,6 +1,6 @@
 import {IsUUID} from "class-validator";
 import {IsEnum, OrUndefined} from "micro-kit-atlas/routing";
-import {Purpose} from "../response/keystore.byme.response";
+import {Purpose} from './keystore.byme.model';
 
 export interface KeyPairSearchQueryProps {
     gid_uuid: string | string[]

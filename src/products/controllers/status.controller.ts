@@ -5,17 +5,20 @@ import {StatusService} from "../services/status.service";
 import {ScopedTokenDataParam} from "../commons/scope.decorator";
 import {STATUS_MANAGE_SCOPE} from "../util/util";
 import {StreamEntity} from "../entity/stream.entity";
-import {Body, Controller, Delete, Get, Param, Post, Put, Request} from "@nestjs/common";
+import {Body, Controller, Delete, Get, Param, Post, Request} from "@nestjs/common";
 import {StreamTypeDto} from "../dto/stream_type.model";
 import {StreamTypeEntity} from "../entity/stream_type.entity";
 import {StreamTypeService} from "../services/stream_type.service";
 import {CreateStreamRequestBody} from "../dto/stream.model";
+import { GrantService } from "../services/grant.service";
+import { GrantDto } from "../dto/grant.model";
 
 @Controller('/api/v1/status')
 export class StatusController {
     constructor(
       private readonly statusService: StatusService,
       private readonly streamService: StreamService,
+      private grantService: GrantService,
       private readonly streamTypeService: StreamTypeService
     ) {}
 
@@ -41,6 +44,12 @@ export class StatusController {
     @TokenProtected()
     async getStreams(@ScopedTokenDataParam(STATUS_MANAGE_SCOPE) tokenData: TokenData): Promise<StreamEntity[]> {
         return this.streamService.getAll();
+    }
+
+    @TokenProtected()
+    @Post('/grants')
+    createGrant(@ScopedTokenDataParam(STATUS_MANAGE_SCOPE) tokenData: TokenData, @Body() grant: GrantDto) {
+      return this.grantService.save(tokenData, grant);
     }
 
     @Post('/streams')

@@ -5,8 +5,11 @@ import { StreamEntity } from "../entity/stream.entity";
 @EntityRepository(StreamEntity)
 export class StreamRepository extends Repository<StreamEntity> {
 
-  saveStream(statusDto: StreamDto): Promise<StreamEntity> {
-    return this.save(statusDto);
+  saveStream(streamDto: StreamDto): Promise<StreamEntity> {
+    const { type, ...streamEntity } = streamDto;
+    streamEntity['type'] = type;
+
+    return this.save(streamEntity);
   }
 
   getStream(options?: FindManyOptions<StreamEntity>): Promise<StreamEntity[]>{

@@ -138,6 +138,63 @@ describe('StatusModule (e2e)', () => {
     });
   });
 
+  describe('POST /api/v1/status/grants', () => {
+    it('should return the grantId', async () => {
+      const streamType = uuid().substring(0, 20);
+      const streamTypeData = {
+        granularity     : 'single',
+        stream_handling : 'lockbox',
+        approximated    : true,
+        supported_grants: ['range'],
+        type            : streamType,
+      };
+
+      const streamData = {
+        "stream_type": streamType,
+        "public_key": "Ut incididuntelit labore",
+        "encrypted_private_key": "Duis Excepteur culpa reprehenderit esse",
+      };
+
+      // Run your end-to-end test
+      await agent
+        .post('/api/v1/status/streams/types')
+        .auth(token, authType)
+        .set('Accept', 'application/json')
+        .send(streamTypeData)
+        .expect('Content-Type', /json/)
+        .expect(201);
+
+        // Run your end-to-end test
+        const { body } = await agent
+            .post('/api/v1/status/streams')
+            .set('Accept', 'text/plain')
+            .auth(token, authType)
+            .send(streamData)
+            .expect('Content-Type', "application/json; charset=utf-8")
+            .expect(201);
+
+        const grantData = {
+          "stream_id": body?.data?.id,
+          "recipient_id": uuid(),
+          "properties": {},
+          "fromDate": "2020-01-01T00:00:00.000Z",
+          "toDate": "2020-01-01T00:00:00.000Z",
+          "type": "range",
+        };
+
+        // Run your end-to-end test
+        const resp = await agent
+            .post('/api/v1/status/grants')
+            .set('Accept', 'text/plain')
+            .auth(token, authType)
+            .send(grantData)
+            .expect('Content-Type', "application/json; charset=utf-8")
+            .expect(201);
+
+        expect(resp?.body?.data?.id).toHaveLength(uuidLength);
+      })
+    })
+
   describe('GET /api/v1/status/streams/types', () => {
     it('should get all streamTypes', async () => {
       const streamTypeOutput = {
