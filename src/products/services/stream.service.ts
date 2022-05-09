@@ -25,8 +25,8 @@ export class StreamService {
     const keystoreDto = {
       public_key           : publicKey,
       encrypted_private_key: encryptedPrivateKey,
-      purpose              : 'encryption', // TODO clarification about new values?
-      algorithm_type       : 'rsa',
+      purpose              : 'status-stream',
+      algorithm_type       : 'ec',
     } as KeystoreByMeDto;
 
     let keypair = null;

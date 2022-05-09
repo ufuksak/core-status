@@ -94,8 +94,8 @@ describe('Status Service', () => {
             expect(keystoreService.createKeystoreKeyByMe.args[0][0]).toEqual(token);
             expect(keystoreService.createKeystoreKeyByMe.args[0][1]).toHaveProperty('encrypted_private_key', encryptedPrivateKey);
             expect(keystoreService.createKeystoreKeyByMe.args[0][1]).toHaveProperty('public_key', publicKey);
-            expect(keystoreService.createKeystoreKeyByMe.args[0][1]).toHaveProperty('purpose', 'encryption');
-            expect(keystoreService.createKeystoreKeyByMe.args[0][1]).toHaveProperty('algorithm_type', 'rsa');
+            expect(keystoreService.createKeystoreKeyByMe.args[0][1]).toHaveProperty('purpose', 'status-stream');
+            expect(keystoreService.createKeystoreKeyByMe.args[0][1]).toHaveProperty('algorithm_type', 'ec');
 
             expect(streamRepository.saveStream.calledOnce).toBeTruthy();
             expect(streamRepository.saveStream.args[0][0]).toHaveProperty('type', streamType);
