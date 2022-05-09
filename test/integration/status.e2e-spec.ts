@@ -251,7 +251,7 @@ describe('StatusModule (e2e)', () => {
       expect(deleteResponse?.body?.data?.attributes?.comment).toEqual('deleted');
     });
 
-    it('mutliple deleted nonexisting skiped', async () => {
+    it('mutliple deleted non-existing skipped', async () => {
       // Prepare
       const {randomUUID, validStatusUpdates, streamId: stream_id} =
         await prepareAndTestStatusDelete();
