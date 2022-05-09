@@ -140,8 +140,6 @@ describe('StatusModule (e2e)', () => {
 
   describe('PUT /api/v1/status/grants', () => {
     it('should return the grantId', async () => {
-      const accessToken = getAccessToken();
-
       const streamType = uuid();
       const streamTypeData = {
         granularity     : 'single',
@@ -160,7 +158,7 @@ describe('StatusModule (e2e)', () => {
       await supertest.agent(app.getHttpServer())
         .post('/api/v1/status/streams/types')
         .set('Accept', 'application/json')
-        .auth(accessToken, {type: "bearer"})
+        .auth(token, {type: "bearer"})
         .send(streamTypeData)
         .expect('Content-Type', /json/)
         .expect(201);
@@ -169,7 +167,7 @@ describe('StatusModule (e2e)', () => {
         const { text: stream_id } = await supertest.agent(app.getHttpServer())
             .put('/api/v1/status/streams')
             .set('Accept', 'text/plain')
-            .auth(accessToken, {type: "bearer"})
+            .auth(token, {type: "bearer"})
             .send(streamData)
             .expect('Content-Type', /text\/html/)
             .expect(200);
@@ -187,7 +185,7 @@ describe('StatusModule (e2e)', () => {
         const { text } = await supertest.agent(app.getHttpServer())
             .put('/api/v1/status/grants')
             .set('Accept', 'text/plain')
-            .auth(accessToken, {type: "bearer"})
+            .auth(token, {type: "bearer"})
             .send(grantData)
             .expect('Content-Type', /text\/html/)
             .expect(200);
