@@ -56,7 +56,7 @@ describe('Grant Service', () => {
 
         const streamEntity = {
           owner_id: tokenData.client_id,
-          type: {
+          streamType: {
             supported_grants: [grantDto.type],
           },
         };

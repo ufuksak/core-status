@@ -57,7 +57,7 @@ describe('Status Controller', () => {
         },
         {
           provide: GrantService,
-          useValue: statusService
+          useValue: grantService
         },
         {
           provide: StreamTypeService,

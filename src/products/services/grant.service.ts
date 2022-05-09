@@ -17,10 +17,10 @@ export class GrantService {
       const { stream_id, type } = grantData;
 
       const stream = await this.streamService.getById(stream_id, {
-        relations: ["type"],
+        relations: ["streamType"],
       });
 
-      if(!stream || tokenData.client_id !== stream.owner_id || !stream.type.supported_grants.includes(type)){
+      if(!stream || tokenData.client_id !== stream.owner_id || !stream.streamType.supported_grants.includes(type)){
         throw new BadRequestException();
       }
 
