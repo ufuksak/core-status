@@ -116,6 +116,36 @@ describe('StatusModule (e2e)', () => {
     );
   });
 
+  const prepareAndTestStatusDelete = async () => {
+    await createStreamTypeAndExpect();
+    await createStreamAndExpect();
+    const resp = await agent
+      .get('/api/v1/status/streams')
+      .set('Accept', 'application/json')
+      .auth(token, authType)
+      .send()
+      .expect('Content-Type', /json/)
+      .expect(200);
+
+    const randomUUID = uuid();
+    const streamId = resp?.body?.data?.[0].id;
+
+    const validStatusUpdates = {
+      status_updates: multipleStatusUpdateTemplate.status_updates.map(el => {
+        el.stream_id = streamId;
+        return el;
+      })
+    };
+    const statusUpdateId = validStatusUpdates.status_updates[0].id;
+
+    await agent.post('/api/v1/status')
+      .auth(token, authType)
+      .send(validStatusUpdates)
+      .expect(201);
+
+    return {statusUpdateId, randomUUID, validStatusUpdates, streamId};
+  }
+
   const getAllStatuses = async () => agent
     .get(`/api/v1/status`)
     .auth(token, authType)
@@ -123,21 +153,21 @@ describe('StatusModule (e2e)', () => {
 
   const createStreamTypeAndExpect = async () => {
     const streamTypeOutput = {
-      "granularity"     : 'single',
-      "stream_handling" : 'lockbox',
-      "approximated"    : true,
+      "granularity": 'single',
+      "stream_handling": 'lockbox',
+      "approximated": true,
       "supported_grants": ['range'],
-      "type"            : streamType,
-      "updated_at"      : expect.any(String),
-      "created_at"      : expect.any(String)
+      "type": streamType,
+      "updated_at": expect.any(String),
+      "created_at": expect.any(String)
     };
 
     const streamTypeData = {
-      granularity     : 'single',
-      stream_handling : 'lockbox',
-      approximated    : true,
+      granularity: 'single',
+      stream_handling: 'lockbox',
+      approximated: true,
       supported_grants: ['range'],
-      type            : streamType,
+      type: streamType,
     };
 
     // Run your end-to-end test
@@ -184,18 +214,46 @@ describe('StatusModule (e2e)', () => {
     });
   });
 
+  describe('POST /api/v1/status/grants', () => {
+    it('should return the grantId', async () => {
+      const {streamId} = await prepareAndTestStatusDelete();
+      const grantData = {
+        "stream_id": streamId,
+        "recipient_id": uuid(),
+        "properties": {
+          e2eKey: '',
+          reEncryptionKey: ''
+        },
+        "fromDate": "2020-01-01T00:00:00.000Z",
+        "toDate": "2020-01-01T00:00:00.000Z",
+        "type": "range",
+      };
+
+      // Run your end-to-end test
+      const resp = await agent
+        .post('/api/v1/status/grants')
+        .set('Accept', 'text/plain')
+        .auth(token, authType)
+        .send(grantData)
+        .expect('Content-Type', "application/json; charset=utf-8")
+        .expect(201);
+
+      expect(resp?.body?.data?.id).toHaveLength(uuidLength);
+    })
+  })
+
   describe('GET /api/v1/status/streams/types', () => {
     it('should get all streamTypes', async () => {
       await createStreamTypeAndExpect();
       await createStreamAndExpect();
       const streamTypeOutput = {
-        "granularity"     : 'single',
-        "stream_handling" : 'lockbox',
-        "approximated"    : true,
+        "granularity": 'single',
+        "stream_handling": 'lockbox',
+        "approximated": true,
         "supported_grants": ['range'],
-        "type"            : streamType,
-        "updated_at"      : expect.any(String),
-        "created_at"      : expect.any(String)
+        "type": streamType,
+        "updated_at": expect.any(String),
+        "created_at": expect.any(String)
       };
 
       // Run your end-to-end test
@@ -211,36 +269,6 @@ describe('StatusModule (e2e)', () => {
         .toEqual(streamTypeOutput)
     });
   });
-
-  const prepareAndTestStatusDelete = async () => {
-    await createStreamTypeAndExpect();
-    await createStreamAndExpect();
-    const resp = await agent
-      .get('/api/v1/status/streams')
-      .set('Accept', 'application/json')
-      .auth(token, authType)
-      .send()
-      .expect('Content-Type', /json/)
-      .expect(200);
-
-    const randomUUID = uuid();
-    const streamId = resp?.body?.data?.[0].id;
-
-    const validStatusUpdates = {
-      status_updates: multipleStatusUpdateTemplate.status_updates.map(el => {
-        el.stream_id = streamId;
-        return el;
-      })
-    };
-    const statusUpdateId = validStatusUpdates.status_updates[0].id;
-
-    await agent.post('/api/v1/status')
-      .auth(token, authType)
-      .send(validStatusUpdates)
-      .expect(201);
-
-    return {statusUpdateId, randomUUID, validStatusUpdates, streamId};
-  }
 
   describe('DELETE /api/v1/status', () => {
     it('single deleted', async () => {
@@ -348,7 +376,7 @@ describe('StatusModule (e2e)', () => {
       }));
 
       const matchedDeleted = matched.map(el => {
-        const result = { ...el };
+        const result = {...el};
         result.marker.deleted = true;
         result.marker = expect.objectContaining({
           ...result.marker
@@ -389,10 +417,10 @@ describe('StatusModule (e2e)', () => {
 
       // Act
       const getByRange = async () => agent
-          .get(`/api/v1/status`)
-          .query({ from: fromTs, to: toTs })
-          .auth(token, authType)
-          .expect(200);
+        .get(`/api/v1/status`)
+        .query({from: fromTs, to: toTs})
+        .auth(token, authType)
+        .expect(200);
 
       const getByRangeResponseLoaded = await getByRange();
 
@@ -407,7 +435,7 @@ describe('StatusModule (e2e)', () => {
 
       await agent.delete(`/api/v1/status/update/range`)
         .auth(token, authType)
-        .send({ from, to, stream_id })
+        .send({from, to, stream_id})
         .expect(200);
 
       const getByRangeResponseAfterCleaned = await getByRange();
@@ -417,7 +445,7 @@ describe('StatusModule (e2e)', () => {
       }));
 
       const matchedDeleted = matched.map(el => {
-        const result = { ...el };
+        const result = {...el};
         result.marker.deleted = true;
         result.marker = expect.objectContaining({
           ...result.marker
@@ -476,7 +504,7 @@ describe('StatusModule (e2e)', () => {
       const payload = 'some payload';
       const validUpdate = Object.assign({}, statusUpdateTemplate);
       validUpdate.status_updates[0].stream_id = createdStreamId;
-      validUpdate.status_updates[0].payload = cryptosdk.PRE.encrypt(masterKeys.public_key,payload).cipher;
+      validUpdate.status_updates[0].payload = cryptosdk.PRE.encrypt(masterKeys.public_key, payload).cipher;
       await agent.post('/api/v1/status')
         .auth(token, authType)
         .send(validUpdate)

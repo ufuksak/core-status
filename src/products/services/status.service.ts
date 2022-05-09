@@ -6,26 +6,19 @@ import {
   Logger
 } from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
-import {
-  GetUserStatusesParams,
-  StatusDto,
-  StatusResponse,
-  UpdateMarkerInterface,
-  UpdateMarkerCreateDto
-} from "../dto/status.model";
+import {GetUserStatusesParams, StatusDto, StatusResponse, UpdateMarkerInterface} from "../dto/status.model";
 import {StatusRepository} from "../repositories/status.repository";
 import {StatusPublisher} from "../rabbit/status.publisher";
 import {UpdateEntity, updateEntityName} from "../entity/update.entity";
 import {StreamRepository} from "../repositories/stream.repository";
 import {PG_UNIQUE_CONSTRAINT_VIOLATION} from "../util/util";
-import { validate } from 'class-validator';
 import {
   DeletedUpdate,
   DeleteStatusDateRangeOptions,
   MassUpdateDeleteOptions,
   SingleUpdateDeleteOptions
 } from "../dto/s3file.model";
-import { Between } from "typeorm";
+import {Between} from "typeorm";
 
 @Injectable()
 export class StatusService {

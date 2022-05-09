@@ -9,6 +9,7 @@ import {StatusRepository} from "../../src/products/repositories/status.repositor
 import {StatusPublisher} from "../../src/products/rabbit/status.publisher";
 import {StreamTypeService} from "../../src/products/services/stream_type.service";
 import {StreamTypeRepository} from "../../src/products/repositories/stream_type.repository";
+import {AlgorithmType, Purpose} from '../../src/products/dto/keystore.byme.model'
 
 describe('Status Service', () => {
     let streamService: StreamService;
@@ -94,8 +95,8 @@ describe('Status Service', () => {
             expect(keystoreService.createKeystoreKeyByMe.args[0][0]).toEqual(token);
             expect(keystoreService.createKeystoreKeyByMe.args[0][1]).toHaveProperty('encrypted_private_key', encryptedPrivateKey);
             expect(keystoreService.createKeystoreKeyByMe.args[0][1]).toHaveProperty('public_key', publicKey);
-            expect(keystoreService.createKeystoreKeyByMe.args[0][1]).toHaveProperty('purpose', 'encryption');
-            expect(keystoreService.createKeystoreKeyByMe.args[0][1]).toHaveProperty('algorithm_type', 'rsa');
+            expect(keystoreService.createKeystoreKeyByMe.args[0][1]).toHaveProperty('purpose', Purpose.status_stream);
+            expect(keystoreService.createKeystoreKeyByMe.args[0][1]).toHaveProperty('algorithm_type', AlgorithmType.ec);
 
             expect(streamRepository.saveStream.calledOnce).toBeTruthy();
             expect(streamRepository.saveStream.args[0][0]).toHaveProperty('type', streamType);

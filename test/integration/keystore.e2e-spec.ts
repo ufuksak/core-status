@@ -3,6 +3,7 @@ import {Test, TestingModule} from "@nestjs/testing";
 import * as supertest from "supertest";
 import {getAccessToken} from "../getacctoken";
 import {AppKeystoreTestModule} from "./modules/app.keystore.test.module";
+import {AlgorithmType, Purpose} from '../../src/products/dto/keystore.byme.model'
 
 jest.setTimeout(60 * 1000);
 
@@ -33,7 +34,7 @@ describe('KeystoreController (e2e)', () => {
     it('should return the keystore', async () => {
       const output = {
         "uuid": expect.any(String),
-        "algorithm_type": "rsa",
+        "algorithm_type": AlgorithmType.rsa,
         "client_id": null,
         "gid_uuid": expect.any(String),
         "status": "confirmed",
@@ -42,7 +43,7 @@ describe('KeystoreController (e2e)', () => {
         "version": expect.any(Number),
         "tag": "encryption",
         "consent_id": null,
-        "purpose": "encryption",
+        "purpose": Purpose.encryption,
         "external": false,
         "latest": true,
         "updated_at": expect.any(String),
@@ -53,8 +54,8 @@ describe('KeystoreController (e2e)', () => {
       const inputData = {
         "public_key": "Ut incididuntelit labore",
         "encrypted_private_key": "Duis Excepteur culpa reprehenderit esse",
-        "purpose": "encryption",
-        "algorithm_type": "rsa"
+        "purpose": Purpose.encryption,
+        "algorithm_type": AlgorithmType.rsa
       };
 
       const scope = 'public keys.manage';

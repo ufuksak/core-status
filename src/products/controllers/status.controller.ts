@@ -17,15 +17,17 @@ import {
     SingleUpdateDeleteDto,
     UUUIDParam
 } from "../dto/s3file.model";
+import {GrantService} from "../services/grant.service";
+import {GrantDto} from "../dto/grant.model";
 
 @Controller('/api/v1/status')
 export class StatusController {
     constructor(
       private readonly statusService: StatusService,
       private readonly streamService: StreamService,
+      private grantService: GrantService,
       private readonly streamTypeService: StreamTypeService
     ) {}
-
 
     @Get()
     @TokenProtected()
@@ -36,7 +38,7 @@ export class StatusController {
         return this.statusService.getUserStatuses(tokenData.uuid, params);
     }
 
-    @Post()
+    @Post('/')
     @TokenProtected()
     async appendStatus(
       @ScopedTokenDataParam(STATUS_MANAGE_SCOPE) tokenData: TokenData,
@@ -82,6 +84,12 @@ export class StatusController {
     @TokenProtected()
     async getStreams(@ScopedTokenDataParam(STATUS_MANAGE_SCOPE) tokenData: TokenData): Promise<StreamEntity[]> {
         return this.streamService.getAll();
+    }
+
+    @TokenProtected()
+    @Post('/grants')
+    createGrant(@ScopedTokenDataParam(STATUS_MANAGE_SCOPE) tokenData: TokenData, @Body() grant: GrantDto) {
+        return this.grantService.save(tokenData, grant);
     }
 
     @Post('/streams')
