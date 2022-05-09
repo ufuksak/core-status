@@ -138,7 +138,6 @@ describe('StatusModule (e2e)', () => {
     });
   });
 
-
   describe('PUT /api/v1/status/grants', () => {
     it('should return the grantId', async () => {
       const accessToken = getAccessToken();
