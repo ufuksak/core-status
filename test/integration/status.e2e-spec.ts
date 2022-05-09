@@ -138,9 +138,9 @@ describe('StatusModule (e2e)', () => {
     });
   });
 
-  describe('PUT /api/v1/status/grants', () => {
+  describe('POST /api/v1/status/grants', () => {
     it('should return the grantId', async () => {
-      const streamType = uuid();
+      const streamType = uuid().substring(0, 20);
       const streamTypeData = {
         granularity     : 'single',
         stream_handling : 'lockbox',
@@ -148,32 +148,33 @@ describe('StatusModule (e2e)', () => {
         supported_grants: ['range'],
         type            : streamType,
       };
+
       const streamData = {
-        "streamType": streamType,
-        "publicKey": "Ut incididuntelit labore",
-        "encryptedPrivateKey": "Duis Excepteur culpa reprehenderit esse",
+        "stream_type": streamType,
+        "public_key": "Ut incididuntelit labore",
+        "encrypted_private_key": "Duis Excepteur culpa reprehenderit esse",
       };
 
       // Run your end-to-end test
-      await supertest.agent(app.getHttpServer())
+      await agent
         .post('/api/v1/status/streams/types')
+        .auth(token, authType)
         .set('Accept', 'application/json')
-        .auth(token, {type: "bearer"})
         .send(streamTypeData)
         .expect('Content-Type', /json/)
         .expect(201);
 
         // Run your end-to-end test
-        const { text: stream_id } = await supertest.agent(app.getHttpServer())
-            .put('/api/v1/status/streams')
+        const body = await agent
+            .post('/api/v1/status/streams')
             .set('Accept', 'text/plain')
-            .auth(token, {type: "bearer"})
+            .auth(token, authType)
             .send(streamData)
-            .expect('Content-Type', /text\/html/)
+            .expect('Content-Type', "application/json; charset=utf-8")
             .expect(200);
 
         const grantData = {
-          "stream_id": stream_id,
+          "stream_id": body?.data?.id,
           "recipient_id": uuid(),
           "properties": {},
           "fromDate": "2020-01-01T00:00:00.000Z",
@@ -182,10 +183,10 @@ describe('StatusModule (e2e)', () => {
         };
 
         // Run your end-to-end test
-        const { text } = await supertest.agent(app.getHttpServer())
-            .put('/api/v1/status/grants')
+        const { text } = await agent
+            .post('/api/v1/status/grants')
             .set('Accept', 'text/plain')
-            .auth(token, {type: "bearer"})
+            .auth(token, authType)
             .send(grantData)
             .expect('Content-Type', /text\/html/)
             .expect(200);
