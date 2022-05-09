@@ -82,9 +82,7 @@ export class StatusService {
 
     for (const status of statuses) {
       try {
-        status.marker = Object.assign(
-          Object.assign({}, markerDefault), status.marker
-        );
+        status.marker = Object.assign({}, markerDefault, status.marker);
 
         const result = await this.statusRepo
           .createQueryBuilder()

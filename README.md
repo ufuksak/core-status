@@ -86,7 +86,7 @@
    Starting temp-status-db_keystore_1                    ... done
    ```
 
-1. git submodule update &&  cd ./globalid-crypto-library && npm i
+1. git submodule init && git submodule update &&  cd ./globalid-crypto-library && npm i
 
 
 1. Troubleshooting,
