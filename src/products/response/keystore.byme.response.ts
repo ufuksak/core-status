@@ -1,5 +1,6 @@
 import {IsBoolean, IsNumber, IsString, IsUUID, MinLength} from "class-validator";
 import {IsEnum, OrNull} from "micro-kit-atlas/routing";
+import {AlgorithmType, Purpose} from "../dto/keystore.byme.model";
 
 export interface PublicCreateAttributes {
     uuid: string
@@ -25,11 +26,6 @@ export interface CreateAttributes extends PublicCreateAttributes {
     managed_key_id: string | null
 }
 
-export enum AlgorithmType {
-    'ripple' = 'ripple',
-    'rsa' = 'rsa',
-}
-
 export interface DateAttributes extends CreateAttributes {
     created_at: string
     updated_at: string
@@ -50,15 +46,6 @@ export enum Status {
     'confirmed' = 'confirmed',
     'declined' = 'declined',
     'expired' = 'expired',
-}
-
-export enum Purpose {
-    'messaging' = 'messaging',
-    'encryption' = 'encryption',
-    'signing' = 'signing',
-    'annotations' = 'annotations',
-    'device_encryption' = 'device-encryption',
-    'status_db' = 'status-db'
 }
 
 export interface PublicCreateAttributes {

@@ -4,8 +4,8 @@ export enum Purpose {
     'signing' = 'signing',
     'annotations' = 'annotations',
     'device_encryption' = 'device-encryption',
-    'status_db' = 'status-db',
-    'status_stream' = 'status-stream'
+    'status_sharing' = 'status-sharing',
+    'status_stream' = 'status-stream',
 }
 
 export enum AlgorithmType {

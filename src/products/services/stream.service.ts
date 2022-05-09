@@ -1,7 +1,7 @@
 import {Injectable, InternalServerErrorException, Logger} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import { FindOneOptions } from "typeorm";
-import { KeystoreByMeDto } from "../dto/keystore.byme.model";
+import {AlgorithmType, KeystoreByMeDto, Purpose} from '../dto/keystore.byme.model'
 import { StreamDto } from "../dto/stream.model";
 import { StreamEntity } from "../entity/stream.entity";
 import { StreamRepository } from "../repositories/stream.repository";
@@ -25,8 +25,8 @@ export class StreamService {
     const keystoreDto = {
       public_key           : publicKey,
       encrypted_private_key: encryptedPrivateKey,
-      purpose              : 'status-stream',
-      algorithm_type       : 'ec',
+      purpose              : Purpose.status_stream,
+      algorithm_type       : AlgorithmType.ec,
     } as KeystoreByMeDto;
 
     let keypair = null;

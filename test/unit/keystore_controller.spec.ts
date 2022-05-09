@@ -1,8 +1,8 @@
-import {Test, TestingModule} from '@nestjs/testing';
-import {KeystoreController} from "../../src/products/controllers/keystore.controller";
-import {KeystoreService} from "../../src/products/services/keystore";
-import {KeystoreByMeDto} from "../../src/products/dto/keystore.byme.model";
-import {KeyPairCreateResponse} from "../../src/products/response/keystore.byme.response";
+import {Test, TestingModule} from '@nestjs/testing'
+import {KeystoreController} from '../../src/products/controllers/keystore.controller'
+import {KeystoreService} from '../../src/products/services/keystore'
+import {AlgorithmType, KeystoreByMeDto, Purpose} from '../../src/products/dto/keystore.byme.model'
+import {KeyPairCreateResponse} from '../../src/products/response/keystore.byme.response'
 
 describe('KeystoreController Unit Tests', () => {
     let testController: KeystoreController;
@@ -39,8 +39,8 @@ describe('KeystoreController Unit Tests', () => {
         const dto = {
             "public_key": "Ut incididuntelit labore",
             "encrypted_private_key": "Duis Excepteur culpa reprehenderit esse",
-            "purpose": "status-stream",
-            "algorithm_type": "ec"
+            "purpose": Purpose.status_stream,
+            "algorithm_type": AlgorithmType.ec
         } as KeystoreByMeDto;
 
         const options = {

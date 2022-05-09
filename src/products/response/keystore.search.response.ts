@@ -1,7 +1,6 @@
 import {IsArrayOf, IsEnum, OrNull} from "micro-kit-atlas/routing";
 import {IsUUID, MinLength} from "class-validator";
-import {AlgorithmType} from "../dto/keystore.byme.model";
-import {Purpose} from "./keystore.byme.response";
+import {AlgorithmType, Purpose} from "../dto/keystore.byme.model";
 
 export namespace KeyPair {
     export const PUBLIC_ATTRIBUTES: string[] = ['uuid', 'algorithm_type', 'gid_uuid', 'public_key', 'purpose']
