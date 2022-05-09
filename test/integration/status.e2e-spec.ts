@@ -189,7 +189,7 @@ describe('StatusModule (e2e)', () => {
             .auth(token, authType)
             .send(grantData)
             .expect('Content-Type', /text\/html/)
-            .expect(200);
+            .expect(201);
 
         expect(typeof text).toBe('string');
         expect(text).toHaveLength(36);
