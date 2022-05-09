@@ -39,17 +39,25 @@ export class StatusService {
   }
 
   async getUserStatuses(owner_id: string, options: GetUserStatusesParams): Promise<UpdateEntity[]> {
+    const where = {
+      stream: {
+        owner_id
+      }
+    };
+
     const {from, to} = options;
-    const pgFrom = new Date(from).toISOString()
-    const pgTo = new Date(to).toISOString()
+    if(from && to) {
+      const pgFrom = new Date(from).toISOString()
+      const pgTo = new Date(to).toISOString()
+      where['recorded_at'] = Between(pgFrom, pgTo);
+    }
+
     return this.statusRepo.find({
-      where: {
-        recorded_at: Between(pgFrom, pgTo),
-        stream: {
-          owner_id
-        }
-      },
-      relations: ['stream']
+      where,
+      relations: ['stream'],
+      order: {
+        uploaded_at: 'ASC'
+      }
     });
   }
 

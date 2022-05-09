@@ -26,6 +26,7 @@ export class StatusController {
       private readonly streamTypeService: StreamTypeService
     ) {}
 
+
     @Get()
     @TokenProtected()
     async getUserStatuses(

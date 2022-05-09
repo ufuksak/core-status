@@ -20,10 +20,12 @@ export interface GetUserStatusesInterface {
 }
 
 export class GetUserStatusesParams implements GetUserStatusesInterface {
+  @IsOptional()
   @Transform(({ value }) => parseInt(value))
   @IsInt()
   from: number;
 
+  @IsOptional()
   @Transform(({ value }) => parseInt(value))
   @IsInt()
   to: number;

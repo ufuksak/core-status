@@ -116,6 +116,11 @@ describe('StatusModule (e2e)', () => {
     );
   });
 
+  const getAllStatuses = async () => agent
+    .get(`/api/v1/status`)
+    .auth(token, authType)
+    .expect(200);
+
   const createStreamTypeAndExpect = async () => {
     const streamTypeOutput = {
       "granularity"     : 'single',
@@ -240,8 +245,21 @@ describe('StatusModule (e2e)', () => {
   describe('DELETE /api/v1/status', () => {
     it('single deleted', async () => {
       // Prepare
-      const {statusUpdateId, randomUUID, streamId} =
+      const {randomUUID, streamId} =
         await prepareAndTestStatusDelete();
+
+      const getAllResponseLoaded = await getAllStatuses();
+      const matched = getAllResponseLoaded.body?.data?.map(el => ({id: el.id, ...el.attributes}));
+      const reallyToBeDeleted = matched[0];
+      const reallyToBeDeletedId = reallyToBeDeleted.id;
+
+      // make like 'deleted'
+      reallyToBeDeleted.marker.deleted = true;
+      reallyToBeDeleted.marker = expect.objectContaining({
+        ...reallyToBeDeleted.marker
+      });
+      reallyToBeDeleted.payload = null;
+      delete reallyToBeDeleted['stream'];
 
       // Act
       const deleteFailedResponse = await agent
@@ -253,17 +271,38 @@ describe('StatusModule (e2e)', () => {
         .expect(200);
 
       const deleteResponse = await agent
-        .delete(`/api/v1/status/${statusUpdateId}`)
+        .delete(`/api/v1/status/${reallyToBeDeletedId}`)
         .auth(token, authType)
         .send({
           stream_id: streamId
         }).expect(200);
 
+      const getStatusesResponseAfterCleaned = await getAllStatuses();
+      const matchedAfterDeleted = getStatusesResponseAfterCleaned.body?.data?.map(el => ({
+        id: el.id,
+        ...el.attributes
+      }));
+
       // Check
       expect(deleteFailedResponse?.body?.data?.id).toEqual(randomUUID);
       expect(deleteFailedResponse?.body?.data?.attributes?.comment).toEqual('update not found');
-      expect(deleteResponse?.body?.data?.id).toEqual(statusUpdateId);
+      expect(deleteResponse?.body?.data?.id).toEqual(reallyToBeDeletedId);
       expect(deleteResponse?.body?.data?.attributes?.comment).toEqual('deleted');
+
+
+      expect(matchedAfterDeleted).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            ...reallyToBeDeleted
+          }),
+          expect.objectContaining({
+            ...(matched[1])
+          }),
+          expect.objectContaining({
+            ...(matched[2])
+          })
+        ])
+      );
     });
 
     it('mutliple deleted non-existing skipped', async () => {
@@ -272,6 +311,9 @@ describe('StatusModule (e2e)', () => {
         await prepareAndTestStatusDelete();
       const ids = validStatusUpdates.status_updates.map(el => el.id);
       ids.push(randomUUID);
+
+      const getAllResponseLoaded = await getAllStatuses();
+      const matched = getAllResponseLoaded.body?.data?.map(el => ({id: el.id, ...el.attributes}));
 
       // Act
       const deletedManyResponse = await agent
@@ -298,8 +340,40 @@ describe('StatusModule (e2e)', () => {
         }
       ];
       const actualResults = deletedManyResponse.body.data.map(el => el.attributes);
+
+      const getStatusesResponseAfterCleaned = await getAllStatuses();
+      const matchedAfterDeleted = getStatusesResponseAfterCleaned.body?.data?.map(el => ({
+        id: el.id,
+        ...el.attributes
+      }));
+
+      const matchedDeleted = matched.map(el => {
+        const result = { ...el };
+        result.marker.deleted = true;
+        result.marker = expect.objectContaining({
+          ...result.marker
+        });
+        result.payload = null;
+        delete el['stream'];
+        return result;
+      });
+
       // Check
       expect(expectedResults).toEqual(actualResults);
+
+      expect(matchedAfterDeleted).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            ...(matchedDeleted[0])
+          }),
+          expect.objectContaining({
+            ...(matchedDeleted[1])
+          }),
+          expect.objectContaining({
+            ...(matchedDeleted[2])
+          })
+        ])
+      );
     });
 
     it('multiple deleted by range', async () => {
@@ -337,26 +411,29 @@ describe('StatusModule (e2e)', () => {
         .expect(200);
 
       const getByRangeResponseAfterCleaned = await getByRange();
-      const matchedAfterCleaned = getByRangeResponseAfterCleaned.body?.data?.map(el => ({
+      const matchedAfterDeleted = getByRangeResponseAfterCleaned.body?.data?.map(el => ({
         id: el.id,
         ...el.attributes
       }));
 
-      expect(matchedAfterCleaned).toEqual(
+      const matchedDeleted = matched.map(el => {
+        const result = { ...el };
+        result.marker.deleted = true;
+        result.marker = expect.objectContaining({
+          ...result.marker
+        });
+        result.payload = null;
+        delete el['stream'];
+        return result;
+      });
+
+      expect(matchedAfterDeleted).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
-            id: matched[0].id,
-            payload: null,
-            marker: expect.objectContaining({
-              deleted: true
-            })
+            ...(matchedDeleted[0])
           }),
           expect.objectContaining({
-            id: matched[1].id,
-            payload: null,
-            marker: expect.objectContaining({
-              deleted: true
-            })
+            ...(matchedDeleted[1])
           })
         ])
       );
