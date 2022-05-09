@@ -165,13 +165,13 @@ describe('StatusModule (e2e)', () => {
         .expect(201);
 
         // Run your end-to-end test
-        const body = await agent
+        const { body } = await agent
             .post('/api/v1/status/streams')
             .set('Accept', 'text/plain')
             .auth(token, authType)
             .send(streamData)
             .expect('Content-Type', "application/json; charset=utf-8")
-            .expect(200);
+            .expect(201);
 
         const grantData = {
           "stream_id": body?.data?.id,
@@ -183,16 +183,15 @@ describe('StatusModule (e2e)', () => {
         };
 
         // Run your end-to-end test
-        const { text } = await agent
+        const resp = await agent
             .post('/api/v1/status/grants')
             .set('Accept', 'text/plain')
             .auth(token, authType)
             .send(grantData)
-            .expect('Content-Type', /text\/html/)
+            .expect('Content-Type', "application/json; charset=utf-8")
             .expect(201);
 
-        expect(typeof text).toBe('string');
-        expect(text).toHaveLength(36);
+        expect(resp?.body?.data?.id).toHaveLength(uuidLength);
       })
     })
 

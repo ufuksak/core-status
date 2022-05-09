@@ -13,22 +13,20 @@ export class GrantService {
       private streamService: StreamService,
     ) {}
 
-    async save(tokenData: TokenData, grantData: GrantDto): Promise<string> {
+    async save(tokenData: TokenData, grantData: GrantDto){
       const { stream_id, type } = grantData;
 
       const stream = await this.streamService.getById(stream_id, {
         relations: ["streamType"],
       });
 
-      if(!stream || tokenData.client_id !== stream.owner_id || !stream.streamType.supported_grants.includes(type)){
+      if(!stream || tokenData.sub !== stream.owner_id || !stream.streamType.supported_grants.includes(type)){
         throw new BadRequestException();
       }
 
       grantData.owner_id = stream.owner_id;
 
-      const grant = await this.grantRepo.saveGrant(grantData);
-
-      return grant.id;
+      return this.grantRepo.saveGrant(grantData);
     }
 
 }

@@ -48,7 +48,7 @@ export class StatusController {
 
     @TokenProtected()
     @Post('/grants')
-    createGrant(@ScopedTokenDataParam(STATUS_MANAGE_SCOPE) tokenData: TokenData, @Body() grant: GrantDto): Promise<string> {
+    createGrant(@ScopedTokenDataParam(STATUS_MANAGE_SCOPE) tokenData: TokenData, @Body() grant: GrantDto) {
       return this.grantService.save(tokenData, grant);
     }
 

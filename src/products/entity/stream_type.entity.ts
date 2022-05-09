@@ -1,7 +1,7 @@
 import {Column, Entity, OneToMany} from "typeorm";
 import {BaseEntity} from "./base.entity";
 import {GrantType} from "../dto/grant.model";
-import { StreamGranularity, StreamHandling } from "../dto/stream_type.model";
+import { StreamGranularity, StreamHandling } from "../dto/stream_handling.model";
 import {StreamEntity} from "./stream.entity";
 
 @Entity({name: "stream_type", synchronize: true})

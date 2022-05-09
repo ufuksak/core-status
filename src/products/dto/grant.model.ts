@@ -21,7 +21,6 @@ export class GrantDto {
   @IsUUID('4')
   recipient_id: string;
 
-  @IsUUID('4')
   owner_id: string;
 
   @IsDateString()

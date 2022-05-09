@@ -42,7 +42,7 @@ describe('Grant Service', () => {
         const grantId = uuid();
 
         const tokenData = {
-          client_id: uuid(),
+          sub: uuid(),
         } as TokenData;
 
         const grantDto = {
@@ -55,7 +55,7 @@ describe('Grant Service', () => {
         } as GrantDto;
 
         const streamEntity = {
-          owner_id: tokenData.client_id,
+          owner_id: tokenData.sub,
           streamType: {
             supported_grants: [grantDto.type],
           },
@@ -66,7 +66,7 @@ describe('Grant Service', () => {
 
         const response = await grantService.save(tokenData, grantDto);
 
-        expect(response).equal(grantId);
+        expect(response.id).to.equal(grantId);
 
         expect(streamService.getById.calledOnce).to.be.true;
         expect(streamService.getById.args[0][0]).equal(streamId);
@@ -74,7 +74,7 @@ describe('Grant Service', () => {
         expect(grantRepository.saveGrant.calledOnce).to.be.true;
         expect(grantRepository.saveGrant.args[0][0]).to.deep.equal({
           ...grantDto,
-          owner_id: tokenData.client_id,
+          owner_id: tokenData.sub,
         });
       });
 

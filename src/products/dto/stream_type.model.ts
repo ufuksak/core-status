@@ -1,17 +1,7 @@
 import { IsArray, IsBoolean, IsEnum, IsNotEmpty, MaxLength } from "class-validator";
 // import { StreamTypeAvailable } from "../validators/stream-type.validator";
 import { GrantType } from "./grant.model";
-
-export enum StreamHandling {
-  e2e = 'e2e',
-  direct = 'direct',
-  lockbox = 'lockbox'
-}
-
-export enum StreamGranularity {
-  single = 'single',
-  batch = 'batch'
-}
+import { StreamGranularity, StreamHandling } from "./stream_handling.model";
 
 export class StreamTypeDto  {
   @IsEnum(StreamGranularity)
