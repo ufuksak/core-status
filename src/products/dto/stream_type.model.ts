@@ -1,5 +1,5 @@
 import { IsArray, IsBoolean, IsEnum, IsNotEmpty, MaxLength } from "class-validator";
-// import { StreamTypeAvailable } from "../validators/stream-type.validator";
+import { StreamTypeAvailable } from "../validators/stream-type.validator";
 import { GrantType } from "./grant.model";
 import { StreamGranularity, StreamHandling } from "./stream_handling.model";
 
@@ -19,7 +19,7 @@ export class StreamTypeDto  {
   @IsEnum(GrantType, { each: true })
   supported_grants: GrantType[];
 
-  // @StreamTypeAvailable(false)
+  @StreamTypeAvailable(false)
   @MaxLength(24)
   type: string;
 }
