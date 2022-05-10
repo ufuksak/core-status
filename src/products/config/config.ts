@@ -24,11 +24,17 @@ export const CONFIG_VALIDATION_SCHEMA: Joi.ObjectSchema = Joi.object({
   RABBITMQ_HOST: Joi.string().required(),
   RABBITMQ_PORT: Joi.number().required(),
   JWT_PUBLIC_KEY: Joi.string().required(),
-  DB_HOST: Joi.string().required(),
-  DB_PORT: Joi.string().required(),
-  DB_USERNAME: Joi.string().required(),
-  DB_PASSWORD: Joi.string().required(),
-  DB_DATABASE: Joi.string().required()
+  CRDB_DB_HOST: Joi.string().required(),
+  CRDB_DB_PORT: Joi.string().required(),
+  CRDB_DB_USERNAME: Joi.string().required(),
+  CRDB_DB_PASSWORD: Joi.string().required(),
+  CRDB_DB_DATABASE: Joi.string().required(),
+  POSTGRESQL_COMPAT: Joi.bool().required(),
+  POSTGRES_DB_HOST: Joi.string().required(),
+  POSTGRES_DB_PORT: Joi.string().required(),
+  POSTGRES_DB_USERNAME: Joi.string().required(),
+  POSTGRES_DB_PASSWORD: Joi.string().required(),
+  POSTGRES_DB_DATABASE: Joi.string().required(),
 });
 
 export const configuration = (): Record<string, unknown> => ({
