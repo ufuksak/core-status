@@ -13,25 +13,16 @@ import * as cryptosdk from 'globalid-crypto-library/src/index';
 import {v4 as uuid} from 'uuid';
 import {validationPipeOptions} from "../../src/products/config/validation-pipe.options";
 import {StatusUpdateDto, UpdateMarker} from "../../src/products/dto/status.model";
-import {
-  GRANTS_CREATE_SCOPE,
-  GRANTS_DELETE_SCOPE,
-  GRANTS_MANAGE_SCOPE,
-  STATUS_MANAGE_SCOPE
-} from "../../src/products/util/util";
+import {Scopes} from "../../src/products/util/util";
 import {GrantEntity} from "../../src/products/entity/grant.entity";
-import {GrantType} from "../../src/products/dto/grant.model";
+import {GrantDto, GrantType} from "../../src/products/dto/grant.model";
 import supertest = require("supertest");
+
 
 jest.setTimeout(3 * 60 * 1000);
 
 
-const token = getAccessToken([
-  ...GRANTS_CREATE_SCOPE,
-  ...GRANTS_DELETE_SCOPE,
-  ...GRANTS_MANAGE_SCOPE,
-  ...STATUS_MANAGE_SCOPE
-].join(' '));
+const token = getAccessToken(Object.values(Scopes).join(' '));
 
 const authType = {type: "bearer"};
 const uuidLength = 36;
@@ -133,12 +124,6 @@ describe('StatusModule (e2e)', () => {
     );
   });
 
-  const cleanup = async () => {
-    await Promise.all([UpdateEntity, StreamEntity, StreamTypeEntity, GrantEntity]
-      .map(el => truncateEntity(el))
-    );
-  };
-
   const prepareAndTestStatusDelete = async () => {
     await createStreamTypeAndExpect();
     await createStreamAndExpect();
@@ -229,10 +214,11 @@ describe('StatusModule (e2e)', () => {
     expect(resp?.body?.data?.id).toHaveLength(uuidLength);
   };
 
-  const prepareGrantAndExpect = async (streamId: string, type: GrantType) => {
+  const prepareGrantAndExpect = async (streamId: string, type: GrantType, customToken?: string, httpCode?: number) => {
+    const recipient_id = uuid();
     const grantData = {
       "stream_id": streamId,
-      "recipient_id": uuid(),
+      recipient_id,
       "properties": {
         e2eKey: '',
         reEncryptionKey: ''
@@ -240,18 +226,18 @@ describe('StatusModule (e2e)', () => {
       "fromDate": "2020-01-01T00:00:00.000Z",
       "toDate": "2020-01-01T00:00:00.000Z",
       "type": type,
-    };
+    } as GrantDto;
 
     // Run your end-to-end test
     const resp = await agent
       .post('/api/v1/status/grants')
       .set('Accept', 'text/plain')
-      .auth(token, authType)
+      .auth(customToken || token, authType)
       .send(grantData)
       .expect('Content-Type', "application/json; charset=utf-8")
-      .expect(201);
+      .expect(httpCode || 201);
 
-    return resp?.body?.data?.id;
+    return {id: resp?.body?.data?.id, recipient_id};
   };
 
   describe('POST /api/v1/status/streams', () => {
@@ -263,8 +249,132 @@ describe('StatusModule (e2e)', () => {
   describe('POST /api/v1/status/grants', () => {
     it('should return the grantId', async () => {
       const {streamId} = await prepareAndTestStatusDelete();
-      const id = await prepareGrantAndExpect(streamId, GrantType.range);
+      const {id} = await prepareGrantAndExpect(streamId, GrantType.range);
       expect(id).toHaveLength(uuidLength);
+    });
+
+    it('should return id for range grant with valid token scope', async () => {
+      const {streamId} = await prepareAndTestStatusDelete();
+      const tokenValidForRangeScope = getAccessToken(
+        [Scopes.status_grants_manage, Scopes.status_grants_create_historical].join(' ')
+      );
+      const {id} = await prepareGrantAndExpect(streamId, GrantType.range, tokenValidForRangeScope);
+      expect(id).toHaveLength(uuidLength);
+    });
+
+    it('should return 403 for range grant with invalid token scope', async () => {
+      const {streamId} = await prepareAndTestStatusDelete();
+      const tokenInvalidForRangeScope = getAccessToken(Scopes.status_grants_manage);
+      await prepareGrantAndExpect(streamId, GrantType.range, tokenInvalidForRangeScope, 403);
+    });
+
+    it('should return id for all grant with valid token scope', async () => {
+      const {streamId} = await prepareAndTestStatusDelete();
+      const tokenValidForRangeScope = getAccessToken([
+        Scopes.status_grants_manage,
+        Scopes.status_grants_create_live,
+        Scopes.status_grants_create_historical
+      ].join(' '));
+      const {id} = await prepareGrantAndExpect(streamId, GrantType.all, tokenValidForRangeScope);
+      expect(id).toHaveLength(uuidLength);
+    });
+
+    it('should return 403 for all grant with invalid token scope', async () => {
+      const {streamId} = await prepareAndTestStatusDelete();
+      const tokenInvalidForRangeScope = getAccessToken([
+        Scopes.status_grants_manage,
+        Scopes.status_grants_create_live
+      ].join(''));
+      await prepareGrantAndExpect(streamId, GrantType.all, tokenInvalidForRangeScope, 403);
+    });
+
+    it('should return id for latest grant with valid token scope', async () => {
+      const {streamId} = await prepareAndTestStatusDelete();
+      const tokenValidForRangeScope = getAccessToken(
+        [Scopes.status_grants_manage, Scopes.status_grants_create_live].join(' ')
+      );
+      const {id} = await prepareGrantAndExpect(streamId, GrantType.latest, tokenValidForRangeScope);
+      expect(id).toHaveLength(uuidLength);
+    });
+
+    it('should return 403 for latest grant with invalid token scope', async () => {
+      const {streamId} = await prepareAndTestStatusDelete();
+      const tokenInvalidForRangeScope = getAccessToken(Scopes.status_grants_manage);
+      await prepareGrantAndExpect(streamId, GrantType.latest, tokenInvalidForRangeScope, 403);
+    });
+
+    it('should not creare second latest grant for same recipient and stream', async () => {
+      const {streamId} = await prepareAndTestStatusDelete();
+      const latestType = GrantType.latest;
+      const {id, recipient_id} = await prepareGrantAndExpect(streamId, latestType);
+      expect(id).toHaveLength(uuidLength);
+
+      const grantData = {
+        "stream_id": streamId,
+        recipient_id,
+        "properties": {
+          e2eKey: '',
+          reEncryptionKey: ''
+        },
+        "fromDate": "2020-01-01T00:00:00.000Z",
+        "toDate": "2020-01-01T00:00:00.000Z",
+        "type": latestType,
+      } as GrantDto;
+
+      // Run your end-to-end test
+      await agent
+        .post('/api/v1/status/grants')
+        .set('Accept', 'text/plain')
+        .auth(token, authType)
+        .send(grantData)
+        .expect('Content-Type', "application/json; charset=utf-8")
+        .expect(409);
+    })
+  })
+
+  describe('PUT /api/v1/status/grants', () => {
+    const route = '/api/v1/status/grants';
+    const fromDate = new Date('2022-04-10T15:00:44.273Z').toISOString();
+    const toDate = new Date('2022-05-10T15:00:44.273Z').toISOString();
+
+    it('should modify grant range', async () => {
+      // Prepare
+      const {streamId} = await prepareAndTestStatusDelete();
+      const {id: rangedGrantId} = await prepareGrantAndExpect(streamId, GrantType.range);
+      const {id: liveGrantId} = await prepareGrantAndExpect(streamId, GrantType.latest);
+      const tokenInvalidForRangeScope = getAccessToken(Scopes.status_grants_manage);
+      expect(rangedGrantId).toHaveLength(uuidLength);
+      expect(liveGrantId).toHaveLength(uuidLength);
+
+      // Act
+      await agent
+        .put(route + `/${rangedGrantId}`)
+        .set('Accept', 'application/json')
+        .auth(token, authType)
+        .send({ fromDate, toDate })
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .then(resp => ({id: resp?.body?.data?.id, ...resp?.body?.data?.attributes}));
+
+      const grant =  await agent
+        .put(route + `/${rangedGrantId}`)
+        .set('Accept', 'application/json')
+        .auth(token, authType)
+        .send({ fromDate, toDate })
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .then(resp => ({id: resp?.body?.data?.id, ...resp?.body?.data?.attributes}));
+
+      expect(grant.fromDate).toEqual(fromDate);
+      expect(grant.toDate).toEqual(toDate);
+
+      await agent.put(route + `/${liveGrantId}`)
+        .set('Accept', 'application/json')
+        .auth(token, authType)
+        .send({ fromDate, toDate })
+        .expect('Content-Type', /json/)
+        .expect(405)
+
     })
   })
 
@@ -273,7 +383,7 @@ describe('StatusModule (e2e)', () => {
       const {streamId} = await prepareAndTestStatusDelete();
       const idsToDelete = [];
       await Promise.all(Object.values(GrantType).map(async el => {
-        const id = await prepareGrantAndExpect(streamId, el);
+        const {id} = await prepareGrantAndExpect(streamId, el);
         expect(id).toHaveLength(uuidLength);
         idsToDelete.push(id);
       }));
@@ -305,7 +415,7 @@ describe('StatusModule (e2e)', () => {
       const invalidToken = getAccessToken();
       const idsToDelete = [];
       await Promise.all(Object.values(GrantType).map(async el => {
-        const id = await prepareGrantAndExpect(streamId, el);
+        const {id} = await prepareGrantAndExpect(streamId, el);
         expect(id).toHaveLength(uuidLength);
         idsToDelete.push(id);
       }));
@@ -375,17 +485,13 @@ describe('StatusModule (e2e)', () => {
       const deleteFailedResponse = await agent
         .delete(`/api/v1/status/${randomUUID}`)
         .auth(token, authType)
-        .send({
-          stream_id: streamId
-        })
+        .send({ stream_id: streamId })
         .expect(200);
 
       const deleteResponse = await agent
         .delete(`/api/v1/status/${reallyToBeDeletedId}`)
         .auth(token, authType)
-        .send({
-          stream_id: streamId
-        }).expect(200);
+        .send({ stream_id: streamId }).expect(200);
 
       const getStatusesResponseAfterCleaned = await getAllStatuses();
       const matchedAfterDeleted = getStatusesResponseAfterCleaned.body?.data?.map(el => ({
@@ -429,10 +535,7 @@ describe('StatusModule (e2e)', () => {
       const deletedManyResponse = await agent
         .delete(`/api/v1/status`)
         .auth(token, authType)
-        .send({
-          ids,
-          stream_id
-        }).expect(200);
+        .send({ ids, stream_id }).expect(200);
 
       // Check
       const expectedResults = [

@@ -15,10 +15,20 @@ export class GrantProperties {
   e2eKey: string;
 }
 
-export class GrantDto {
+export class ModifyGrantRangeDto {
+  @IsDateString()
+  @IsNotEmpty()
+  fromDate: string;
+
+  @IsDateString()
+  @IsNotEmpty()
+  toDate: string;
+}
+
+export class GrantDto extends ModifyGrantRangeDto {
   @IsEnum(GrantType)
   @IsNotEmpty()
-  type: string;
+  type: GrantType;
 
   @ValidateNested()
   @Type(() => GrantProperties)
@@ -28,14 +38,6 @@ export class GrantDto {
   recipient_id: string;
 
   owner_id: string;
-
-  @IsDateString()
-  @IsNotEmpty()
-  fromDate: string;
-
-  @IsDateString()
-  @IsNotEmpty()
-  toDate: string;
 
   @IsUUID('4')
   @IsNotEmpty()

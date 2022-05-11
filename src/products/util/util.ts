@@ -13,13 +13,19 @@ export const PG_UNIQUE_CONSTRAINT_VIOLATION = '23505';
 
 export const PG_FOREIGN_KEY_VIOLATION = '23503';
 
-export const STATUS_MANAGE_SCOPE = ['status.manage', 'keys.manage'];
+export enum Scopes {
+    status_manage = 'status.manage',
+    keys_manage = 'keys.manage',
+    status_grants_delete = 'status.grants.delete',
+    status_grants_manage = 'status.grants.manage',
+    status_grants_create_historical = 'status.grants.create.historical',
+    status_grants_create_live = 'status.grants.create.live'
+}
 
-export const GRANTS_DELETE_SCOPE = ['status.grants.delete'];
-
-export const GRANTS_MANAGE_SCOPE = ['status.grants.manage'];
-
-export const GRANTS_CREATE_SCOPE = ['status.grants.create'];
+export const STATUS_MANAGE_SCOPE = [Scopes.status_manage, Scopes.keys_manage];
+export const GRANTS_DELETE_SCOPE = [Scopes.status_grants_delete];
+export const GRANTS_MANAGE_SCOPE = [Scopes.status_grants_manage];
+export const GRANTS_MANAGE_RANGE_SCOPE = [Scopes.status_grants_manage, Scopes.status_grants_create_historical];
 
 export const PERSONAL_CHANNEL_PARTICIPANTS: number = 1
 

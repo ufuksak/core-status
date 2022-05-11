@@ -3,9 +3,9 @@ import {AddStatusInterface, GetUserStatusesParams, StatusUpdateDto} from "../dto
 import {TokenData, TokenProtected} from "@globalid/nest-auth";
 import {StatusService} from "../services/status.service";
 import {ScopedTokenDataParam} from "../commons/scope.decorator";
-import {GRANTS_CREATE_SCOPE, GRANTS_DELETE_SCOPE, GRANTS_MANAGE_SCOPE, STATUS_MANAGE_SCOPE} from "../util/util";
+import {GRANTS_DELETE_SCOPE, GRANTS_MANAGE_RANGE_SCOPE, GRANTS_MANAGE_SCOPE, STATUS_MANAGE_SCOPE} from "../util/util";
 import {StreamEntity} from "../entity/stream.entity";
-import {Body, Controller, Delete, Get, Param, ParseUUIDPipe, Post, Query, Request} from "@nestjs/common";
+import {Body, Controller, Delete, Get, Param, ParseUUIDPipe, Post, Put, Query, Request} from "@nestjs/common";
 import {StreamTypeDto} from "../dto/stream_type.model";
 import {StreamTypeEntity} from "../entity/stream_type.entity";
 import {StreamTypeService} from "../services/stream_type.service";
@@ -18,7 +18,7 @@ import {
     UUUIDParam
 } from "../dto/s3file.model";
 import {GrantService} from "../services/grant.service";
-import {GrantDto} from "../dto/grant.model";
+import {GrantDto, ModifyGrantRangeDto} from "../dto/grant.model";
 import {GrantEntity} from "../entity/grant.entity";
 
 @Controller('/api/v1/status')
@@ -50,7 +50,7 @@ export class StatusController {
             status_updates: saveStatus,
         };
     }
-    
+
     @Delete()
     @TokenProtected()
     async removeStatus(
@@ -89,8 +89,8 @@ export class StatusController {
 
     @TokenProtected()
     @Post('/grants')
-    createGrant(@ScopedTokenDataParam(GRANTS_CREATE_SCOPE) tokenData: TokenData, @Body() grant: GrantDto) {
-        return this.grantService.save(tokenData, grant);
+    createGrant(@ScopedTokenDataParam(GRANTS_MANAGE_SCOPE) tokenData: TokenData, @Body() grant: GrantDto) {
+        return this.grantService.save(tokenData.uuid, grant, tokenData.scopes);
     }
 
     @TokenProtected()
@@ -105,6 +105,14 @@ export class StatusController {
     deleteGrant(@ScopedTokenDataParam(GRANTS_DELETE_SCOPE) tokenData: TokenData,
                 @Param() {id}: UUUIDParam)  : Promise<GrantEntity> {
         return this.grantService.delete(id, tokenData.uuid);
+    }
+
+    @TokenProtected()
+    @Put('/grants/:id')
+    modifyGrantRange(@ScopedTokenDataParam(GRANTS_MANAGE_RANGE_SCOPE) tokenData: TokenData,
+      @Param('id', new ParseUUIDPipe({version: '4'})) id: string,
+      @Body() body: ModifyGrantRangeDto): Promise<GrantEntity> {
+        return this.grantService.modifyRange(id, tokenData.uuid, body);
     }
 
     @Post('/streams')

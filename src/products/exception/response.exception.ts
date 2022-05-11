@@ -1,4 +1,10 @@
-import {HttpException, NotFoundException} from '@nestjs/common';
+import {
+    ConflictException,
+    ForbiddenException,
+    HttpException,
+    MethodNotAllowedException,
+    NotFoundException
+} from '@nestjs/common';
 
 export class ResponseException extends HttpException {
     constructor(errors: string | object, title: string, status: number) {
@@ -9,5 +15,23 @@ export class ResponseException extends HttpException {
 export class GrantNotFoundException extends NotFoundException {
     constructor() {
         super('grant not found');
+    }
+}
+
+export class GrantOperationNotAllowed extends MethodNotAllowedException {
+    constructor() {
+        super('range does not support this operation');
+    }
+}
+
+export class SingletonGrantExists extends ConflictException {
+    constructor() {
+        super('all/latest grant already exists');
+    }
+}
+
+export class GrantInvalidTokenScopeException extends ForbiddenException {
+    constructor() {
+        super('missing permission');
     }
 }

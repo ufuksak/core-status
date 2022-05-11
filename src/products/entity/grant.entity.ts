@@ -1,4 +1,4 @@
-import {Column, Entity, ManyToOne } from "typeorm";
+import {Column, Entity, ManyToOne, UpdateDateColumn } from "typeorm";
 import { GrantProperties, GrantType } from "../dto/grant.model";
 import {BaseEntity} from "./base.entity";
 import {StreamEntity} from "./stream.entity";
@@ -28,4 +28,10 @@ export class GrantEntity extends BaseEntity {
 
     @ManyToOne(() => StreamEntity, stream => stream.id)
     stream_id: string;
+
+    @UpdateDateColumn({
+        type: "timestamptz",
+        nullable: true
+    })
+    updated_at: string;
 }

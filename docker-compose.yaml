@@ -41,6 +41,144 @@ services:
       HOSTNAME_EXTERNAL: localstack
       SERVICES: "sns,sqs,s3"
 
+  phpmyadmin:
+    depends_on:
+      - mysql
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - '8081:80'
+    environment:
+      PMA_HOST: mysql
+      MYSQL_ROOT_PASSWORD: root
+
+  hydra:
+    image: ghcr.io/globalid/container-images/hydra:latest
+    ports:
+      - 4444:4444
+      - 4445:4445
+    environment:
+      SECRETS_SYSTEM: youReallyNeedToChangeThis
+      URLS_SELF_ISSUER: http://hydra:4444
+      DSN: memory
+
+  crdb:
+    image: cockroachdb/cockroach:v21.2.7
+    ports:
+      - "26257:26257"
+      - "8090:8080"
+    command: start-single-node --insecure
+
+  gloo:
+    image: ${GLOO_REPO:-quay.io/solo-io}/gloo:${GLOO_VERSION:-1.10.16}
+    working_dir: /
+    command:
+      - "--dir=/data/"
+    volumes:
+      - ./gloo/data:/data/
+    ports:
+      - "9977:9977"
+    restart: always
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  gateway:
+    image: ${GLOO_REPO:-quay.io/solo-io}/gateway:${GLOO_VERSION:-1.10.16}
+    working_dir: /
+    command:
+      - "--dir=/data/"
+    volumes:
+      - ./gloo/data:/data/
+    restart: always
+
+  gateway-proxy:
+    image: ${GLOO_REPO:-quay.io/solo-io}/gloo-envoy-wrapper:${GLOO_VERSION:-1.10.16}
+    entrypoint: ["envoy"]
+    command: ["-c", "/config/envoy.yaml", "--disable-hot-restart"]
+    volumes:
+      - ./gloo/data/envoy-config.yaml:/config/envoy.yaml:ro
+    ports:
+      - "8099:8080"
+      - "8443:8443"
+      - "19000:19000"
+    restart: always
+
+  mysql:
+    container_name: mysql
+    image: mysql:5.7
+    restart: always
+    environment:
+      - MYSQL_HOST=0.0.0.0
+      - MYSQL_PORT=33306
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+    volumes:
+      - mysql:/var/lib/mysql
+    ports:
+      - "33306:3306"
+    entrypoint: sh -c " echo 'SET GLOBAL sql_mode = 'NO_ENGINE_SUBSTITUTION'; CREATE DATABASE IF NOT EXISTS database_production; CREATE DATABASE IF NOT EXISTS database_development; CREATE DATABASE IF NOT EXISTS database_test; CREATE DATABASE IF NOT EXISTS hydra;' > /docker-entrypoint-initdb.d/init.sql; /usr/local/bin/docker-entrypoint.sh --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --sql-mode='NO_ENGINE_SUBSTITUTION' "
+
+  messaging-service:
+    image: messaging-legacy-core
+    ports:
+      - "9836:9836"
+    depends_on:
+      - postgres
+      - redis
+      - localstack
+    environment:
+      NAMESPACE: messaging-service-test
+      NODE_ENV: development
+      PUBNUB_SUBSCRIBE_KEY: 'sub-c-252ec7e2-7ca4-11e9-89f1-56e8a30b5f0e'
+      PUBNUB_PUBLISH_KEY: 'pub-c-5cffb7ac-5697-44e4-bfc4-dcad6bfae55d'
+      MESSAGING_TRANSPORT_SERVICE_URL: http://messaging-transport-service:9840
+      SERVER_PORT: 9836
+      DATABASE_CONNECTION_URL: 'postgresql://user_messaging:e5YGE3cQ2ysqHesT@postgres:5432/test_messaging'
+      #      PUBNUB_SUBSCRIBE_KEY: 'sub-c-252ec7e2-7ca4-11e9-89f1-56e8a30b5f0e'
+      #      PUBNUB_PUBLISH_KEY: 'pub-c-937068cd-2e67-4c0e-a1eb-3c108d85f9e7'
+      AWS_CLOUDFRONT_ACCESS_KEY_ID: 'aws-id'
+      AWS_CLOUDFRONT_PRIVATE_KEY: 'aws-private-key'
+      DEFAULT_CLIENT_ID: '4cf2c57b-ab68-4415-9b1d-9876df5d307f'
+      AWS_CLOUDFRONT_DOMAIN: 'http://my.cloudfront.com/'
+      AWS_REGION: 'eu-west-1'
+      DISABLE_DDTRACE: 1
+      SQS_ENDPOINT: 'http://localstack:4566'
+      SNS_ENDPOINT: 'http://localstack:4566'
+      DEEPLINK_BASE_URL: 'https://link.dev.global.id'
+      AWS_CHIME_SERVICE_URL: 'https://service.chime.aws.amazon.com/console'
+      AWS_CHIME_KEY_ID: 'aws_chime_key_id'
+      AWS_CHIME_SECRET_KEY: 'aws_chime_secret_key'
+      AWS_ACCESS_KEY_ID: invalid
+      AWS_SECRET_ACCESS_KEY: invalid
+      JWT_PUBLIC_KEY: 'sigsecret'
+      JWT_ISSUER: 'https://iss.uer'
+      SVC_URL_CONTACTS: 'http://contacts:8095'
+      SVC_URL_GROUP: 'http://group-service:9125'
+      SVC_URL_IDENTITY_NAMESPACE: 'http://identity-namespace-service:9992'
+      SVC_URL_KEYSTORE: 'http://keystore-service:9123'
+      SVC_URL_UPLOAD: 'http://upload:8080'
+      SVC_URL_MESSAGING_FILE: 'http://localhost'
+      REDIS_HOST: 'redis'
+      REDIS_PORT: 6379
+      JWT_AUTH_DISABLED: 1
+
+  contacts:
+    image: contacts
+    ports:
+      - "8095:8080"
+    environment:
+      NAMESPACE: core
+      NODE_ENV: development
+      HOSTNAME: http://localhost:9836
+      DATABASE_CONNECTION_URL: postgres://user_messaging:e5YGE3cQ2ysqHesT@postgres:5432/contacts?debug=false&charset=utf8
+      OBFUSCATED_SALT: a_nice_testing_salty
+      AWS_REGION: 'us-east-1'
+      SQS_ENDPOINT: 'http://localstack:4566'
+      SNS_ENDPOINT: 'http://localstack:4566'
+      JWT_PUBLIC_KEY: 'sigsecret'
+      JWT_ISSUER: 'https://iss.uer'
+      AWS_SECRET_ACCESS_KEY: 'invalid'
+      AWS_ACCESS_KEY_ID: 'invalid'
+      DISABLE_DDTRACE: 1
+
   messaging-transport-service:
     image: messaging-transport
     ports:
@@ -59,50 +197,6 @@ services:
       AWS_SECRET_ACCESS_KEY: 'invalid'
       AWS_ACCESS_KEY_ID: 'invalid'
       DISABLE_DDTRACE: 1
-
-  mysql:
-    container_name: mysql
-    image: mysql:5.7
-    restart: always
-    environment:
-      - MYSQL_HOST=0.0.0.0
-      - MYSQL_PORT=33306
-      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
-    volumes:
-      - mysql:/var/lib/mysql
-    ports:
-      - "33306:3306"
-    entrypoint: sh -c " echo 'SET GLOBAL sql_mode = 'NO_ENGINE_SUBSTITUTION'; CREATE DATABASE IF NOT EXISTS database_production; CREATE DATABASE IF NOT EXISTS database_development; CREATE DATABASE IF NOT EXISTS database_test; CREATE DATABASE IF NOT EXISTS hydra;' > /docker-entrypoint-initdb.d/init.sql; /usr/local/bin/docker-entrypoint.sh --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --sql-mode='NO_ENGINE_SUBSTITUTION' "
-
-  phpmyadmin:
-    depends_on:
-      - mysql
-    image: phpmyadmin/phpmyadmin
-    ports:
-      - '8081:80'
-    environment:
-      PMA_HOST: mysql
-      MYSQL_ROOT_PASSWORD: root
-
-  keystore:
-    extends:
-      file: ./docker-compose.base.yml
-      service: keystore
-    image: keystore
-    ports:
-      - '9123:9123'
-    depends_on:
-      - mysql
-
-  hydra:
-    image: ghcr.io/globalid/container-images/hydra:latest
-    ports:
-      - 4444:4444
-      - 4445:4445
-    environment:
-      SECRETS_SYSTEM: youReallyNeedToChangeThis
-      URLS_SELF_ISSUER: http://hydra:4444
-      DSN: memory
 
   identity:
     image: identity-namespace-service
@@ -185,106 +279,12 @@ services:
       - JWT_ISSUER='https://iss.uer'
       - DISABLE_DDTRACE=1
 
-  contacts:
-    image: contacts
+  keystore:
+    extends:
+      file: ./docker-compose.base.yml
+      service: keystore
+    image: keystore
     ports:
-      - "8095:8080"
-    environment:
-      NAMESPACE: core
-      NODE_ENV: development
-      HOSTNAME: http://localhost:9836
-      DATABASE_CONNECTION_URL: postgres://user_messaging:e5YGE3cQ2ysqHesT@postgres:5432/contacts?debug=false&charset=utf8
-      OBFUSCATED_SALT: a_nice_testing_salty
-      AWS_REGION: 'us-east-1'
-      SQS_ENDPOINT: 'http://localstack:4566'
-      SNS_ENDPOINT: 'http://localstack:4566'
-      JWT_PUBLIC_KEY: 'sigsecret'
-      JWT_ISSUER: 'https://iss.uer'
-      AWS_SECRET_ACCESS_KEY: 'invalid'
-      AWS_ACCESS_KEY_ID: 'invalid'
-      DISABLE_DDTRACE: 1
-
-  messaging-service:
-    image: messaging-legacy-core
-    ports:
-      - "9836:9836"
+      - '9123:9123'
     depends_on:
-      - postgres
-      - redis
-      - localstack
-    environment:
-      NAMESPACE: messaging-service-test
-      NODE_ENV: development
-      PUBNUB_SUBSCRIBE_KEY: 'sub-c-252ec7e2-7ca4-11e9-89f1-56e8a30b5f0e'
-      PUBNUB_PUBLISH_KEY: 'pub-c-5cffb7ac-5697-44e4-bfc4-dcad6bfae55d'
-      MESSAGING_TRANSPORT_SERVICE_URL: http://messaging-transport-service:9840
-      SERVER_PORT: 9836
-      DATABASE_CONNECTION_URL: 'postgresql://user_messaging:e5YGE3cQ2ysqHesT@postgres:5432/test_messaging'
-#      PUBNUB_SUBSCRIBE_KEY: 'sub-c-252ec7e2-7ca4-11e9-89f1-56e8a30b5f0e'
-#      PUBNUB_PUBLISH_KEY: 'pub-c-937068cd-2e67-4c0e-a1eb-3c108d85f9e7'
-      AWS_CLOUDFRONT_ACCESS_KEY_ID: 'aws-id'
-      AWS_CLOUDFRONT_PRIVATE_KEY: 'aws-private-key'
-      DEFAULT_CLIENT_ID: '4cf2c57b-ab68-4415-9b1d-9876df5d307f'
-      AWS_CLOUDFRONT_DOMAIN: 'http://my.cloudfront.com/'
-      AWS_REGION: 'eu-west-1'
-      DISABLE_DDTRACE: 1
-      SQS_ENDPOINT: 'http://localstack:4566'
-      SNS_ENDPOINT: 'http://localstack:4566'
-      DEEPLINK_BASE_URL: 'https://link.dev.global.id'
-      AWS_CHIME_SERVICE_URL: 'https://service.chime.aws.amazon.com/console'
-      AWS_CHIME_KEY_ID: 'aws_chime_key_id'
-      AWS_CHIME_SECRET_KEY: 'aws_chime_secret_key'
-      AWS_ACCESS_KEY_ID: invalid
-      AWS_SECRET_ACCESS_KEY: invalid
-      JWT_PUBLIC_KEY: 'sigsecret'
-      JWT_ISSUER: 'https://iss.uer'
-      SVC_URL_CONTACTS: 'http://contacts:8095'
-      SVC_URL_GROUP: 'http://group-service:9125'
-      SVC_URL_IDENTITY_NAMESPACE: 'http://identity-namespace-service:9992'
-      SVC_URL_KEYSTORE: 'http://keystore-service:9123'
-      SVC_URL_UPLOAD: 'http://upload:8080'
-      SVC_URL_MESSAGING_FILE: 'http://localhost'
-      REDIS_HOST: 'redis'
-      REDIS_PORT: 6379
-      JWT_AUTH_DISABLED: 1
-
-  crdb:
-    image: cockroachdb/cockroach:v21.2.7
-    ports:
-      - "26257:26257"
-      - "8090:8080"
-    command: start-single-node --insecure
-
-  gloo:
-    image: ${GLOO_REPO:-quay.io/solo-io}/gloo:${GLOO_VERSION:-1.10.16}
-    working_dir: /
-    command:
-      - "--dir=/data/"
-    volumes:
-      - ./gloo/data:/data/
-    ports:
-      - "9977:9977"
-    restart: always
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-
-  gateway:
-    image: ${GLOO_REPO:-quay.io/solo-io}/gateway:${GLOO_VERSION:-1.10.16}
-    working_dir: /
-    command:
-      - "--dir=/data/"
-    volumes:
-      - ./gloo/data:/data/
-    restart: always
-
-  gateway-proxy:
-    image: ${GLOO_REPO:-quay.io/solo-io}/gloo-envoy-wrapper:${GLOO_VERSION:-1.10.16}
-    entrypoint: ["envoy"]
-    command: ["-c", "/config/envoy.yaml", "--disable-hot-restart"]
-    volumes:
-      - ./gloo/data/envoy-config.yaml:/config/envoy.yaml:ro
-    ports:
-      - "8099:8080"
-      - "8443:8443"
-      - "19000:19000"
-    restart: always
+      - mysql

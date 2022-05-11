@@ -17,7 +17,7 @@ import {KeystoreService} from "../../src/products/services/keystore";
 import {ConfigModule} from '@nestjs/config';
 import {CONFIG_VALIDATION_SCHEMA, configuration} from "../../src/products/config/config";
 import {GrantService} from '../../src/products/services/grant.service';
-import {GrantDto} from '../../src/products/dto/grant.model';
+import {GrantDto, ModifyGrantRangeDto} from '../../src/products/dto/grant.model';
 
 describe('Status Controller', () => {
   let statusController: StatusController;
@@ -161,6 +161,45 @@ describe('Status Controller', () => {
       const response = await statusController.getGrant(tokenData, {id});
 
       expect(response).equal(body);
+    });
+  });
+
+  describe('modify grant range', () => {
+    it('should modify grant range', async () => {
+      const streamId = uuid();
+      const body = {
+        "id": uuid(),
+        "stream_id": streamId,
+        "recipient_id": uuid(),
+        "properties": {},
+        "fromDate": "2020-01-01T00:00:00.000Z",
+        "toDate": "2020-01-01T00:00:00.000Z",
+        "type": "range",
+      };
+
+      const fromDate = new Date("2020-01-02T00:00:00.000Z").toISOString();
+      const toDate = new Date("2020-01-03T00:00:00.000Z").toISOString();
+
+      grantService.modifyRange = jest.fn(async (id: string, owner_id: string, range: ModifyGrantRangeDto) => ({
+        ...body,
+        ...range
+      }));
+
+      const tokenData = {
+        client_id: uuid(),
+      } as TokenData;
+
+      const rangeToApply: ModifyGrantRangeDto = {
+        fromDate,
+        toDate
+      };
+
+      const response = await statusController.modifyGrantRange(tokenData, body.id, rangeToApply);
+
+      expect(JSON.stringify(response)).to.be.equal(JSON.stringify({
+        ...body,
+        ...rangeToApply
+      }));
     });
   });
 

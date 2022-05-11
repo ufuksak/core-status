@@ -1,7 +1,6 @@
 import {Body, Controller, Get, Post, Request} from "@nestjs/common";
 import {AddChannelBody, ChannelWithParticipants} from "../dto/channel.model";
 import {ApiService} from "../services/api";
-import {ChannelPublisher} from "../rabbit/channel.publisher";
 
 @Controller('/api/v1/channel')
 export class ChannelController {

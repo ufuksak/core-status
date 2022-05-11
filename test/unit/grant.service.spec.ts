@@ -4,12 +4,33 @@ import * as sinon from 'sinon'
 import {expect} from './setup'
 import {GrantService} from '../../src/products/services/grant.service';
 import {GrantRepository} from '../../src/products/repositories/grant.repository';
-import {GrantDto} from '../../src/products/dto/grant.model';
+import {GrantDto, GrantType, ModifyGrantRangeDto} from '../../src/products/dto/grant.model';
 import {TokenData} from '@globalid/nest-auth';
 import {StreamService} from '../../src/products/services/stream.service';
 import {BadRequestException} from '@nestjs/common';
 import {GrantEntity} from 'src/products/entity/grant.entity';
-import {GrantNotFoundException} from "../../src/products/exception/response.exception";
+import {
+  GrantInvalidTokenScopeException,
+  GrantNotFoundException,
+  GrantOperationNotAllowed,
+  SingletonGrantExists
+} from "../../src/products/exception/response.exception";
+import {FindOneOptions} from 'typeorm';
+import {Scopes} from "../../src/products/util/util";
+
+const validScopesToken = {
+  sub: uuid(),
+  scopes: [
+    Scopes.status_grants_create_live,
+    Scopes.status_grants_create_historical,
+    Scopes.status_grants_manage
+  ]
+} as TokenData;
+
+const invalidScopesToken = {
+  sub: uuid(),
+  scopes: []
+} as TokenData;
 
 describe('Grant Service', () => {
     let grantService: GrantService;
@@ -53,10 +74,6 @@ describe('Grant Service', () => {
         const streamId = uuid();
         const grantId = uuid();
 
-        const tokenData = {
-          sub: uuid(),
-        } as TokenData;
-
         const grantDto = {
           "stream_id": streamId,
           "recipient_id": uuid(),
@@ -67,7 +84,7 @@ describe('Grant Service', () => {
         } as GrantDto;
 
         const streamEntity = {
-          owner_id: tokenData.sub,
+          owner_id: validScopesToken.sub,
           streamType: {
             supported_grants: [grantDto.type],
           },
@@ -76,7 +93,7 @@ describe('Grant Service', () => {
         grantRepository.saveGrant = sinon.spy(() => ({ id: grantId }));
         streamService.getById = sinon.spy(() => streamEntity);
 
-        const response = await grantService.save(tokenData, grantDto);
+        const response = await grantService.save(validScopesToken.sub, grantDto, validScopesToken.scopes);
 
         expect(response.id).to.equal(grantId);
 
@@ -86,17 +103,102 @@ describe('Grant Service', () => {
         expect(grantRepository.saveGrant.calledOnce).to.be.true;
         expect(grantRepository.saveGrant.args[0][0]).to.deep.equal({
           ...grantDto,
-          owner_id: tokenData.sub,
+          owner_id: validScopesToken.sub,
         });
+      });
+
+      it('should not create all/latest grant twice', async () => {
+        const singletonGrants = [
+          {type: GrantType.latest},
+          {type: GrantType.all}
+        ];
+
+        for(const el of singletonGrants) {
+          const {type} = el;
+          const streamId = uuid();
+          const grantId = uuid();
+
+          const grantDto = {
+            "stream_id": streamId,
+            "recipient_id": uuid(),
+            "properties": {},
+            "fromDate": "2020-01-01T00:00:00.000Z",
+            "toDate": "2020-01-01T00:00:00.000Z",
+            type
+          } as GrantDto;
+
+          const streamEntity = {
+            owner_id: validScopesToken.sub,
+            streamType: {
+              supported_grants: Object.values(GrantType),
+            },
+          };
+
+          grantRepository.find = sinon.spy(() => []);
+          grantRepository.saveGrant = sinon.spy(() => ({ id: grantId }));
+          grantRepository.save = sinon.spy(() => ({ id: grantId }));
+          streamService.getById = sinon.spy(() => streamEntity);
+
+          const response = await grantService.save(validScopesToken.sub, grantDto, validScopesToken.scopes);
+
+          expect(response.id).to.equal(grantId);
+
+          expect(streamService.getById.calledOnce).to.be.true;
+          expect(streamService.getById.args[0][0]).equal(streamId);
+
+          expect(grantRepository.saveGrant.calledOnce).to.be.true;
+          expect(grantRepository.saveGrant.args[0][0]).to.deep.equal({
+            ...grantDto,
+            owner_id: validScopesToken.sub,
+          });
+
+          grantRepository.find = sinon.spy(() => [grantDto]);
+          await expect(grantService.save(validScopesToken.sub, grantDto, validScopesToken.scopes))
+            .to.be.rejectedWith(SingletonGrantExists);
+        }
+      });
+
+      it('should not create grant without needed scope', async () => {
+        const singletonGrants = [
+          {type: GrantType.latest},
+          {type: GrantType.range},
+          {type: GrantType.all}
+        ];
+
+        for(const el of singletonGrants) {
+          const {type} = el;
+          const streamId = uuid();
+          const grantId = uuid();
+
+          const grantDto = {
+            "stream_id": streamId,
+            "recipient_id": uuid(),
+            "properties": {},
+            "fromDate": "2020-01-01T00:00:00.000Z",
+            "toDate": "2020-01-01T00:00:00.000Z",
+            type
+          } as GrantDto;
+
+          const streamEntity = {
+            owner_id: invalidScopesToken.sub,
+            streamType: {
+              supported_grants: Object.values(GrantType),
+            },
+          };
+
+          grantRepository.find = sinon.spy(() => []);
+          grantRepository.saveGrant = sinon.spy(() => ({ id: grantId }));
+          grantRepository.save = sinon.spy(() => ({ id: grantId }));
+          streamService.getById = sinon.spy(() => streamEntity);
+
+          await expect(grantService.save(invalidScopesToken.sub, grantDto, invalidScopesToken.scopes))
+            .to.be.rejectedWith(GrantInvalidTokenScopeException);
+        }
       });
 
       it('should throw error if there is no stream', async () => {
         const streamId = uuid();
         const grantId = uuid();
-
-        const tokenData = {
-          client_id: uuid(),
-        } as TokenData;
 
         const grantDto = {
           "stream_id": streamId,
@@ -110,7 +212,9 @@ describe('Grant Service', () => {
         grantRepository.saveGrant = sinon.spy(() => ({ id: grantId }));
         streamService.getById = sinon.spy(() => null);
 
-        await expect(grantService.save(tokenData, grantDto)).to.be.rejectedWith(BadRequestException);
+        await expect(grantService.save(
+          validScopesToken.sub, grantDto, validScopesToken.scopes))
+          .to.be.rejectedWith(BadRequestException);
 
         expect(streamService.getById.calledOnce).to.be.true;
         expect(streamService.getById.args[0][0]).equal(streamId);
@@ -121,10 +225,6 @@ describe('Grant Service', () => {
       it('should throw error if owner id is not match', async () => {
         const streamId = uuid();
         const grantId = uuid();
-
-        const tokenData = {
-          client_id: uuid(),
-        } as TokenData;
 
         const grantDto = {
           "stream_id": streamId,
@@ -145,7 +245,8 @@ describe('Grant Service', () => {
         grantRepository.saveGrant = sinon.spy(() => ({ id: grantId }));
         streamService.getById = sinon.spy(() => streamEntity);
 
-        await expect(grantService.save(tokenData, grantDto)).to.be.rejectedWith(BadRequestException);
+        await expect(grantService.save(validScopesToken.sub, grantDto, validScopesToken.scopes))
+          .to.be.rejectedWith(BadRequestException);
 
         expect(streamService.getById.calledOnce).to.be.true;
         expect(streamService.getById.args[0][0]).equal(streamId);
@@ -156,10 +257,6 @@ describe('Grant Service', () => {
       it('should throw error if grant type is not supported by streamType', async () => {
         const streamId = uuid();
         const grantId = uuid();
-
-        const tokenData = {
-          client_id: uuid(),
-        } as TokenData;
 
         const grantDto = {
           "stream_id": streamId,
@@ -180,7 +277,8 @@ describe('Grant Service', () => {
         grantRepository.saveGrant = sinon.spy(() => ({ id: grantId }));
         streamService.getById = sinon.spy(() => streamEntity);
 
-        await expect(grantService.save(tokenData, grantDto)).to.be.rejectedWith(BadRequestException);
+        await expect(grantService.save(validScopesToken.sub, grantDto, validScopesToken.scopes))
+          .to.be.rejectedWith(BadRequestException);
 
         expect(streamService.getById.calledOnce).to.be.true;
         expect(streamService.getById.args[0][0]).equal(streamId);
@@ -263,7 +361,7 @@ describe('Grant Service', () => {
         expect(response.id).to.equal(id);
       });
 
-      it("should response GrantNotFoundException", async () => {
+      it('should response error for non existing grant', async () => {
         // Prepare
         const stream_id = uuid();
         const id = uuid();
@@ -289,4 +387,70 @@ describe('Grant Service', () => {
         expect(queryBuilder.execute.calledOnce).to.be.true;
       });
     });
+
+  describe('should modify/not modify grant date range', () => {
+    it('should modify ranged grant', async () => {
+      // Prepare
+      const stream_id = uuid();
+      const id = uuid();
+      const owner_id = uuid();
+      const grantEntity = {
+        id,
+        stream_id,
+        owner_id,
+        "recipient_id": uuid(),
+        "properties": {},
+        "fromDate": "2020-01-01T00:00:00.000Z",
+        "toDate": "2020-01-01T00:00:00.000Z",
+        "type": "range",
+      } as GrantEntity;
+
+      const fromDate = new Date("2020-01-01T00:00:00.000Z").toISOString();
+      const toDate = new Date("2020-01-01T00:00:00.000Z").toISOString();
+      const rangeToApply: ModifyGrantRangeDto = { fromDate, toDate };
+      grantRepository.findOne = sinon.spy((id: string, options: FindOneOptions<GrantEntity>) => grantEntity);
+      grantRepository.save = sinon.spy((entity: GrantEntity) => {});
+
+      // Act
+      const response = await grantService.modifyRange(grantEntity.id, grantEntity.owner_id, rangeToApply);
+
+      // Check
+      expect(grantRepository.findOne.calledOnce).to.be.true;
+      expect(grantRepository.save.calledOnce).to.be.true;
+      expect(JSON.stringify(response)).to.equal(JSON.stringify({...grantEntity, ...rangeToApply}));
+    });
+
+    it('should throw error on range change for latest/all', async () => {
+      // Prepare
+      const stream_id = uuid();
+      const id = uuid();
+      const owner_id = uuid();
+      const grantEntity = {
+        id,
+        stream_id,
+        owner_id,
+        recipient_id: uuid(),
+        properties: {},
+        fromDate: "2020-01-01T00:00:00.000Z",
+        toDate: "2020-01-01T00:00:00.000Z",
+        type: "latest",
+      } as GrantEntity;
+
+      const fromDate = new Date("2020-01-01T00:00:00.000Z").toISOString();
+      const toDate = new Date("2020-01-01T00:00:00.000Z").toISOString();
+      const rangeToApply: ModifyGrantRangeDto = { fromDate, toDate };
+      grantRepository.findOne = sinon.spy((id: string, options: FindOneOptions<GrantEntity>) => grantEntity);
+      grantRepository.save = sinon.spy((entity: GrantEntity) => {});
+
+      // Act & Check
+      await expect(grantService.modifyRange(grantEntity.id, grantEntity.owner_id, rangeToApply))
+        .to.be.rejectedWith(GrantOperationNotAllowed);
+      expect(grantRepository.findOne.calledOnce).to.be.true;
+
+      grantEntity.type = GrantType.all;
+      await expect(grantService.modifyRange(grantEntity.id, grantEntity.owner_id, rangeToApply))
+        .to.be.rejectedWith(GrantOperationNotAllowed);
+      expect(grantRepository.findOne.calledOnce).to.be.true;
+    });
+  });
 });
