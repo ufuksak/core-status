@@ -1,24 +1,23 @@
 import {Test} from '@nestjs/testing';
-import { StatusController } from '../../src/products/controllers/status.controller';
-import { StreamService } from '../../src/products/services/stream.service';
-import { StreamRepository } from '../../src/products/repositories/stream.repository';
+import {StatusController} from '../../src/products/controllers/status.controller';
+import {StreamService} from '../../src/products/services/stream.service';
+import {StreamRepository} from '../../src/products/repositories/stream.repository';
 import {v4 as uuid} from 'uuid';
-import { StreamTypeService } from '../../src/products/services/stream_type.service';
-import { StreamTypeDto } from '../../src/products/dto/stream_type.model';
+import {StreamTypeService} from '../../src/products/services/stream_type.service';
+import {StreamTypeDto} from '../../src/products/dto/stream_type.model';
 import {expect} from './setup';
 import * as sinon from 'sinon';
-import { TokenData, TokenModule } from '@globalid/nest-auth';
+import {TokenData, TokenModule} from '@globalid/nest-auth';
 import {CreateStreamRequestBody} from "../../src/products/dto/stream.model";
 import {StatusService} from "../../src/products/services/status.service";
 import {StatusRepository} from "../../src/products/repositories/status.repository";
 import {StreamTypeRepository} from "../../src/products/repositories/stream_type.repository";
 import {StatusPublisher} from "../../src/products/rabbit/status.publisher";
 import {KeystoreService} from "../../src/products/services/keystore";
-import { ConfigModule } from '@nestjs/config';
+import {ConfigModule} from '@nestjs/config';
 import {CONFIG_VALIDATION_SCHEMA, configuration} from "../../src/products/config/config";
-import {getAccessToken} from "../getacctoken";
-import { GrantService } from '../../src/products/services/grant.service';
-import { GrantDto } from '../../src/products/dto/grant.model';
+import {GrantService} from '../../src/products/services/grant.service';
+import {GrantDto} from '../../src/products/dto/grant.model';
 
 describe('Status Controller', () => {
   let statusController: StatusController;
@@ -139,6 +138,58 @@ describe('Status Controller', () => {
     });
   });
 
+  describe('getGrant', () => {
+    it('should get grant', async () => {
+      const streamId = uuid();
+      const id = uuid();
+      const body = {
+        id,
+        "stream_id": streamId,
+        "recipient_id": uuid(),
+        "properties": {},
+        "fromDate": "2020-01-01T00:00:00.000Z",
+        "toDate": "2020-01-01T00:00:00.000Z",
+        "type": "range",
+      };
+
+      grantService.get = jest.fn(async () => body);
+
+      const tokenData = {
+        client_id: uuid(),
+      } as TokenData;
+
+      const response = await statusController.getGrant(tokenData, {id});
+
+      expect(response).equal(body);
+    });
+  });
+
+  describe('deleteGrant', () => {
+    it('should delete grant', async () => {
+      const streamId = uuid();
+      const id = uuid();
+      const body = {
+        id,
+        "stream_id": streamId,
+        "recipient_id": uuid(),
+        "properties": {},
+        "fromDate": "2020-01-01T00:00:00.000Z",
+        "toDate": "2020-01-01T00:00:00.000Z",
+        "type": "range",
+      };
+
+      grantService.delete = jest.fn(async () => body);
+
+      const tokenData = {
+        client_id: uuid(),
+      } as TokenData;
+
+      const response = await statusController.deleteGrant(tokenData, {id});
+
+      expect(response).equal(body);
+    });
+  });
+
   describe('getStreamTypes', () => {
     it('should return all streamTypes', async () => {
       const streamTypeEntity = {
@@ -186,15 +237,15 @@ describe('Status Controller', () => {
 
   describe('deleteStreamType', () => {
     it('should delete streamType', async () => {
-      const streamTypeId = uuid();
+      const id = uuid();
       streamTypeService.delete = sinon.spy(async () => ({ affected: 1 }));
 
-      const response = await statusController.deleteStreamType(streamTypeId);
+      const response = await statusController.deleteStreamType({id});
 
       expect(response).to.have.property('affected', 1);
 
       expect(streamTypeService.delete.calledOnce).to.be.true;
-      expect(streamTypeService.delete.args[0][0]).equal(streamTypeId);
+      expect(streamTypeService.delete.args[0][0]).equal(id);
     });
   });
 

@@ -15,6 +15,12 @@ export const PG_FOREIGN_KEY_VIOLATION = '23503';
 
 export const STATUS_MANAGE_SCOPE = ['status.manage', 'keys.manage'];
 
+export const GRANTS_DELETE_SCOPE = ['status.grants.delete'];
+
+export const GRANTS_MANAGE_SCOPE = ['status.grants.manage'];
+
+export const GRANTS_CREATE_SCOPE = ['status.grants.create'];
+
 export const PERSONAL_CHANNEL_PARTICIPANTS: number = 1
 
 export const MULTI_CHANNEL_MIN_PARTICIPANTS: number = 3

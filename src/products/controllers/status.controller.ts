@@ -3,9 +3,9 @@ import {AddStatusInterface, GetUserStatusesParams, StatusUpdateDto} from "../dto
 import {TokenData, TokenProtected} from "@globalid/nest-auth";
 import {StatusService} from "../services/status.service";
 import {ScopedTokenDataParam} from "../commons/scope.decorator";
-import {STATUS_MANAGE_SCOPE} from "../util/util";
+import {GRANTS_CREATE_SCOPE, GRANTS_DELETE_SCOPE, GRANTS_MANAGE_SCOPE, STATUS_MANAGE_SCOPE} from "../util/util";
 import {StreamEntity} from "../entity/stream.entity";
-import {Body, Controller, Delete, Get, Param, Post, Query, Request} from "@nestjs/common";
+import {Body, Controller, Delete, Get, Param, ParseUUIDPipe, Post, Query, Request} from "@nestjs/common";
 import {StreamTypeDto} from "../dto/stream_type.model";
 import {StreamTypeEntity} from "../entity/stream_type.entity";
 import {StreamTypeService} from "../services/stream_type.service";
@@ -19,13 +19,14 @@ import {
 } from "../dto/s3file.model";
 import {GrantService} from "../services/grant.service";
 import {GrantDto} from "../dto/grant.model";
+import {GrantEntity} from "../entity/grant.entity";
 
 @Controller('/api/v1/status')
 export class StatusController {
     constructor(
       private readonly statusService: StatusService,
       private readonly streamService: StreamService,
-      private grantService: GrantService,
+      private readonly grantService: GrantService,
       private readonly streamTypeService: StreamTypeService
     ) {}
 
@@ -88,8 +89,22 @@ export class StatusController {
 
     @TokenProtected()
     @Post('/grants')
-    createGrant(@ScopedTokenDataParam(STATUS_MANAGE_SCOPE) tokenData: TokenData, @Body() grant: GrantDto) {
+    createGrant(@ScopedTokenDataParam(GRANTS_CREATE_SCOPE) tokenData: TokenData, @Body() grant: GrantDto) {
         return this.grantService.save(tokenData, grant);
+    }
+
+    @TokenProtected()
+    @Get('/grants/:id')
+    getGrant(@ScopedTokenDataParam(GRANTS_MANAGE_SCOPE) tokenData: TokenData,
+             @Param() {id}: UUUIDParam)  : Promise<GrantEntity> {
+        return this.grantService.get(id, tokenData.uuid);
+    }
+
+    @TokenProtected()
+    @Delete('/grants/:id')
+    deleteGrant(@ScopedTokenDataParam(GRANTS_DELETE_SCOPE) tokenData: TokenData,
+                @Param() {id}: UUUIDParam)  : Promise<GrantEntity> {
+        return this.grantService.delete(id, tokenData.uuid);
     }
 
     @Post('/streams')
@@ -120,7 +135,7 @@ export class StatusController {
 
     @Delete('/streams/types/:id')
     @TokenProtected()
-    async deleteStreamType(@Param('id') id: string){
+    async deleteStreamType(@Param() {id}: UUUIDParam){
       return this.streamTypeService.delete(id)
     }
 }

@@ -146,7 +146,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"public_key\": \"Ut incididuntelit labore\",\n  \"encrypted_private_key\": \"Duis Excepteur culpa repreаddsfdsfhenderit esse\",\n  \"stream_type\": \"test2132331\" \n}",
+							"raw": "{\n  \"public_key\": \"Ut incididuntelit labore\",\n  \"encrypted_private_key\": \"Duis Excepteur culpa repreаddsfdsfhenderit esse\",\n  \"stream_type\": \"test2132333\" \n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -285,7 +285,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n \"granularity\": \"single\",\n \"stream_handling\": \"lockbox\",\n \"approximated\": true,\n \"supported_grants\": [\"range\"],\n \"type\": \"test2132331\"\n}",
+							"raw": "{\n \"granularity\": \"single\",\n \"stream_handling\": \"lockbox\",\n \"approximated\": true,\n \"supported_grants\": [\"range\"],\n \"type\": \"test2132333\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -487,6 +487,107 @@
 								"v1",
 								"status",
 								"1f4e9b27-68a2-43a1-a96f-160ecdbdd352"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "createGrant",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\n          \"stream_id\": \"451f9816-46bd-490b-ba4d-43ba980def33\",\n          \"recipient_id\": \"95abffad-9c5b-40da-ada5-a156418b64ef\",\n          \"properties\": {\n              \"reEncryptionKey\": \"reEncryptionKey\",\n              \"e2eKey\": \"e2eKey\"\n          },\n          \"fromDate\": \"2020-01-01T00:00:00.000Z\",\n          \"toDate\": \"2020-01-01T00:00:00.000Z\",\n          \"type\": \"range\"\n\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{STATUSDB}}/api/v1/status/grants",
+							"host": [
+								"{{STATUSDB}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"status",
+								"grants"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "removeGrant",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{STATUSDB}}/api/v1/status/grants/a5cf2871-8354-4f5a-b083-cb156963b5d7",
+							"host": [
+								"{{STATUSDB}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"status",
+								"grants",
+								"a5cf2871-8354-4f5a-b083-cb156963b5d7"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getGrant",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{STATUSDB}}/api/v1/status/grants/e756c422-d6f2-4942-b024-f146a9afcab0",
+							"host": [
+								"{{STATUSDB}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"status",
+								"grants",
+								"e756c422-d6f2-4942-b024-f146a9afcab0"
 							]
 						}
 					},
@@ -1045,7 +1146,7 @@
 		},
 		{
 			"key": "TOKEN",
-			"value": "eyJhbGciOiJIUzI1NiJ9.eyJnbG9iYWxpZCI6ImpvaG5kb2UiLCJzdWIiOiJjOWI4ZjQ1My1hOWMwLTQ2NjYtODNhOC1kMjJkZDQyN2Y0NmQiLCJjbGllbnRfaWQiOiJhYjg2NzVkZi02Yzc1LTRmNjAtOGQ5Mi0yYTI2YmFjZmUxMzgiLCJzY29wZSI6ImtleXMubWFuYWdlIHN0YXR1cy5tYW5hZ2UiLCJncm91cHMiOltdLCJleHAiOjE2NTIxMDA1MjAsImlhdCI6MTY1MjAxNDEyMCwiaXNzIjoiaHR0cHM6Ly9pc3MudWVyIn0.2SVJn5Y63Z7nGeX9ivVolxKqXcA-teSkGLN--SE7nAo",
+			"value": "eyJhbGciOiJIUzI1NiJ9.eyJnbG9iYWxpZCI6ImpvaG5kb2UiLCJzdWIiOiJmZDcxZWViMi02NzQ3LTQzOWEtYjJlYS1hNTI0OGRhYmMxNDciLCJjbGllbnRfaWQiOiIxYTdiYmIxMS1mY2VlLTQxNTctYTk0MS02YjVlYzNiMzgyZDkiLCJzY29wZSI6ImtleXMubWFuYWdlIHN0YXR1cy5tYW5hZ2Ugc3RhdHVzLmdyYW50cy5kZWxldGUgc3RhdHVzLmdyYW50cy5tYW5hZ2Ugc3RhdHVzLmdyYW50cy5jcmVhdGUiLCJncm91cHMiOltdLCJleHAiOjE2NTIyNjU2OTMsImlhdCI6MTY1MjE3OTI5MywiaXNzIjoiaHR0cHM6Ly9pc3MudWVyIn0.r3CrzVTFNUUIbqKzNW0h2X-vlZlQmgAB1trYh7EwZJE",
 			"type": "default"
 		}
 	]
