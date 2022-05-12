@@ -196,10 +196,10 @@ describe('Status Controller', () => {
 
       const response = await statusController.modifyGrantRange(tokenData, body.id, rangeToApply);
 
-      expect(JSON.stringify(response)).to.be.equal(JSON.stringify({
+      expect(response).to.deep.equal({
         ...body,
         ...rangeToApply
-      }));
+      });
     });
   });
 

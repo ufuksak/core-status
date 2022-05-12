@@ -7,7 +7,7 @@ import {StreamTypeEntity} from "../../../src/products/entity/stream_type.entity"
 import {TypeOrmModule} from "@nestjs/typeorm";
 import {Module} from "@nestjs/common";
 import {CONFIG_VALIDATION_SCHEMA, RABBIT_URI} from "../../../src/products/config/config";
-import {AmqpModule} from "@globalid/nest-amqp";
+import {AmqpModule, MessageHandler} from "@globalid/nest-amqp";
 import {ConfigModule} from "@nestjs/config";
 import {TokenModule} from "@globalid/nest-auth";
 import {StreamEntity} from "../../../src/products/entity/stream.entity";
@@ -15,6 +15,24 @@ import config from "../ormconfig";
 import {StatusModule} from "../../../src/products/modules/status.module";
 import {UpdateEntity} from "../../../src/products/entity/update.entity";
 import {GrantEntity} from "../../../src/products/entity/grant.entity";
+import {UpdateWorkerDto} from "../../../src/products/dto/update-worker.dto";
+
+export class Handlers {
+  collectedMessages: [] = []
+
+  getCollectedMessages(): any[] {
+    return [...this.collectedMessages]
+  }
+
+  clearCollectedMessages(): void {
+    this.collectedMessages = [];
+  }
+
+  @MessageHandler({})
+  async updateAdd(evt: UpdateWorkerDto): Promise<void> {
+    this.collectedMessages.push(evt as never)
+  }
+}
 
 @Module({
   imports: [
@@ -46,6 +64,9 @@ import {GrantEntity} from "../../../src/products/entity/grant.entity";
         GrantEntity
       ]
     })
+  ],
+  providers: [
+    Handlers
   ]
 })
 export class AppUpdateTestModule {}

@@ -77,7 +77,6 @@ export class UpdateMarkerCreateDto implements UpdateMarkerCreate {
   frequency: string | null;
 }
 
-@Message({ name: STATUS_UPDATE_EXCHANGE })
 export class StatusDto implements StatusResponse {
   @IsUUID('4')
   id: string;

@@ -8,7 +8,6 @@ import {
 import {InjectRepository} from "@nestjs/typeorm";
 import {GetUserStatusesParams, StatusDto, StatusResponse, UpdateMarkerInterface} from "../dto/status.model";
 import {StatusRepository} from "../repositories/status.repository";
-import {StatusPublisher} from "../rabbit/status.publisher";
 import {UpdateEntity, updateEntityName} from "../entity/update.entity";
 import {StreamRepository} from "../repositories/stream.repository";
 import {PG_UNIQUE_CONSTRAINT_VIOLATION} from "../util/util";
@@ -27,7 +26,6 @@ export class StatusService {
   constructor(
     @InjectRepository(StatusRepository) private readonly statusRepo: StatusRepository,
     @InjectRepository(StreamRepository) private readonly streamRepo: StreamRepository,
-    private readonly statusPublisher: StatusPublisher
   ) {
   }
 
@@ -89,8 +87,6 @@ export class StatusService {
           .insert()
           .values(status)
           .execute();
-
-        await this.statusPublisher.publishStatusUpdate(status);
 
         results.push(...result.generatedMaps?.map((generatedColumns, index) => ({
           ...status,

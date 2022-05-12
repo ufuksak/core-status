@@ -1,9 +1,9 @@
-import {EventSubscriber, EntitySubscriberInterface, UpdateEvent} from 'typeorm';
-import {Pot} from './entity/pot.entity';
-import {PotService} from './services/pot.service';
-import {Notification} from './push-notification/notification';
-import {Publisher} from './push-notification';
-import {AppContainer} from './commons/app.container';
+import {EntitySubscriberInterface, EventSubscriber, UpdateEvent} from 'typeorm';
+import {Pot} from '../entity/pot.entity';
+import {PotService} from '../services/pot.service';
+import {Notification} from '../push-notification/notification';
+import {Publisher} from '../push-notification';
+import {AppContainer} from '../commons/app.container';
 
 @EventSubscriber()
 export class PotSubscriber implements EntitySubscriberInterface<Pot> {

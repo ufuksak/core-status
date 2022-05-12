@@ -16,7 +16,7 @@ export class StreamService {
   ) {}
 
   async getAll(): Promise<StreamEntity[]> {
-    return this.streamRepo.find({});
+    return this.streamRepo.find({ relations: ['grants']});
   }
 
   async create(

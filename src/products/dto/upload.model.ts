@@ -5,25 +5,6 @@ import {UPLOAD_UPDATE_EXCHANGE} from "../config/rabbit";
 import {Message} from "@globalid/nest-amqp";
 import {Type} from "class-transformer";
 
-export class ImageFileDTO {
-    @ApiPropertyOptional()
-    fieldname?: string;
-
-    @ApiPropertyOptional()
-    originalname?: string;
-
-    @ApiPropertyOptional()
-    encoding?: string;
-
-    @ApiPropertyOptional()
-    mimetype?: string;
-
-    @ApiPropertyOptional()
-    buffer?: any;
-
-    @ApiPropertyOptional()
-    size?: number;
-}
 
 export class ImageResponseDTO {
     @ApiPropertyOptional()

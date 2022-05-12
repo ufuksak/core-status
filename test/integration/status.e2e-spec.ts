@@ -1,6 +1,6 @@
 import {INestApplication, ValidationPipe} from "@nestjs/common";
 import {Test, TestingModule} from "@nestjs/testing";
-import {AppUpdateTestModule} from "./modules/app.update.test.module";
+import {AppUpdateTestModule, Handlers} from "./modules/app.update.test.module";
 import {JsonApiExceptionTransformer} from "../../src/products/commons/transformer/jsonapi-exception.transformer";
 import {JsonApiTransformer} from "../../src/products/commons/transformer/jsonapi.transformer";
 import {useContainer} from "class-validator";
@@ -13,9 +13,10 @@ import * as cryptosdk from 'globalid-crypto-library/src/index';
 import {v4 as uuid} from 'uuid';
 import {validationPipeOptions} from "../../src/products/config/validation-pipe.options";
 import {StatusUpdateDto, UpdateMarker} from "../../src/products/dto/status.model";
-import {Scopes} from "../../src/products/util/util";
+import {GRANTS_MANAGE_SCOPE, Scopes, STATUS_MANAGE_SCOPE} from "../../src/products/util/util";
 import {GrantEntity} from "../../src/products/entity/grant.entity";
 import {GrantDto, GrantType} from "../../src/products/dto/grant.model";
+import waitForExpect from "wait-for-expect";
 import supertest = require("supertest");
 
 
@@ -28,7 +29,7 @@ const authType = {type: "bearer"};
 const uuidLength = 36;
 const streamType = 'steamTypeToCreateValid';
 
-const allGrants = Object.values(GrantType);
+const allGrantTypes = Object.values(GrantType);
 
 const validStreamTypeCreateDto = {
   granularity: "single",
@@ -102,6 +103,7 @@ describe('StatusModule (e2e)', () => {
   let app: INestApplication;
   let server = null;
   let agent = null;
+  let handlers: Handlers = null;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -115,6 +117,7 @@ describe('StatusModule (e2e)', () => {
     app.useGlobalInterceptors(new JsonApiTransformer());
     server = await app.getHttpServer();
     agent = await supertest.agent(server);
+    handlers = app.get<Handlers>(Handlers);
     await app.init();
   });
 
@@ -124,13 +127,14 @@ describe('StatusModule (e2e)', () => {
     );
   });
 
-  const prepareAndTestStatusDelete = async () => {
-    await createStreamTypeAndExpect();
-    await createStreamAndExpect();
+  const prepareAndTestStatusDelete = async (length?: number, customToken?: string) => {
+    const tokenToOperate = token || customToken;
+    await createStreamTypeAndExpect(tokenToOperate);
+    await createStreamAndExpect(tokenToOperate);
     const resp = await agent
       .get('/api/v1/status/streams')
       .set('Accept', 'application/json')
-      .auth(token, authType)
+      .auth(tokenToOperate , authType)
       .send()
       .expect('Content-Type', /json/)
       .expect(200);
@@ -144,10 +148,15 @@ describe('StatusModule (e2e)', () => {
         return el;
       })
     };
+
+    if(length && length < validStatusUpdates.status_updates.length) {
+      validStatusUpdates.status_updates = validStatusUpdates.status_updates.slice(0, length);
+    }
+
     const statusUpdateId = validStatusUpdates.status_updates[0].id;
 
     await agent.post('/api/v1/status')
-      .auth(token, authType)
+      .auth(tokenToOperate, authType)
       .send(validStatusUpdates)
       .expect(201);
 
@@ -159,12 +168,13 @@ describe('StatusModule (e2e)', () => {
     .auth(token, authType)
     .expect(200);
 
-  const createStreamTypeAndExpect = async () => {
+  const createStreamTypeAndExpect = async (customToken?: string) => {
+    const tokenToOperate = token || customToken;
     const streamTypeOutput = {
       "granularity": 'single',
       "stream_handling": 'lockbox',
       "approximated": true,
-      "supported_grants": allGrants,
+      "supported_grants": allGrantTypes,
       "type": streamType,
       "updated_at": expect.any(String),
       "created_at": expect.any(String)
@@ -174,14 +184,14 @@ describe('StatusModule (e2e)', () => {
       granularity: 'single',
       stream_handling: 'lockbox',
       approximated: true,
-      supported_grants: allGrants,
+      supported_grants: allGrantTypes,
       type: streamType,
     };
 
     // Run your end-to-end test
     const resp = await agent
       .post('/api/v1/status/streams/types')
-      .auth(token, authType)
+      .auth(tokenToOperate, authType)
       .set('Accept', 'application/json')
       .send(streamTypeData)
       .expect(201);
@@ -193,7 +203,8 @@ describe('StatusModule (e2e)', () => {
     it('should create streamType', async () => createStreamTypeAndExpect());
   });
 
-  const createStreamAndExpect = async () => {
+  const createStreamAndExpect = async (customToken?: string) => {
+    const tokenToOperate = token || customToken;
     // prepare
     const streamData = {
       "stream_type": streamType,
@@ -205,7 +216,7 @@ describe('StatusModule (e2e)', () => {
     const resp = await agent
       .post('/api/v1/status/streams')
       .set('Accept', 'text/plain')
-      .auth(token, authType)
+      .auth(tokenToOperate, authType)
       .send(streamData)
       .expect('Content-Type', "application/json; charset=utf-8")
       .expect(201);
@@ -342,7 +353,6 @@ describe('StatusModule (e2e)', () => {
       const {streamId} = await prepareAndTestStatusDelete();
       const {id: rangedGrantId} = await prepareGrantAndExpect(streamId, GrantType.range);
       const {id: liveGrantId} = await prepareGrantAndExpect(streamId, GrantType.latest);
-      const tokenInvalidForRangeScope = getAccessToken(Scopes.status_grants_manage);
       expect(rangedGrantId).toHaveLength(uuidLength);
       expect(liveGrantId).toHaveLength(uuidLength);
 
@@ -433,7 +443,6 @@ describe('StatusModule (e2e)', () => {
     })
   })
 
-
   describe('GET /api/v1/status/streams/types', () => {
     it('should get all streamTypes', async () => {
       await createStreamTypeAndExpect();
@@ -442,7 +451,7 @@ describe('StatusModule (e2e)', () => {
         "granularity": 'single',
         "stream_handling": 'lockbox',
         "approximated": true,
-        "supported_grants": allGrants,
+        "supported_grants": allGrantTypes,
         "type": streamType,
         "updated_at": expect.any(String),
         "created_at": expect.any(String)
@@ -459,6 +468,88 @@ describe('StatusModule (e2e)', () => {
 
       expect(resp?.body?.data?.[0]['attributes'])
         .toEqual(streamTypeOutput)
+    });
+  });
+
+  const prepareStatusUpdatesWithGrantType = async (updatesLength: number, token: string, type: GrantType) => {
+    // Prepare
+    const {streamId, validStatusUpdates} = await prepareAndTestStatusDelete(updatesLength);
+
+    const {id} = await prepareGrantAndExpect(streamId, type, token);
+    expect(id).toHaveLength(uuidLength);
+
+    // Act
+    validStatusUpdates.status_updates[0].id = uuid();
+    await agent.post('/api/v1/status')
+      .auth(token, authType)
+      .send(validStatusUpdates)
+      .expect(201);
+
+    return { validStatusUpdates }
+  }
+
+  describe('POST /api/v1/status', () => {
+    it('should not push status update to workers with grant `range`', async () => {
+      // Prepare
+      const tokenValidForRangeScope = getAccessToken([
+          ...STATUS_MANAGE_SCOPE,
+          ...GRANTS_MANAGE_SCOPE,
+          Scopes.status_grants_create_historical
+        ].join(' ')
+      );
+
+      await prepareStatusUpdatesWithGrantType(
+        1, tokenValidForRangeScope, GrantType.range
+      );
+
+      // Check
+      await waitForExpect(() => {
+        expect(handlers.getCollectedMessages().length)
+          .toEqual(0);
+      })
+
+      handlers.clearCollectedMessages();
+    });
+
+    it('should push status update to workers with grant `all`', async () => {
+      // Prepare
+      const tokenValidForAllScope = getAccessToken([
+          ...STATUS_MANAGE_SCOPE,
+          ...GRANTS_MANAGE_SCOPE,
+          Scopes.status_grants_create_historical,
+          Scopes.status_grants_create_live
+        ].join(' ')
+      );
+
+      const { validStatusUpdates } = await prepareStatusUpdatesWithGrantType(
+        1, tokenValidForAllScope, GrantType.all
+      );
+
+      // Check
+      await waitForExpect(() => {
+        expect(handlers.getCollectedMessages()[0].update?.id)
+          .toEqual(validStatusUpdates.status_updates[0].id);
+      });
+    });
+
+    it('should push status update to workers with grant `latest`', async () => {
+      // Prepare
+      const tokenValidForLatestScope = getAccessToken([
+          ...STATUS_MANAGE_SCOPE,
+          ...GRANTS_MANAGE_SCOPE,
+          Scopes.status_grants_create_live
+        ].join(' ')
+      );
+
+      const { validStatusUpdates } = await prepareStatusUpdatesWithGrantType(
+        1, tokenValidForLatestScope, GrantType.latest
+      );
+
+      // Check
+      await waitForExpect(() => {
+        expect(handlers.getCollectedMessages().slice(-1)[0].update?.id)
+          .toEqual(validStatusUpdates.status_updates[0].id);
+      });
     });
   });
 
@@ -673,10 +764,10 @@ describe('StatusModule (e2e)', () => {
 
       const e2eStream = Object.assign({}, validStreamCreateDto);
 
-
-      e2eStream.encrypted_private_key = cryptosdk.PRE.encrypt(
+      const v = cryptosdk.PRE.encrypt(
         masterKeys.public_key, masterKeys.private_key
-      ).cipher;
+      );
+      e2eStream.encrypted_private_key = v.cipher;
 
       e2eStream.public_key = masterKeys.public_key;
 

@@ -417,7 +417,7 @@ describe('Grant Service', () => {
       // Check
       expect(grantRepository.findOne.calledOnce).to.be.true;
       expect(grantRepository.save.calledOnce).to.be.true;
-      expect(JSON.stringify(response)).to.equal(JSON.stringify({...grantEntity, ...rangeToApply}));
+      expect(response).to.deep.equal({...grantEntity, ...rangeToApply});
     });
 
     it('should throw error on range change for latest/all', async () => {

@@ -1,5 +1,5 @@
-﻿import { TypeOrmModuleOptions } from "@nestjs/typeorm";
-import { ConfigService } from '@nestjs/config';
+﻿import {TypeOrmModuleOptions} from "@nestjs/typeorm";
+import {ConfigService} from '@nestjs/config';
 
 export const ormOptions = (configService: ConfigService): TypeOrmModuleOptions =>  ({
   type: 'postgres',
@@ -9,7 +9,7 @@ export const ormOptions = (configService: ConfigService): TypeOrmModuleOptions =
   password: configService.get('POSTGRESQL_COMPAT') ? configService.get('POSTGRES_DB_PASSWORD'): configService.get('CRDB_DB_PASSWORD'),
   database: configService.get('POSTGRESQL_COMPAT') ? configService.get('POSTGRES_DB_DATABASE'): configService.get('CRDB_DB_DATABASE'),
   entities: [__dirname + '/../entity/*.entity{.ts,.js}'],
-  subscribers: [__dirname + '/../*.subscriber{.ts,.js}'],
+  subscribers: [__dirname + '/../subscribers/*.subscriber{.ts,.js}'],
   synchronize: configService.get('POSTGRESQL_COMPAT'),
   migrations: ['migrations/*.ts'],
   cli: {

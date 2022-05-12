@@ -1,10 +1,10 @@
 ﻿import {Module} from '@nestjs/common'
 import {TypeOrmModule} from '@nestjs/typeorm';
 import {StatusController} from "../controllers/status.controller";
-import {GrantRepository } from '../repositories/grant.repository';
-import {StreamRepository } from '../repositories/stream.repository';
-import {StreamTypeRepository } from '../repositories/stream_type.repository';
-import {GrantService } from '../services/grant.service';
+import {GrantRepository} from '../repositories/grant.repository';
+import {StreamRepository} from '../repositories/stream.repository';
+import {StreamTypeRepository} from '../repositories/stream_type.repository';
+import {GrantService} from '../services/grant.service';
 import {StreamService} from "../services/stream.service";
 import {KeystoreModule} from './keystore.module';
 import {StatusRepository} from "../repositories/status.repository";
@@ -15,6 +15,8 @@ import {UploadService} from "../services/upload.service";
 import {UploadPublisher} from "../rabbit/uploads.publisher";
 import {StreamTypeService} from '../services/stream_type.service';
 import {StreamTypeNotExistsRule} from "../validators/stream-type.validator";
+import {UpdateSubscriber} from "../subscribers/update.subscriber";
+import {SubscribersService} from "../services/subscribers.service";
 
 @Module({
     imports: [
@@ -24,7 +26,7 @@ import {StreamTypeNotExistsRule} from "../validators/stream-type.validator";
         StreamTypeRepository,
         GrantRepository,
         StatusRepository,
-        UploadRepository,
+        UploadRepository
       ])
     ],
     controllers: [StatusController],
@@ -36,7 +38,9 @@ import {StreamTypeNotExistsRule} from "../validators/stream-type.validator";
       StatusService,
       UploadService,
       UploadPublisher,
-      StreamTypeNotExistsRule
+      StreamTypeNotExistsRule,
+      UpdateSubscriber,
+      SubscribersService
     ]
 })
 export class StatusModule {}
