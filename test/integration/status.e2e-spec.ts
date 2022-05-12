@@ -18,12 +18,14 @@ import {GrantEntity} from "../../src/products/entity/grant.entity";
 import {GrantDto, GrantType} from "../../src/products/dto/grant.model";
 import waitForExpect from "wait-for-expect";
 import supertest = require("supertest");
+import { Purpose } from "../../src/products/dto/keystore.byme.model";
 
 
 jest.setTimeout(3 * 60 * 1000);
 
+const allScopes = Object.values(Scopes).join(' ');
 
-const token = getAccessToken(Object.values(Scopes).join(' '));
+const token = getAccessToken(allScopes);
 
 const authType = {type: "bearer"};
 const uuidLength = 36;
@@ -314,7 +316,7 @@ describe('StatusModule (e2e)', () => {
       await prepareGrantAndExpect(streamId, GrantType.latest, tokenInvalidForRangeScope, 403);
     });
 
-    it('should not creare second latest grant for same recipient and stream', async () => {
+    it('should not create second latest grant for same recipient and stream', async () => {
       const {streamId} = await prepareAndTestStatusDelete();
       const latestType = GrantType.latest;
       const {id, recipient_id} = await prepareGrantAndExpect(streamId, latestType);
@@ -340,6 +342,121 @@ describe('StatusModule (e2e)', () => {
         .send(grantData)
         .expect('Content-Type', "application/json; charset=utf-8")
         .expect(409);
+    })
+
+
+    it('should return error if stream not exist', async () => {
+      const grantData = {
+        "stream_id": uuid(),
+        "recipient_id": uuid(),
+        "properties": {
+          e2eKey: '',
+          reEncryptionKey: ''
+        },
+        "fromDate": "2020-01-01T00:00:00.000Z",
+        "toDate": "2020-01-01T00:00:00.000Z",
+        "type": "range",
+      };
+
+      // Run your end-to-end test
+      await agent
+        .post('/api/v1/status/grants')
+        .set('Accept', 'text/plain')
+        .auth(token, authType)
+        .send(grantData)
+        .expect('Content-Type', "application/json; charset=utf-8")
+        .expect(500);
+
+      // expect(resp?.body?.data?.id).toHaveLength(uuidLength);
+    })
+
+    it('should return error if stream owner_id not equal to sub', async () => {
+      const {streamId} = await prepareAndTestStatusDelete();
+      const token = getAccessToken(
+        [
+          Scopes.keys_manage,
+          Scopes.status_manage,
+          Scopes.status_grants_manage,
+          Scopes.status_grants_create_historical
+        ].join(' '), uuid()
+      );
+
+      const grantData = {
+        "stream_id": streamId,
+        "recipient_id": uuid(),
+        "properties": {
+          e2eKey: '',
+          reEncryptionKey: ''
+        },
+        "fromDate": "2020-01-01T00:00:00.000Z",
+        "toDate": "2020-01-01T00:00:00.000Z",
+        "type": "range",
+      };
+
+      // Run your end-to-end test
+      await agent
+        .post('/api/v1/status/grants')
+        .set('Accept', 'text/plain')
+        .auth(token, authType)
+        .send(grantData)
+        .expect('Content-Type', "application/json; charset=utf-8")
+        .expect(400);
+    })
+
+    it('should return error if stream type not support grant type', async () => {
+      const streamTypeData = {
+        granularity: 'single',
+        stream_handling: 'lockbox',
+        approximated: true,
+        supported_grants: ['range'],
+        type: streamType,
+      };
+
+      await agent
+        .post('/api/v1/status/streams/types')
+        .auth(token, authType)
+        .set('Accept', 'application/json')
+        .send(streamTypeData)
+        .expect(201);
+
+      // prepare
+      const streamData = {
+        "stream_type": streamType,
+        "public_key": "Ut incididuntelit labore",
+        "encrypted_private_key": "Duis Excepteur culpa reprehenderit esse",
+      };
+
+      // Act
+      const resp = await agent
+        .post('/api/v1/status/streams')
+        .set('Accept', 'text/plain')
+        .auth(token, authType)
+        .send(streamData)
+        .expect('Content-Type', "application/json; charset=utf-8")
+        .expect(201);
+
+      const streamId = resp.body.data.id;
+
+      const grantData = {
+        "stream_id": streamId,
+        "recipient_id": uuid(),
+        "properties": {
+          e2eKey: '',
+          reEncryptionKey: ''
+        },
+        "fromDate": "2020-01-01T00:00:00.000Z",
+        "toDate": "2020-01-01T00:00:00.000Z",
+        "type": "all",
+      };
+
+      // Run your end-to-end test
+      await agent
+        .post('/api/v1/status/grants')
+        .set('Accept', 'text/plain')
+        .auth(token, authType)
+        .send(grantData)
+        .expect('Content-Type', "application/json; charset=utf-8")
+        .expect(400);
     })
   })
 
@@ -785,6 +902,72 @@ describe('StatusModule (e2e)', () => {
         .auth(token, authType)
         .send(validUpdate)
         .expect(201);
+    });
+
+    it('e2e grant create', async () => {
+      const token = getAccessToken(allScopes, uuid());
+
+      const keys = cryptosdk.PRE.generateKeyPair();
+
+      const e2eStreamType = Object.assign({}, validStreamTypeCreateDto);
+
+      await agent.post('/api/v1/status/streams/types')
+        .auth(token, authType)
+        .send(e2eStreamType)
+        .expect(201);
+
+      const e2eStream = Object.assign({}, validStreamCreateDto);
+
+      e2eStream.encrypted_private_key = cryptosdk.PRE.encrypt(
+        keys.public_key, keys.private_key
+      ).cipher;
+
+      e2eStream.public_key = keys.public_key;
+
+      const respStream = await agent.post('/api/v1/status/streams')
+        .auth(token, authType)
+        .send(e2eStream)
+        .expect(201);
+
+      const createdStreamId = respStream?.body?.data?.id;
+      const gid_uuid = respStream?.body?.data?.attributes?.owner_id;
+
+      const restKeys = await agent
+        .post(`/api/v1/identity/keys/search`)
+        .auth(token, authType)
+        .send({ gid_uuid, purpose: Purpose.status_stream })
+        .expect('Content-Type', /json/)
+        .expect(201);
+
+      const keyPublic_key = restKeys?.body?.data?.attributes?.key_pairs[0].public_key;
+
+      const reEncryptionKey = cryptosdk.PRE.generateReEncryptionKey(
+        keys.private_key,
+        keyPublic_key
+      );
+
+      const grantData = {
+        "stream_id": createdStreamId,
+        "recipient_id": uuid(),
+        "properties": {
+          e2eKey: '',
+          reEncryptionKey
+        },
+        "fromDate": "2020-01-01T00:00:00.000Z",
+        "toDate": "2020-01-01T00:00:00.000Z",
+        "type": "range",
+      };
+
+      // Run your end-to-end test
+      const resp = await agent
+        .post('/api/v1/status/grants')
+        .set('Accept', 'text/plain')
+        .auth(token, authType)
+        .send(grantData)
+        .expect('Content-Type', "application/json; charset=utf-8")
+        .expect(201);
+
+      expect(resp?.body?.data?.id).toHaveLength(uuidLength);
     });
   })
 

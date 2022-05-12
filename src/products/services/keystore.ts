@@ -42,7 +42,7 @@ export class KeystoreService {
 
   public async postSearchKeyPairPublic(body: PostKeyPairSearchBody): Promise<KeyPairSearchResponse> {
     return this.getResponseData(await this.client.post<KeyPairSearchResponse>(
-      '/identity/keys/search',
+      '/v1/identity/keys/search',
       body));
   }
 

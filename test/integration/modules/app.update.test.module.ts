@@ -15,6 +15,7 @@ import config from "../ormconfig";
 import {StatusModule} from "../../../src/products/modules/status.module";
 import {UpdateEntity} from "../../../src/products/entity/update.entity";
 import {GrantEntity} from "../../../src/products/entity/grant.entity";
+import { KeystoreModule } from "../../../src/products/modules/keystore.module";
 import {UpdateWorkerDto} from "../../../src/products/dto/update-worker.dto";
 
 export class Handlers {
@@ -36,6 +37,7 @@ export class Handlers {
 
 @Module({
   imports: [
+    KeystoreModule,
     StatusModule,
     TokenModule,
     AmqpModule.forConfig({
