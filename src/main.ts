@@ -3,14 +3,12 @@ import {AppModule} from './app.module';
 import {JsonApiTransformer} from "./products/commons/transformer/jsonapi.transformer";
 import {JsonApiExceptionTransformer} from "./products/commons/transformer/jsonapi-exception.transformer";
 import {ValidationPipe} from "@nestjs/common";
-import {AppContainer} from './products/commons/app.container';
 import {S3ConfigProvider} from "./products/config/s3.config.provider";
 import {useContainer} from 'class-validator';
 import {validationPipeOptions} from "./products/config/validation-pipe.options";
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
-    AppContainer.initContainer(app);
     useContainer(app.select(AppModule), { fallbackOnErrors: true });
     app.useGlobalPipes(new ValidationPipe(validationPipeOptions));
     app.useGlobalFilters(new JsonApiExceptionTransformer());

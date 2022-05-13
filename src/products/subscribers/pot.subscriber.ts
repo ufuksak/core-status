@@ -1,14 +1,17 @@
-import {EntitySubscriberInterface, EventSubscriber, UpdateEvent} from 'typeorm';
+import {Connection, EntitySubscriberInterface, EventSubscriber, UpdateEvent} from 'typeorm';
 import {Pot} from '../entity/pot.entity';
 import {PotService} from '../services/pot.service';
 import {Notification} from '../push-notification/notification';
 import {Publisher} from '../push-notification';
-import {AppContainer} from '../commons/app.container';
+import {InjectConnection} from '@nestjs/typeorm';
 
 @EventSubscriber()
 export class PotSubscriber implements EntitySubscriberInterface<Pot> {
 
-    constructor(private potService: PotService) {}
+    constructor(@InjectConnection() readonly connection: Connection,
+                private potService: PotService) {
+        connection.subscribers.push(this);
+    }
     /**
      * Indicates that this subscriber only listen to Pot events.
      */
@@ -21,7 +24,6 @@ export class PotSubscriber implements EntitySubscriberInterface<Pot> {
      */
     async afterUpdate(event: UpdateEvent<Pot>) {
         let notification: Notification;
-        this.potService = AppContainer.getService('PotService');
 
         notification = new Notification(Publisher);
         notification.setTitle('Receive notification from Pot')

@@ -371,7 +371,7 @@ describe('StatusModule (e2e)', () => {
     })
 
     it('should return error if stream owner_id not equal to sub', async () => {
-      const {streamId} = await prepareAndTestStatusDelete();
+      const {streamId} = await prepareAndTestStatusOperations();
       const token = getAccessToken(
         [
           Scopes.keys_manage,
