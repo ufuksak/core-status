@@ -31,6 +31,10 @@ export class DeleteStatusDateRangeDto implements DeleteStatusDateRangeOptions {
     to: string;
 }
 
+export interface SingleSelectOptions {
+    stream_id: string;
+}
+
 export interface SingleUpdateDeleteOptions {
     id: string;
     stream_id: string;

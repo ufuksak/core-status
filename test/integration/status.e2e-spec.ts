@@ -129,7 +129,7 @@ describe('StatusModule (e2e)', () => {
     );
   });
 
-  const prepareAndTestStatusDelete = async (length?: number, customToken?: string) => {
+  const prepareAndTestStatusOperations = async (length?: number, customToken?: string) => {
     const tokenToOperate = token || customToken;
     await createStreamTypeAndExpect(tokenToOperate);
     await createStreamAndExpect(tokenToOperate);
@@ -255,19 +255,19 @@ describe('StatusModule (e2e)', () => {
 
   describe('POST /api/v1/status/streams', () => {
     it('should create stream', async () => {
-      await prepareAndTestStatusDelete();
+      await prepareAndTestStatusOperations();
     });
   });
 
   describe('POST /api/v1/status/grants', () => {
     it('should return the grantId', async () => {
-      const {streamId} = await prepareAndTestStatusDelete();
+      const {streamId} = await prepareAndTestStatusOperations();
       const {id} = await prepareGrantAndExpect(streamId, GrantType.range);
       expect(id).toHaveLength(uuidLength);
     });
 
     it('should return id for range grant with valid token scope', async () => {
-      const {streamId} = await prepareAndTestStatusDelete();
+      const {streamId} = await prepareAndTestStatusOperations();
       const tokenValidForRangeScope = getAccessToken(
         [Scopes.status_grants_manage, Scopes.status_grants_create_historical].join(' ')
       );
@@ -276,13 +276,13 @@ describe('StatusModule (e2e)', () => {
     });
 
     it('should return 403 for range grant with invalid token scope', async () => {
-      const {streamId} = await prepareAndTestStatusDelete();
+      const {streamId} = await prepareAndTestStatusOperations();
       const tokenInvalidForRangeScope = getAccessToken(Scopes.status_grants_manage);
       await prepareGrantAndExpect(streamId, GrantType.range, tokenInvalidForRangeScope, 403);
     });
 
     it('should return id for all grant with valid token scope', async () => {
-      const {streamId} = await prepareAndTestStatusDelete();
+      const {streamId} = await prepareAndTestStatusOperations();
       const tokenValidForRangeScope = getAccessToken([
         Scopes.status_grants_manage,
         Scopes.status_grants_create_live,
@@ -293,7 +293,7 @@ describe('StatusModule (e2e)', () => {
     });
 
     it('should return 403 for all grant with invalid token scope', async () => {
-      const {streamId} = await prepareAndTestStatusDelete();
+      const {streamId} = await prepareAndTestStatusOperations();
       const tokenInvalidForRangeScope = getAccessToken([
         Scopes.status_grants_manage,
         Scopes.status_grants_create_live
@@ -302,7 +302,7 @@ describe('StatusModule (e2e)', () => {
     });
 
     it('should return id for latest grant with valid token scope', async () => {
-      const {streamId} = await prepareAndTestStatusDelete();
+      const {streamId} = await prepareAndTestStatusOperations();
       const tokenValidForRangeScope = getAccessToken(
         [Scopes.status_grants_manage, Scopes.status_grants_create_live].join(' ')
       );
@@ -311,13 +311,13 @@ describe('StatusModule (e2e)', () => {
     });
 
     it('should return 403 for latest grant with invalid token scope', async () => {
-      const {streamId} = await prepareAndTestStatusDelete();
+      const {streamId} = await prepareAndTestStatusOperations();
       const tokenInvalidForRangeScope = getAccessToken(Scopes.status_grants_manage);
       await prepareGrantAndExpect(streamId, GrantType.latest, tokenInvalidForRangeScope, 403);
     });
 
-    it('should not create second latest grant for same recipient and stream', async () => {
-      const {streamId} = await prepareAndTestStatusDelete();
+    it('should not creare second latest grant for same recipient and stream', async () => {
+      const {streamId} = await prepareAndTestStatusOperations();
       const latestType = GrantType.latest;
       const {id, recipient_id} = await prepareGrantAndExpect(streamId, latestType);
       expect(id).toHaveLength(uuidLength);
@@ -467,7 +467,7 @@ describe('StatusModule (e2e)', () => {
 
     it('should modify grant range', async () => {
       // Prepare
-      const {streamId} = await prepareAndTestStatusDelete();
+      const {streamId} = await prepareAndTestStatusOperations();
       const {id: rangedGrantId} = await prepareGrantAndExpect(streamId, GrantType.range);
       const {id: liveGrantId} = await prepareGrantAndExpect(streamId, GrantType.latest);
       expect(rangedGrantId).toHaveLength(uuidLength);
@@ -507,7 +507,7 @@ describe('StatusModule (e2e)', () => {
 
   describe('DELETE /api/v1/status/grants', () => {
     it('should delete each type of grant and get 404 if grant not exists', async () => {
-      const {streamId} = await prepareAndTestStatusDelete();
+      const {streamId} = await prepareAndTestStatusOperations();
       const idsToDelete = [];
       await Promise.all(Object.values(GrantType).map(async el => {
         const {id} = await prepareGrantAndExpect(streamId, el);
@@ -538,7 +538,7 @@ describe('StatusModule (e2e)', () => {
     });
 
     it('should reject invalid scoped token', async () => {
-      const {streamId} = await prepareAndTestStatusDelete();
+      const {streamId} = await prepareAndTestStatusOperations();
       const invalidToken = getAccessToken();
       const idsToDelete = [];
       await Promise.all(Object.values(GrantType).map(async el => {
@@ -590,7 +590,7 @@ describe('StatusModule (e2e)', () => {
 
   const prepareStatusUpdatesWithGrantType = async (updatesLength: number, token: string, type: GrantType) => {
     // Prepare
-    const {streamId, validStatusUpdates} = await prepareAndTestStatusDelete(updatesLength);
+    const {streamId, validStatusUpdates} = await prepareAndTestStatusOperations(updatesLength);
 
     const {id} = await prepareGrantAndExpect(streamId, type, token);
     expect(id).toHaveLength(uuidLength);
@@ -674,7 +674,7 @@ describe('StatusModule (e2e)', () => {
     it('single deleted', async () => {
       // Prepare
       const {randomUUID, streamId} =
-        await prepareAndTestStatusDelete();
+        await prepareAndTestStatusOperations();
 
       const getAllResponseLoaded = await getAllStatuses();
       const matched = getAllResponseLoaded.body?.data?.map(el => ({id: el.id, ...el.attributes}));
@@ -732,7 +732,7 @@ describe('StatusModule (e2e)', () => {
     it('mutliple deleted non-existing skipped', async () => {
       // Prepare
       const {randomUUID, validStatusUpdates, streamId: stream_id} =
-        await prepareAndTestStatusDelete();
+        await prepareAndTestStatusOperations();
       const ids = validStatusUpdates.status_updates.map(el => el.id);
       ids.push(randomUUID);
 
@@ -800,7 +800,7 @@ describe('StatusModule (e2e)', () => {
     it('multiple deleted by range', async () => {
       // Prepare
       const {validStatusUpdates, streamId: stream_id} =
-        await prepareAndTestStatusDelete();
+        await prepareAndTestStatusOperations();
 
       const [first, second] = validStatusUpdates.status_updates;
       const from = new Date(first.recorded_at).toISOString();
@@ -870,38 +870,76 @@ describe('StatusModule (e2e)', () => {
         }))
     });
 
-    it('e2e stream create and upload update', async () => {
+    async function createStream() {
       const masterKeys = cryptosdk.PRE.generateKeyPair();
 
       const e2eStreamType = Object.assign({}, validStreamTypeCreateDto);
       await agent.post('/api/v1/status/streams/types')
-        .auth(token, authType)
-        .send(e2eStreamType)
-        .expect(201);
+          .auth(token, authType)
+          .send(e2eStreamType)
+          .expect(201);
 
       const e2eStream = Object.assign({}, validStreamCreateDto);
 
       const v = cryptosdk.PRE.encrypt(
-        masterKeys.public_key, masterKeys.private_key
+          masterKeys.public_key, masterKeys.private_key
       );
       e2eStream.encrypted_private_key = v.cipher;
 
       e2eStream.public_key = masterKeys.public_key;
 
       const respStream = await agent.post('/api/v1/status/streams')
-        .auth(token, authType)
-        .send(e2eStream)
-        .expect(201);
+          .auth(token, authType)
+          .send(e2eStream)
+          .expect(201);
+      return {masterKeys, respStream};
+    }
 
+    async function uploadUpdate(respStream: any, masterKeys: any) {
       const createdStreamId = respStream?.body?.data?.id;
       const payload = 'some payload';
       const validUpdate = Object.assign({}, statusUpdateTemplate);
       validUpdate.status_updates[0].stream_id = createdStreamId;
       validUpdate.status_updates[0].payload = cryptosdk.PRE.encrypt(masterKeys.public_key, payload).cipher;
       await agent.post('/api/v1/status')
-        .auth(token, authType)
-        .send(validUpdate)
-        .expect(201);
+          .auth(token, authType)
+          .send(validUpdate)
+          .expect(201);
+      return validUpdate;
+    }
+
+    it('e2e stream create and upload update', async () => {
+      const {masterKeys, respStream} = await createStream();
+
+      await uploadUpdate(respStream, masterKeys);
+    });
+
+    it('e2e stream create and get stream by range', async () => {
+      // Prepare
+      const {masterKeys, respStream} = await createStream();
+      const validUpdate = await uploadUpdate(respStream, masterKeys);
+
+      const from = new Date(validUpdate.status_updates[0].recorded_at).toISOString();
+      const to = new Date(validUpdate.status_updates[0].recorded_at).toISOString();
+      const fromTs = new Date(from).valueOf();
+      const toTs = new Date(to).valueOf();
+
+      const getByRange = async () => agent
+          .get('/api/v1/status/data/' + validUpdate.status_updates[0].stream_id)
+          .query({from: fromTs, to: toTs})
+          .auth(token, authType)
+          .expect(200);
+
+      // Act
+      const getByRangeResponseAfterCleaned = await getByRange();
+
+      // Check
+      const matched = getByRangeResponseAfterCleaned.body?.data?.map(el => ({id: el.id, ...el.attributes}));
+      const matchMarker = new UpdateMarker();
+      expect(matched.length).toEqual(1);
+      expect(matched[0].id).toEqual(validUpdate.status_updates[0].id);
+      expect(matched[0].payload).toEqual(validUpdate.status_updates[0].payload);
+      expect(matched[0].marker).toMatchObject(matchMarker);
     });
 
     it('e2e grant create', async () => {

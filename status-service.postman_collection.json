@@ -230,6 +230,36 @@
 					"response": []
 				},
 				{
+					"name": "getStreamByDateRange",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{STATUSDB}}/api/v1/status/streams",
+							"host": [
+								"{{STATUSDB}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"status",
+								"streams"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "getUserStatuses",
 					"request": {
 						"auth": {

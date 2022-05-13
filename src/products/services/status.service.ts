@@ -36,8 +36,22 @@ export class StatusService {
       }
     };
 
+    return this.filterStatusRange(options, where);
+  }
+
+  async getUserStatusByStreamId(id: string, options: GetUserStatusesParams): Promise<UpdateEntity[]> {
+    const where = {
+      stream: {
+        id
+      }
+    };
+
+    return this.filterStatusRange(options, where);
+  }
+
+  private filterStatusRange(options: GetUserStatusesParams, where: any) {
     const {from, to} = options;
-    if(from && to) {
+    if (from && to) {
       const pgFrom = new Date(from).toISOString()
       const pgTo = new Date(to).toISOString()
       where['recorded_at'] = Between(pgFrom, pgTo);

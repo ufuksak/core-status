@@ -15,11 +15,12 @@ import {
     DeleteStatusDateRangeDto,
     MassUpdateDeleteDto,
     SingleUpdateDeleteDto,
-    UUUIDParam
+    UUUIDParam, SingleSelectOptions
 } from "../dto/s3file.model";
 import {GrantService} from "../services/grant.service";
 import {GrantDto, ModifyGrantRangeDto} from "../dto/grant.model";
 import {GrantEntity} from "../entity/grant.entity";
+import {UpdateEntity} from "../entity/update.entity";
 
 @Controller('/api/v1/status')
 export class StatusController {
@@ -85,6 +86,15 @@ export class StatusController {
     @TokenProtected()
     async getStreams(@ScopedTokenDataParam(STATUS_MANAGE_SCOPE) tokenData: TokenData): Promise<StreamEntity[]> {
         return this.streamService.getAll();
+    }
+
+    @Get('/data/:stream_id')
+    @TokenProtected()
+    async getStreamByDateRange(
+        @ScopedTokenDataParam(STATUS_MANAGE_SCOPE) tokenData: TokenData,
+        @Query() params: GetUserStatusesParams,
+        @Param() param: SingleSelectOptions): Promise<UpdateEntity[]> {
+        return this.statusService.getUserStatusByStreamId(param.stream_id, params);
     }
 
     @TokenProtected()
