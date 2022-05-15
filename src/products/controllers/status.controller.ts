@@ -3,7 +3,13 @@ import {AddStatusInterface, GetUserStatusesParams, StatusUpdateDto} from "../dto
 import {TokenData, TokenProtected} from "@globalid/nest-auth";
 import {StatusService} from "../services/status.service";
 import {ScopedTokenDataParam} from "../commons/scope.decorator";
-import {GRANTS_DELETE_SCOPE, GRANTS_MANAGE_RANGE_SCOPE, GRANTS_MANAGE_SCOPE, STATUS_MANAGE_SCOPE} from "../util/util";
+import {
+    GRANTS_DELETE_SCOPE,
+    GRANTS_MANAGE_RANGE_SCOPE,
+    GRANTS_MANAGE_SCOPE,
+    PUBLIC_SCOPE,
+    STATUS_MANAGE_SCOPE
+} from "../util/util";
 import {StreamEntity} from "../entity/stream.entity";
 import {Body, Controller, Delete, Get, Param, ParseUUIDPipe, Post, Put, Query, Request} from "@nestjs/common";
 import {StreamTypeDto} from "../dto/stream_type.model";
@@ -20,7 +26,9 @@ import {
 import {GrantService} from "../services/grant.service";
 import {GrantDto, ModifyGrantRangeDto} from "../dto/grant.model";
 import {GrantEntity} from "../entity/grant.entity";
+import { queryParams } from "../repositories/query.options";
 import {UpdateEntity} from "../entity/update.entity";
+
 
 @Controller('/api/v1/status')
 export class StatusController {
@@ -99,8 +107,41 @@ export class StatusController {
 
     @TokenProtected()
     @Post('/grants')
-    createGrant(@ScopedTokenDataParam(GRANTS_MANAGE_SCOPE) tokenData: TokenData, @Body() grant: GrantDto) {
+    @TokenProtected()
+    async createGrant(@ScopedTokenDataParam(GRANTS_MANAGE_SCOPE) tokenData: TokenData, @Body() grant: GrantDto) {
         return this.grantService.save(tokenData.uuid, grant, tokenData.scopes);
+    }
+
+    @Get('/grants/my')
+    @TokenProtected()
+    getMyGrants(@ScopedTokenDataParam(PUBLIC_SCOPE) tokenData: TokenData, @Query() query) {
+      const options = queryParams({
+        ...query,
+        filter: {
+          ...query.filter,
+          owner_id: {
+            is: tokenData.sub
+          }
+        }
+      });
+
+      return this.grantService.getMy(tokenData, options);
+    }
+
+    @Get('/grants/forme')
+    @TokenProtected()
+    getGrantsForMe(@ScopedTokenDataParam(PUBLIC_SCOPE) tokenData: TokenData, @Query() query) {
+      const options = queryParams({
+        ...query,
+        filter: {
+          ...query.filter,
+          recipient_id: {
+            is: tokenData.sub
+          }
+        }
+      });
+
+      return this.grantService.getForMe(tokenData, options);
     }
 
     @TokenProtected()

@@ -1,9 +1,11 @@
 import {BadRequestException, Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
+import {GrantEntity} from "../entity/grant.entity";
 import {GrantDto, GrantType, ModifyGrantRangeDto} from "../dto/grant.model";
 import {GrantRepository} from "../repositories/grant.repository";
+import {QueryOptions} from "../repositories/query.options";
+import {BaseService} from "./base.service";
 import {StreamService} from "./stream.service";
-import {GrantEntity} from "../entity/grant.entity";
 import {Scopes} from "../util/util";
 import {
   GrantInvalidTokenScopeException,
@@ -11,96 +13,114 @@ import {
   GrantOperationNotAllowed,
   SingletonGrantExists
 } from "../exception/response.exception";
+import {TokenData} from "@globalid/nest-auth";
 
 @Injectable()
-export class GrantService {
+export class GrantService extends BaseService {
 
-    constructor(
-      @InjectRepository(GrantRepository) private readonly grantRepo: GrantRepository,
-      private streamService: StreamService,
-    ) {}
+  constructor(
+    @InjectRepository(GrantRepository) public readonly repository: GrantRepository,
+    private streamService: StreamService,
+  ) {
+    super();
+  }
 
-    async get(id: string, owner_id: string) {
-      const grant = await this.grantRepo.findOne(id, {where: {owner_id}});
+  async get(id: string, owner_id: string) {
+    const grant = await this.repository.findOne(id, {where: {owner_id}});
 
-      if(!grant) {
-        throw new GrantNotFoundException();
+    if (!grant) {
+      throw new GrantNotFoundException();
+    }
+
+    return grant;
+  }
+
+  private async avoidExistingSingletonGrant(stream_id, owner_id, recipient_id, scopes: string[]) {
+    const maybeExists = await this.repository.find({
+      where: {
+        stream_id,
+        owner_id,
+        recipient_id,
+        type: GrantType.latest
+      }
+    });
+
+    if (maybeExists.length) {
+      throw new SingletonGrantExists();
+    }
+  }
+
+  async save(uuid: string, grantData: GrantDto, scopes: string[]) {
+    const {stream_id, type} = grantData;
+
+    const isHistorical = (type === GrantType.all || type === GrantType.range);
+    if (isHistorical && !scopes.includes(Scopes.status_grants_create_historical)) {
+      throw new GrantInvalidTokenScopeException();
+    }
+
+    const singletonGrantTypes = [GrantType.all, GrantType.latest]
+    if (singletonGrantTypes.includes(type)) {
+      if (!scopes.includes(Scopes.status_grants_create_live)) {
+        throw new GrantInvalidTokenScopeException();
+      }
+      await this.avoidExistingSingletonGrant(stream_id, uuid, grantData.recipient_id, scopes);
+    }
+
+    const stream = await this.streamService.getById(stream_id, {
+      relations: ["streamType"],
+    });
+
+    if (!stream || uuid !== stream.owner_id || !stream.streamType.supported_grants.includes(type)) {
+      throw new BadRequestException();
+    }
+
+    grantData.owner_id = stream.owner_id;
+
+    return this.repository.saveGrant(grantData);
+  }
+
+  async getMy(tokenData: TokenData, options: QueryOptions) {
+    const grants = await this.find(options) as GrantEntity[];
+
+    return grants.map(grant => {
+      if (!tokenData.scopes.includes(Scopes.status_grants_manage)) {
+        delete grant.properties;
       }
 
       return grant;
+    });
+  }
+
+  getForMe(tokenData: TokenData, options: QueryOptions) {
+    return this.find(options);
+  }
+
+  async delete(id: string, owner_id: string): Promise<any> {
+    const {raw} = await this.repository
+      .createQueryBuilder()
+      .delete()
+      .where('id = :id AND owner_id = :owner_id', {id, owner_id})
+      .returning('*')
+      .execute()
+
+    if (raw.length === 0) {
+      throw new GrantNotFoundException();
+    }
+    return raw[0];
+  }
+
+  async modifyRange(id: string, owner_id: string, range: ModifyGrantRangeDto): Promise<GrantEntity> {
+    const grant = await this.get(id, owner_id);
+
+    if (grant.type !== GrantType.range) {
+      throw new GrantOperationNotAllowed();
     }
 
-    private async avoidExistingSignletonGrant(stream_id, owner_id, recipient_id, scopes: string[]) {
-      const maybeExists = await this.grantRepo.find({
-        where: {
-          stream_id,
-          owner_id,
-          recipient_id,
-          type: GrantType.latest
-        }
-      });
+    grant.fromDate = range.fromDate;
+    grant.toDate = range.toDate;
 
-      if(maybeExists.length) {
-        throw new SingletonGrantExists();
-      }
-    }
+    await this.repository.save(grant);
 
-    async save(uuid: string, grantData: GrantDto, scopes: string[]){
-      const { stream_id, type } = grantData;
-
-      if(type === GrantType.all || type === GrantType.range) {
-        if(!scopes.includes(Scopes.status_grants_create_historical)) {
-          throw new GrantInvalidTokenScopeException();
-        }
-      }
-      const singletonGrantTypes = [GrantType.all, GrantType.latest]
-      if(singletonGrantTypes.includes(type)) {
-        if(!scopes.includes(Scopes.status_grants_create_live)) {
-          throw new GrantInvalidTokenScopeException();
-        }
-        await this.avoidExistingSignletonGrant(stream_id, uuid, grantData.recipient_id, scopes);
-      }
-
-      const stream = await this.streamService.getById(stream_id, {
-        relations: ["streamType"],
-      });
-
-      if(!stream || uuid !== stream.owner_id || !stream.streamType.supported_grants.includes(type)){
-        throw new BadRequestException();
-      }
-
-      grantData.owner_id = stream.owner_id;
-
-      return this.grantRepo.saveGrant(grantData);
-    }
-
-    async delete(id: string, owner_id: string) : Promise<any> {
-      const {raw} = await this.grantRepo
-        .createQueryBuilder()
-        .delete()
-        .where('id = :id AND owner_id = :owner_id', {id, owner_id})
-        .returning('*')
-        .execute()
-
-      if(raw.length === 0) {
-        throw new GrantNotFoundException();
-      }
-      return raw[0];
-    }
-
-    async modifyRange(id: string, owner_id: string, range: ModifyGrantRangeDto): Promise<GrantEntity> {
-      const grant = await this.get(id, owner_id);
-
-      if(grant.type !== GrantType.range) {
-        throw new GrantOperationNotAllowed();
-      }
-
-      grant.fromDate = range.fromDate;
-      grant.toDate = range.toDate;
-
-      await this.grantRepo.save(grant);
-
-      return grant;
-    }
-
+    return grant;
+  }
 }

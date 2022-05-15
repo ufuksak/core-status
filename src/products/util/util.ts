@@ -14,6 +14,7 @@ export const PG_UNIQUE_CONSTRAINT_VIOLATION = '23505';
 export const PG_FOREIGN_KEY_VIOLATION = '23503';
 
 export enum Scopes {
+    public = 'public',
     status_manage = 'status.manage',
     keys_manage = 'keys.manage',
     status_grants_delete = 'status.grants.delete',
@@ -25,6 +26,7 @@ export enum Scopes {
 export const STATUS_MANAGE_SCOPE = [Scopes.status_manage, Scopes.keys_manage];
 export const GRANTS_DELETE_SCOPE = [Scopes.status_grants_delete];
 export const GRANTS_MANAGE_SCOPE = [Scopes.status_grants_manage];
+export const PUBLIC_SCOPE = [Scopes.public];
 export const GRANTS_MANAGE_RANGE_SCOPE = [Scopes.status_grants_manage, Scopes.status_grants_create_historical];
 
 export const PERSONAL_CHANNEL_PARTICIPANTS: number = 1

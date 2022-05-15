@@ -17,7 +17,7 @@ export class StreamRepository extends Repository<StreamEntity> {
   }
 
   getStreamById(id: string, options?: FindOneOptions<StreamEntity>): Promise<StreamEntity> {
-    return this.findOneOrFail(id, options);
+    return this.findOne(id, options);
   }
 
   deleteStream(id: string) {
