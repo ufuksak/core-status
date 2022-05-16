@@ -1186,6 +1186,134 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "grant",
+			"item": [
+				{
+					"name": "addGrant",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"type\" : \"all\",\n    \"properties\": {\n        \"reEncryptionKey\" : \"test\",\n        \"e2eKey\" : \"e2eKey\"\n    },\n    \"recipient_id\":\"4f05c340-20db-4fef-9d95-b204044a8ff6\",\n    \"owner_id\" : \"4f05c340-20db-4fef-9d95-b204044a8ff6\",\n    \"fromDate\" : \"2022-01-21T09:35:31.820Z\",\n    \"toDate\" : \"2022-07-21T09:35:31.820Z\",\n    \"created_at\" : \"2022-01-21T09:35:31.820Z\",\n    \"updated_at\" : \"2022-07-21T09:35:31.820Z\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{STATUSDB}}/api/v1/status/data",
+							"host": [
+								"{{STATUSDB}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"status",
+								"data"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getGrant",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{STATUSDB}}/api/v1/status/data/6c9be5cf-08f1-489f-ba26-a022bd19c447?query={\"filter\": \"1\", \"where\" : \"type = 'grantentitys'\"}",
+							"host": [
+								"{{STATUSDB}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"status",
+								"data",
+								"6c9be5cf-08f1-489f-ba26-a022bd19c447"
+							],
+							"query": [
+								{
+									"key": "fromDate",
+									"value": "2022-01-21T09:35:31.820Z"
+								},
+								{
+									"key": "toDate",
+									"value": "2022-08-21T09:35:31.820Z"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateGrant",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"type\" : \"all\",\n    \"properties\": {\n        \"reEncryptionKey\" : \"test12345\",\n        \"e2eKey\" : \"e2eKey\"\n    },\n    \"recipient_id\":\"4f05c340-20db-4fef-9d95-b204044a8ff6\",\n    \"owner_id\" : \"4f05c340-20db-4fef-9d95-b204044a8ff6\",\n    \"fromDate\" : \"2022-01-21T09:35:31.820Z\",\n    \"toDate\" : \"2022-07-21T09:35:31.820Z\",\n    \"created_at\" : \"2022-01-21T09:35:31.820Z\",\n    \"updated_at\" : \"2022-07-21T09:35:31.820Z\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{STATUSDB}}/api/v1/status/data/6894df01-8027-478d-83c6-365496a0741d",
+							"host": [
+								"{{STATUSDB}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"status",
+								"data",
+								"6894df01-8027-478d-83c6-365496a0741d"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteGrant",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{STATUSDB}}/api/v1/status/data/6d341a3c-1372-4725-8e01-9fe1933a9b8e",
+							"host": [
+								"{{STATUSDB}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"status",
+								"data",
+								"6d341a3c-1372-4725-8e01-9fe1933a9b8e"
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"event": [
