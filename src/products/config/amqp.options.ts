@@ -1,7 +1,7 @@
-import {RABBIT_URI} from "./config";
+import { RABBIT_CONNECTION_URL } from "./rabbit";
 
 export const amqpOptions = {
-  urlOrOpts: RABBIT_URI,
+  urlOrOpts: RABBIT_CONNECTION_URL,
   defaultValidationOptions: {
     classTransform: {enableImplicitConversion: true},
     validate: true,

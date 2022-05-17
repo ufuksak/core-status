@@ -1,4 +1,4 @@
-﻿import {Module} from '@nestjs/common'
+import {Module} from '@nestjs/common'
 import {TypeOrmModule} from '@nestjs/typeorm';
 import {StatusController} from "../controllers/status.controller";
 import {GrantRepository} from '../repositories/grant.repository';

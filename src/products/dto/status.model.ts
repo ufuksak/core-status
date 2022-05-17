@@ -1,4 +1,3 @@
-import {Message} from "@globalid/nest-amqp";
 import {Transform, Type} from "class-transformer";
 import {
   IsArray,
@@ -12,7 +11,6 @@ import {
   Matches,
   ValidateNested
 } from "class-validator";
-import {STATUS_UPDATE_EXCHANGE} from "../config/rabbit";
 
 export interface GetUserStatusesInterface {
   from: number;
