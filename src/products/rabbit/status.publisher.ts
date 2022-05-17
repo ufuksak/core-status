@@ -10,6 +10,7 @@ export class StatusPublisher {
 
     constructor(private amqpService: AmqpService) {
         this.sender = this.amqpService.getPublisher(UpdateWorkerDto)
+        this.grantSender = this.amqpService.getPublisher(GrantWorkerDto)
     }
 
     public async publishStatusUpdate(payload: UpdateWorkerDto): Promise<void> {
