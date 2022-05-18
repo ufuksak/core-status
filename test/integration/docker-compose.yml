@@ -52,9 +52,10 @@ services:
       service: keystore
     depends_on:
       - mysql
+      - localstack
 
   pgadmin:
-    container_name: pgadmin_container
+    container_name: pgadmin-int
     image: dpage/pgadmin4
     environment:
       PGADMIN_DEFAULT_EMAIL: root@root.com

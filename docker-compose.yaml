@@ -106,17 +106,16 @@ services:
 
   mysql:
     container_name: mysql
-    image: mysql:5.7
+    image: mysql:5.7.22
+    command: --sql_mode=NO_ENGINE_SUBSTITUTION
     restart: always
-    environment:
-      - MYSQL_HOST=0.0.0.0
-      - MYSQL_PORT=33306
-      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
-    volumes:
-      - mysql:/var/lib/mysql
     ports:
-      - "33306:3306"
-    entrypoint: sh -c " echo 'SET GLOBAL sql_mode = 'NO_ENGINE_SUBSTITUTION'; CREATE DATABASE IF NOT EXISTS database_production; CREATE DATABASE IF NOT EXISTS database_development; CREATE DATABASE IF NOT EXISTS database_test; CREATE DATABASE IF NOT EXISTS hydra;' > /docker-entrypoint-initdb.d/init.sql; /usr/local/bin/docker-entrypoint.sh --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --sql-mode='NO_ENGINE_SUBSTITUTION' "
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: test
+      MYSQL_DATABASE: test_keystoreservice
+      MYSQL_USER: root
+      MYSQL_PASSWORD: test
 
   messaging-service:
     image: messaging-legacy-core

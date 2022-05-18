@@ -35,6 +35,7 @@ export const CONFIG_VALIDATION_SCHEMA: Joi.ObjectSchema = Joi.object({
   POSTGRES_DB_USERNAME: Joi.string().required(),
   POSTGRES_DB_PASSWORD: Joi.string().required(),
   POSTGRES_DB_DATABASE: Joi.string().required(),
+  CORE_STATUS_PORT: Joi.number().required()
 });
 
 export const configuration = (): Record<string, unknown> => ({

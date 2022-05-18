@@ -7,9 +7,9 @@
     "experimentalDecorators": true,
     "target": "es2020",
     "sourceMap": true,
-    "outDir": "./dist",
-    "baseUrl": "./",
+    "outDir": "./worker/dist",
+    "baseUrl": "./../",
     "incremental": true
   },
-  "exclude": ["node_modules", "dist"]
+  "exclude": ["worker/node_modules", "worker/dist"]
 }

@@ -1,9 +1,10 @@
 import {IsNotEmpty, IsString, IsUUID, MaxLength, MinLength} from "class-validator";
 import {StreamTypeAvailable} from "../validators/stream-type.validator";
+import {MAX_STREAM_TYPE} from "../util/util";
 
 export class CreateStreamRequestBody {
   @StreamTypeAvailable(true)
-  @MaxLength(24)
+  @MaxLength(MAX_STREAM_TYPE)
   stream_type: string;
 
   @IsString()

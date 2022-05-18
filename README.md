@@ -122,3 +122,9 @@ Time:        3.964s
 Ran all test suites.
 Done in 4.80s.
 ```
+
+Worker IT
+
+1. Run all containers from main docker-compose
+2. Run npm i for root and globalid-crypto-library
+3. Run npm run test:worker

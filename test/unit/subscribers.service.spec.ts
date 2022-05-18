@@ -38,7 +38,13 @@ const streamWithoutLive = {
   updated_at: "2022-05-12T14:09:25.280Z",
   grants: [{
     id: "c0e7d770-aabd-4192-98c7-7538b49415a7",
-    type: GrantType.range
+    type: GrantType.range,
+    recipient_id: "c0e7d770-aabd-4192-98c7-7538b49415a8",
+    owner_id: "c0e7d770-aabd-4192-98c7-7538b4941510",
+    properties: {
+      e2eKey: 'e2ekey',
+      reEncryptionKey: 'reEncryptionKey'
+    }
   }]
 } as StreamEntity;
 
@@ -46,7 +52,13 @@ const streamWithAllGrant = {
   ...streamWithoutLive,
   grants: [...streamWithoutLive.grants, {
     id: "c0e7d770-aabd-4192-98c7-7538b49415a7",
-    type: GrantType.all
+    type: GrantType.all,
+    recipient_id: "c0e7d770-aabd-4192-98c7-7538b49415a8",
+    owner_id: "c0e7d770-aabd-4192-98c7-7538b4941510",
+    properties: {
+      e2eKey: 'e2ekey',
+      reEncryptionKey: 'reEncryptionKey'
+    }
   }]
 };
 
@@ -54,7 +66,13 @@ const streamWithLatestGrant = {
   ...streamWithoutLive,
   grants: [...streamWithoutLive.grants, {
     id: "c0e7d770-aabd-4192-98c7-7538b49415a7",
-    type: GrantType.latest
+    type: GrantType.latest,
+    recipient_id: "c0e7d770-aabd-4192-98c7-7538b49415a8",
+    owner_id: "c0e7d770-aabd-4192-98c7-7538b4941510",
+    properties: {
+      e2eKey: 'e2ekey',
+      reEncryptionKey: 'reEncryptionKey'
+    }
   }]
 };
 
@@ -121,8 +139,11 @@ describe('SubscribersService', () => {
     it('pushToWorker should publish if all grant available', async () => {
       // Prepare
       streamRepo.findOne = sinon.spy(() => streamWithAllGrant);
-      publisher.publishStatusUpdate = sinon.spy(() => null);
+      publisher.publishStatusUpdate = sinon.spy(async () => null);
       const grants = streamWithAllGrant.grants.filter(el => el.type === GrantType.all);
+      const {id, recorded_at, payload, stream_id} = update;
+      const {id: grant_id, owner_id: user_id, recipient_id, properties} = grants[0];
+
       // Act
       await service.pushToWorker(update);
 
@@ -130,16 +151,20 @@ describe('SubscribersService', () => {
       expect(streamRepo.findOne.calledOnce).to.be.true;
       expect(publisher.publishStatusUpdate.calledOnce).to.be.false;
       expect(publisher.publishStatusUpdate.args[0][0]).to.deep.equal({
-        update,
-        grants
+        id, recorded_at: recorded_at.toISOString(), payload,
+        grant_id, user_id, recipient_id, stream_id,
+        reEncryptionKey: properties.reEncryptionKey
       });
     });
 
     it('pushToWorker should publish if latest grant available', async () => {
       // Prepare
       streamRepo.findOne = sinon.spy(() => streamWithLatestGrant);
-      publisher.publishStatusUpdate = sinon.spy(() => null);
+      publisher.publishStatusUpdate = sinon.spy(async () => null);
       const grants = streamWithLatestGrant.grants.filter(el => el.type === GrantType.latest);
+      const {id, recorded_at, payload, stream_id} = update;
+      const {id: grant_id, owner_id: user_id, recipient_id, properties} = grants[0];
+
       // Act
       await service.pushToWorker(update);
 
@@ -147,8 +172,9 @@ describe('SubscribersService', () => {
       expect(streamRepo.findOne.calledOnce).to.be.true;
       expect(publisher.publishStatusUpdate.calledOnce).to.be.false;
       expect(publisher.publishStatusUpdate.args[0][0]).to.deep.equal({
-        update,
-        grants
+        id, recorded_at: recorded_at.toISOString(), payload,
+        grant_id, user_id, recipient_id, stream_id,
+        reEncryptionKey: properties.reEncryptionKey
       });
     });
   })

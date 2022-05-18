@@ -1,6 +1,6 @@
 # compiled output
 /dist
-/workers/dist
+/worker/worker/dist
 /node_modules
 /cockroach-data
 

@@ -9,6 +9,7 @@ export enum ChannelType {
     GroupCustom = 'GROUP_CUSTOM',
 }
 
+export const MAX_STREAM_TYPE = 40;
 export const PG_UNIQUE_CONSTRAINT_VIOLATION = '23505';
 
 export const PG_FOREIGN_KEY_VIOLATION = '23503';

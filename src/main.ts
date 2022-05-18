@@ -1,4 +1,5 @@
 import {NestFactory} from '@nestjs/core';
+import {ConfigService} from "@nestjs/config";
 import {AppModule} from './app.module';
 import {JsonApiTransformer} from "./products/commons/transformer/jsonapi.transformer";
 import {JsonApiExceptionTransformer} from "./products/commons/transformer/jsonapi-exception.transformer";
@@ -14,7 +15,8 @@ async function bootstrap() {
     app.useGlobalFilters(new JsonApiExceptionTransformer());
     app.useGlobalInterceptors(new JsonApiTransformer());
     await new S3ConfigProvider().createBucket();
-    await app.listen(3000);
+    const configService = app.get(ConfigService);
+    await app.listen(configService.get('CORE_STATUS_PORT'));
 }
 
 bootstrap();
