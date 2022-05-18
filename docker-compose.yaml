@@ -106,7 +106,7 @@ services:
 
   mysql:
     container_name: mysql
-    image: mysql:5.7.22
+    image: mysql:5.7
     command: --sql_mode=NO_ENGINE_SUBSTITUTION
     restart: always
     ports:
@@ -114,7 +114,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: test
       MYSQL_DATABASE: test_keystoreservice
-      MYSQL_USER: root
+      MYSQL_USER: test
       MYSQL_PASSWORD: test
 
   messaging-service:

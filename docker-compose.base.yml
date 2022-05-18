@@ -2,6 +2,7 @@ version: '3.7'
 
 services:
   keystore:
+    restart: always
     image: keystore
     environment:
       AWS_ACCESS_KEY_ID: invalid
