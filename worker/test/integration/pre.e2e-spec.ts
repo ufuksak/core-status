@@ -6,7 +6,7 @@ import {getAccessToken} from "../../../test/getacctoken";
 import {Scopes} from "../../../src/products/util/util";
 import {StreamTypeDto} from "../../../src/products/dto/stream_type.model";
 import {CreateStreamRequestBody} from "../../../src/products/dto/stream.model";
-import {GrantDto, GrantType} from "../../../src/products/dto/grant.model";
+import {GrantDto, GrantType, ModifyGrantRangeDto} from "../../../src/products/dto/grant.model";
 import {v4 as uuid} from 'uuid';
 import waitForExpect from "wait-for-expect";
 import {CHANNEL_PREFIX} from "../../src/services/pubnub.service";
@@ -17,8 +17,6 @@ import * as cryptosdk from 'globalid-crypto-library';
 
 const dotenv = require('dotenv');
 dotenv.config();
-
-
 
 const recipient_id = "95abffad-9c5b-40da-ada5-a156418b64ef";
 const allScopes = Object.values(Scopes).join(' ');
@@ -57,6 +55,10 @@ const prepareGrant = async (
   dto: GrantDto, options: prepareEntityOptions
 ) => agentPostAndExpect(`/api/v1/status/grants`, dto, options);
 
+const updateGrantRange = async (
+    dto: GrantDto, modifyGrantRangeDto: ModifyGrantRangeDto, options: prepareEntityOptions
+) => agentPutAndExpect(`/api/v1/status/grants/` + dto.id, dto, options);
+
 const prepareStatus = async (
   dto: StatusUpdateDto, options: prepareEntityOptions
 ) => agentPostAndExpect(`/api/v1/status`, dto, options);
@@ -69,6 +71,15 @@ const agentPostAndExpect = async (
   .send(dto)
   .expect('Content-Type', /json/)
   .expect(httpCode || 201);
+
+const agentPutAndExpect = async (
+    suffix: string, dto: any, {agent, accessToken, httpCode}: prepareEntityOptions
+) => agent.put(suffix)
+    .set('Accept', 'application/json')
+    .auth(accessToken, {type: "bearer"})
+    .send(dto)
+    .expect('Content-Type', /json/)
+    .expect(httpCode || 200);
 
 const sleep = (ms) => new Promise(resolve => setTimeout(() => resolve({}), ms));
 
@@ -94,7 +105,7 @@ const createDtos = () => {
     "granularity": "single",
     "stream_handling": "lockbox",
     "approximated": true,
-    "supported_grants": ["all"],
+    "supported_grants": ["range"],
     type
   } as StreamTypeDto;
 
@@ -115,7 +126,9 @@ const createDtos = () => {
 
   const payload = encryptPayload(data, keyPairA.public_key);
 
+  const grantUUID = uuid();
   const grantDto = {
+    id: grantUUID,
     stream_id: '',
     recipient_id: recipient_id,
     "properties": {
@@ -124,8 +137,13 @@ const createDtos = () => {
     },
     "fromDate": "2020-01-01T00:00:00.000Z",
     "toDate": "2020-01-01T00:00:00.000Z",
-    "type": GrantType.all
+    "type": GrantType.range
   } as GrantDto;
+
+  const modifyGrantRangeDto = {
+    "fromDate": "2020-06-01T00:00:00.000Z",
+    "toDate": "2021-01-01T00:00:00.000Z"
+  } as ModifyGrantRangeDto;
 
   const updatesUUID = uuid();
   const statusUpdateDto = {
@@ -143,7 +161,7 @@ const createDtos = () => {
     ]
   } as StatusUpdateDto;
 
-  return {statusUpdateDto, updatesUUID, grantDto, streamDto, streamTypeDto, accessToken, data, keyPairA, keyPairB};
+  return {statusUpdateDto, updatesUUID, grantDto, streamDto, streamTypeDto, accessToken, data, keyPairA, keyPairB, modifyGrantRangeDto};
 }
 
 describe('WorkerController (e2e)', () => {
@@ -170,7 +188,7 @@ describe('WorkerController (e2e)', () => {
     it('should handle PRE when recipient listens', async () => {
       // Prepare
       const {accessToken, streamTypeDto, streamDto, grantDto,
-        statusUpdateDto, updatesUUID, keyPairB, data} = createDtos();
+        statusUpdateDto, updatesUUID, keyPairB, data, modifyGrantRangeDto} = createDtos();
 
       // Act
       const defaultPostArgs = {agent, accessToken};
@@ -183,11 +201,15 @@ describe('WorkerController (e2e)', () => {
 
       const {body: grant} = await prepareGrant(grantDto, defaultPostArgs);
 
+      grantDto.fromDate = "2021-01-01T00:00:00.000Z";
+      grantDto.toDate = "2023-01-01T00:00:00.000Z";
+
       const grantChannel = CHANNEL_PREFIX + grant?.data?.id;
       await pubnub.subscribe({channels: [grantChannel]});
 
       await waitUntilSubscribed(grantChannel);
 
+      await updateGrantRange(grantDto, modifyGrantRangeDto, defaultPostArgs);
       await prepareStatus(statusUpdateDto, defaultPostArgs);
 
       // Check
