@@ -35,7 +35,7 @@ services:
 
   mysql:
     container_name: mysql-int
-    image: mysql:5.7.22
+    image: mysql:5.7
     command: --sql_mode=NO_ENGINE_SUBSTITUTION
     restart: always
     ports:
@@ -43,7 +43,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: test
       MYSQL_DATABASE: test_keystoreservice
-      MYSQL_USER: root
+      MYSQL_USER: test
       MYSQL_PASSWORD: test
 
   keystore:
@@ -53,6 +53,7 @@ services:
     depends_on:
       - mysql
       - localstack
+    restart: always
 
   pgadmin:
     container_name: pgadmin-int

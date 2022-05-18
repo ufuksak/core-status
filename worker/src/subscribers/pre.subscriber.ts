@@ -3,8 +3,8 @@ import {MessageHandler} from '@globalid/nest-amqp'
 import {UpdateWorkerDto} from "../../../src/products/dto/update-worker.dto";
 import {PubnubService} from "../services/pubnub.service";
 import * as cryptosdk from 'globalid-crypto-library/src/index';
-import {LockboxWithContent} from "../../worker/dist/pre";
 
+type LockboxWithContent = cryptosdk.PRE.LockboxWithContent;
 const util = cryptosdk.PRE.util;
 
 @Controller()

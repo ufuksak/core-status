@@ -1,0 +1,11 @@
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": "./../",
+  "modulePaths":["<rootDir>"],
+  "testEnvironment": "node",
+  "testPathIgnorePatterns": [ "<rootDir>/worker", "<rootDir>/dist" ],
+  "testRegex": ".e2e-spec.ts$|.spec.ts$",
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  }
+}

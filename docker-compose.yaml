@@ -51,7 +51,7 @@ services:
       - '8081:80'
     environment:
       PMA_HOST: mysql
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: test
 
   hydra:
     image: ghcr.io/globalid/container-images/hydra:latest
@@ -281,6 +281,7 @@ services:
       - DISABLE_DDTRACE=1
 
   keystore:
+    restart: always
     extends:
       file: ./docker-compose.base.yml
       service: keystore
@@ -289,3 +290,4 @@ services:
       - '9123:9123'
     depends_on:
       - mysql
+      - localstack

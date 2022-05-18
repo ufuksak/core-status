@@ -7,17 +7,20 @@ import {Scopes} from "../../../src/products/util/util";
 import {StreamTypeDto} from "../../../src/products/dto/stream_type.model";
 import {CreateStreamRequestBody} from "../../../src/products/dto/stream.model";
 import {GrantDto, GrantType} from "../../../src/products/dto/grant.model";
-import * as cryptosdk from "../../../globalid-crypto-library/src";
 import {v4 as uuid} from 'uuid';
-import {LockboxWithContent} from "../../worker/dist/pre";
 import waitForExpect from "wait-for-expect";
 import {CHANNEL_PREFIX} from "../../src/services/pubnub.service";
-import PubNub = require("pubnub");
 import {StatusUpdateDto} from "../../../src/products/dto/status.model";
+import PubNub = require("pubnub");
+import * as cryptosdk from 'globalid-crypto-library/src/index';
+
+type LockboxWithContent = cryptosdk.PRE.LockboxWithContent;
+const util = cryptosdk.PRE.util;
 
 const dotenv = require('dotenv');
 dotenv.config();
-const util = cryptosdk.PRE.util;
+
+
 
 const recipient_id = "95abffad-9c5b-40da-ada5-a156418b64ef";
 const allScopes = Object.values(Scopes).join(' ');
@@ -69,9 +72,11 @@ const agentPostAndExpect = async (
   .expect('Content-Type', /json/)
   .expect(httpCode || 201);
 
+const sleep = (ms) => new Promise(resolve => setTimeout(() => resolve({}), ms));
+
 const waitUntilSubscribed = async (grantChannel: string) => {
   while(true) {
-    await new Promise(resolve => setTimeout(() => resolve({}), 500));
+    await sleep(1000);
     const response: PubNub.HereNowResponse = await pubnub.hereNow({
       channels : [grantChannel],
       includeUUIDs: true,
@@ -237,7 +242,8 @@ describe('WorkerController (e2e)', () => {
   });
 
   afterAll(async () => {
-    await app.close();
     await pubnub.unsubscribeAll();
+    await app.close();
+    await sleep(1000);
   });
 });

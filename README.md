@@ -123,8 +123,25 @@ Ran all test suites.
 Done in 4.80s.
 ```
 
-Worker IT
+### Run Worker IT
 
 1. Run all containers from main docker-compose
-2. Run npm i for root and globalid-crypto-library
-3. Run npm run test:worker
+```
+docker-compose up
+```
+2. install the node modules on the root directory.
+```
+npm i
+```
+3. install node modules on globalid-crypto-library
+```
+cd globalid-crypto-library && npm i && cd ../
+```
+4. Run the core-status app
+```
+npm run start
+```
+5. Run the worker tests
+```
+npm run test:worker   
+```
