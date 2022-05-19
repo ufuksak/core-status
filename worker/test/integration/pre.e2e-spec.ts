@@ -12,7 +12,7 @@ import waitForExpect from "wait-for-expect";
 import {CHANNEL_PREFIX} from "../../src/services/pubnub.service";
 import {StatusUpdateDto} from "../../../src/products/dto/status.model";
 import PubNub = require("pubnub");
-import * as cryptosdk from 'globalid-crypto-library/src/index';
+import * as cryptosdk from 'globalid-crypto-library';
 
 type LockboxWithContent = cryptosdk.PRE.LockboxWithContent;
 const util = cryptosdk.PRE.util;

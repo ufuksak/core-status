@@ -2,7 +2,7 @@ import {Controller, Logger} from '@nestjs/common'
 import {MessageHandler} from '@globalid/nest-amqp'
 import {UpdateWorkerDto} from "../../../src/products/dto/update-worker.dto";
 import {PubnubService} from "../services/pubnub.service";
-import * as cryptosdk from 'globalid-crypto-library/src/index';
+import * as cryptosdk from 'globalid-crypto-library';
 
 type LockboxWithContent = cryptosdk.PRE.LockboxWithContent;
 const util = cryptosdk.PRE.util;

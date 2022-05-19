@@ -9,7 +9,7 @@ import {truncateEntity} from "./helpers";
 import {StreamEntity} from "../../src/products/entity/stream.entity";
 import {StreamTypeEntity} from "../../src/products/entity/stream_type.entity";
 import {UpdateEntity} from "../../src/products/entity/update.entity";
-import * as cryptosdk from 'globalid-crypto-library/src/index';
+import * as cryptosdk from 'globalid-crypto-library';
 import {v4 as uuid} from 'uuid';
 import {validationPipeOptions} from "../../src/products/config/validation-pipe.options";
 import {StatusUpdateDto, UpdateMarker} from "../../src/products/dto/status.model";
