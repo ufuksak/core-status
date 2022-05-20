@@ -13,6 +13,14 @@ export class ResponseException extends HttpException {
   }
 }
 
+export class ChannelDeletionError extends InternalServerErrorException {
+  constructor() {
+    super(
+      "channel could not be deleted from channel group for specified channel parameters"
+    );
+  }
+}
+
 export class GrantNotFoundException extends NotFoundException {
   constructor() {
     super("grant not found");
