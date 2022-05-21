@@ -1,4 +1,5 @@
 import * as Joi from 'joi'
+import {Transport} from "../pubnub/interfaces";
 
 export const RABBIT_URI = 'amqp://guest:guest@localhost:5672/'
 export const EXCHANGE_PRODUCER = 'producer_exchange'
@@ -17,7 +18,6 @@ export interface TestEvent {
     }
 }
 
-
 export const CONFIG_VALIDATION_SCHEMA: Joi.ObjectSchema = Joi.object({
   RABBITMQ_USER: Joi.string().required(),
   RABBITMQ_PASSWORD: Joi.string().required(),
@@ -35,9 +35,20 @@ export const CONFIG_VALIDATION_SCHEMA: Joi.ObjectSchema = Joi.object({
   POSTGRES_DB_USERNAME: Joi.string().required(),
   POSTGRES_DB_PASSWORD: Joi.string().required(),
   POSTGRES_DB_DATABASE: Joi.string().required(),
-  CORE_STATUS_PORT: Joi.number().required()
+  CORE_STATUS_PORT: Joi.number().required(),
+  WORKER_SUBSCRIBE_KEY: Joi.string().required(),
+  WORKER_PUBLISH_KEY: Joi.string().required(),
+  WORKER_PUBNUB_LOGGING: Joi.bool().required(),
+  WORKER_UUID: Joi.string().required()
 });
 
 export const configuration = (): Record<string, unknown> => ({
   serviceName: 'status-service'
 });
+
+export const TRANSPORT_CONFIG: Transport.Config = {
+  subscribeKey: <string> process.env.WORKER_SUBSCRIBE_KEY,
+  publishKey: <string> process.env.WORKER_PUBLISH_KEY,
+  logVerbosity: process.env.WORKER_PUBNUB_LOGGING === 'true',
+  uuid: <string> process.env.WORKER_UUID
+}

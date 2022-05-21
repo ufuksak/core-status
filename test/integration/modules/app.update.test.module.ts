@@ -17,6 +17,7 @@ import {UpdateEntity} from "../../../src/products/entity/update.entity";
 import {GrantEntity} from "../../../src/products/entity/grant.entity";
 import { KeystoreModule } from "../../../src/products/modules/keystore.module";
 import {UpdateWorkerDto} from "../../../src/products/dto/update-worker.dto";
+import {GrantRepository} from "../../../src/products/repositories/grant.repository";
 
 export class Handlers {
   collectedMessages: [] = []
@@ -63,6 +64,7 @@ export class Handlers {
         UploadEntity,
         StreamTypeRepository,
         StreamTypeEntity,
+        GrantRepository,
         GrantEntity
       ]
     })

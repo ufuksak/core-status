@@ -17,6 +17,7 @@ import {
 } from "../../src/products/exception/response.exception";
 import {FindOneOptions} from 'typeorm';
 import {Scopes} from "../../src/products/util/util";
+import {SubscribersService} from "../../src/products/services/subscribers.service";
 
 const validScopesToken = {
   sub: uuid(),
@@ -37,10 +38,12 @@ describe('Grant Service', () => {
     let streamService;
     let grantRepository;
     let queryBuilder: any;
+    let subscribersService;
 
     beforeAll(async () => {
       grantRepository = {};
       streamService = {};
+      subscribersService = {};
 
       const module = await Test.createTestingModule({
           controllers: [],
@@ -53,6 +56,10 @@ describe('Grant Service', () => {
             {
               provide: StreamService,
               useValue: streamService
+            },
+            {
+              provide: SubscribersService,
+              useValue: subscribersService
             }
           ],
       }).compile();
@@ -350,6 +357,9 @@ describe('Grant Service', () => {
 
         queryBuilder.execute = sinon.spy(() => ({raw: [grantEntity]}));
         grantRepository.createQueryBuilder = sinon.spy(() => queryBuilder);
+        grantRepository.findOne = sinon.spy((id: string, options: FindOneOptions<GrantEntity>) => grantEntity);
+        grantRepository.save = sinon.spy((entity: GrantEntity) => {});
+        subscribersService.removeFromChannelGroup = sinon.spy(() => {});
 
         // Act
         const response = await grantService.delete(grantEntity.id, grantEntity.owner_id);

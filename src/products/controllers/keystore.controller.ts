@@ -1,7 +1,6 @@
 import {Body, Controller, Post, Request} from "@nestjs/common";
 import {KeystoreService} from "../services/keystore";
 import {KeystoreByMeDto} from "../dto/keystore.byme.model";
-import {KeyPairCreateResponse} from "../response/keystore.byme.response";
 import {Exposed} from "micro-kit-atlas/routing";
 import {KeyPairSearchResponse} from "../response/keystore.search.response";
 import {PostKeyPairSearchBody} from "../dto/keystore.search.model";

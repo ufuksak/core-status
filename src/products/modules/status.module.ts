@@ -15,6 +15,7 @@ import {UploadService} from "../services/upload.service";
 import {UploadPublisher} from "../rabbit/uploads.publisher";
 import {StreamTypeService} from '../services/stream_type.service';
 import {StreamTypeNotExistsRule} from "../validators/stream-type.validator";
+import {GrantSubscriber} from "../subscribers/grant.subscriber";
 import {UpdateSubscriber} from "../subscribers/update.subscriber";
 import {SubscribersService} from "../services/subscribers.service";
 
@@ -39,6 +40,7 @@ import {SubscribersService} from "../services/subscribers.service";
       UploadService,
       UploadPublisher,
       StreamTypeNotExistsRule,
+      GrantSubscriber,
       UpdateSubscriber,
       SubscribersService
     ]

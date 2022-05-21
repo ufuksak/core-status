@@ -1,11 +1,10 @@
 import {
     Entity,
     PrimaryGeneratedColumn,
-    ManyToOne,
     OneToMany, CreateDateColumn, UpdateDateColumn,
 } from "typeorm";
 
-import {Pot} from "./pot.entity";
+import {GrantEntity} from "./grant.entity";
 
 @Entity()
 export class Container {
@@ -25,8 +24,8 @@ export class Container {
     })
     updated_at: string;
 
-    @OneToMany(type => Pot, pot => pot.container, {
+    @OneToMany(type => GrantEntity, grant => grant.stream_id, {
         cascade: true
     })
-    pots: Pot[];
+    grants: GrantEntity[];
 }

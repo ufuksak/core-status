@@ -7,6 +7,8 @@ import {ValidationPipe} from "@nestjs/common";
 import {S3ConfigProvider} from "./products/config/s3.config.provider";
 import {useContainer} from 'class-validator';
 import {validationPipeOptions} from "./products/config/validation-pipe.options";
+import {addListener as transportInit} from './products/pubnub/pubnub'
+import {TRANSPORT_CONFIG} from "./products/config/config";
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
@@ -16,6 +18,7 @@ async function bootstrap() {
     app.useGlobalInterceptors(new JsonApiTransformer());
     await new S3ConfigProvider().createBucket();
     const configService = app.get(ConfigService);
+    transportInit(TRANSPORT_CONFIG);
     await app.listen(configService.get('CORE_STATUS_PORT'));
 }
 

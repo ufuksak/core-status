@@ -17,7 +17,6 @@ import {TimezoneEntity} from "../../../src/products/entity/tz.entity";
 import {UserActionEntity} from "../../../src/products/entity/user_action.entity";
 import {StatusRepository} from "../../../src/products/repositories/status.repository";
 import {Container} from "../../../src/products/entity/container.entity";
-import {Pot} from "../../../src/products/entity/pot.entity";
 import {DeviceModelEntity} from "../../../src/products/entity/device_model.entity";
 import {StreamEntity} from "../../../src/products/entity/stream.entity";
 import {StreamTypeEntity} from "../../../src/products/entity/stream_type.entity";
@@ -46,7 +45,6 @@ import { TokenModule } from '@globalid/nest-auth';
                 StatusRepository,
                 UploadRepository,
                 Container,
-                Pot,
                 StreamEntity,
                 StreamTypeEntity,
                 GrantEntity

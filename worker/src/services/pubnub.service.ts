@@ -55,6 +55,4 @@ export class PubnubService {
       this.logger.error(`error on fetch listeners ${e.message}`);
     }
   }
-
-
 }

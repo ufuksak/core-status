@@ -8,12 +8,14 @@ import {BaseService} from "./base.service";
 import {StreamService} from "./stream.service";
 import {Scopes} from "../util/util";
 import {
+  ChannelGroupRemovalError,
   GrantInvalidTokenScopeException,
   GrantNotFoundException,
   GrantOperationNotAllowed,
   SingletonGrantExists
 } from "../exception/response.exception";
 import {TokenData} from "@globalid/nest-auth";
+import {SubscribersService} from "./subscribers.service";
 
 @Injectable()
 export class GrantService extends BaseService {
@@ -21,6 +23,7 @@ export class GrantService extends BaseService {
   constructor(
     @InjectRepository(GrantRepository) public readonly repository: GrantRepository,
     private streamService: StreamService,
+    private readonly subscribersService: SubscribersService
   ) {
     super();
   }
@@ -96,6 +99,14 @@ export class GrantService extends BaseService {
   }
 
   async delete(id: string, owner_id: string): Promise<any> {
+    const grant = await this.get(id, owner_id);
+
+    try {
+      await this.subscribersService.removeFromChannelGroup(grant);
+    } catch (e) {
+      throw new ChannelGroupRemovalError();
+    }
+
     const {raw} = await this.repository
       .createQueryBuilder()
       .delete()
@@ -106,6 +117,7 @@ export class GrantService extends BaseService {
     if (raw.length === 0) {
       throw new GrantNotFoundException();
     }
+
     return raw[0];
   }
 

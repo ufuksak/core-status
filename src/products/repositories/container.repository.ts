@@ -5,8 +5,8 @@ import {Container} from "../entity/container.entity";
 @EntityRepository(Container)
 export class ContainerRepository extends Repository<ContainerInterface> {
 
-    saveContainer = async (pot: ContainerInterface) => {
-        await this.save(pot);
+    saveContainer = async (grant: ContainerInterface) => {
+        await this.save(grant);
     }
 
     getContainers = async () => {

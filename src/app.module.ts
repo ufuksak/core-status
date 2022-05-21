@@ -4,7 +4,6 @@ import {TypeOrmModule} from "@nestjs/typeorm";
 import {UploadImageModule} from "./products/modules/uploadimage.module";
 import {ChannelModule} from "./products/modules/channel.module";
 import {KeystoreModule} from "./products/modules/keystore.module";
-import {PotModule} from "./products/modules/pot.module";
 import {ContainerModule} from "./products/modules/container.module";
 import {AmqpModule} from "@globalid/nest-amqp";
 import {ConfigModule, ConfigService} from "@nestjs/config";
@@ -29,7 +28,6 @@ import ormOptions from "./products/config/orm.options";
     UploadImageModule,
     ChannelModule,
     KeystoreModule,
-    PotModule,
     ContainerModule
   ],
   controllers: [],

@@ -17,6 +17,8 @@ import {PUBLIC_SCOPE, Scopes} from "../../src/products/util/util";
 import {GrantEntity} from "../../src/products/entity/grant.entity";
 import {GrantDto, GrantType} from "../../src/products/dto/grant.model";
 import supertest = require("supertest");
+import {addListener as transportInit} from "../../src/products/pubnub/pubnub";
+import {Transport} from "../../src/products/pubnub/interfaces";
 
 jest.setTimeout(3 * 60 * 1000);
 
@@ -116,6 +118,13 @@ describe('StatusModule (e2e)', () => {
       imports: [AppUpdateTestModule]
     }).compile();
 
+    const transportConf: Transport.Config = {
+      subscribeKey: 'sub-c-b791aa8d-6d5d-4f39-8de1-d81bc4dfe39e',
+      publishKey: 'pub-c-2c1361ef-be16-4581-89aa-6be9df0c9910',
+      logVerbosity: false,
+      uuid: uuid(),
+    }
+
     app = moduleFixture.createNestApplication();
     useContainer(app.select(AppUpdateTestModule), {fallbackOnErrors: true});
     app.useGlobalPipes(new ValidationPipe(validationPipeOptions));
@@ -123,6 +132,7 @@ describe('StatusModule (e2e)', () => {
     app.useGlobalInterceptors(new JsonApiTransformer());
     server = await app.getHttpServer();
     agent = await supertest.agent(server);
+    transportInit(transportConf);
     await app.init();
   });
 

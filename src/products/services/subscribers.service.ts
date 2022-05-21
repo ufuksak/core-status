@@ -1,10 +1,17 @@
-import {Injectable, Logger} from "@nestjs/common";
+import {Injectable, InternalServerErrorException, Logger} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {UpdateEntity} from "../entity/update.entity";
 import {StatusPublisher} from "../rabbit/status.publisher";
 import {StreamRepository} from "../repositories/stream.repository";
 import {GrantType} from "../dto/grant.model";
-import {StreamHandling} from "../dto/stream_handling.model";
+import {GrantEntity} from "../entity/grant.entity";
+import {CHANNEL_PREFIX} from "../../../worker/src/services/pubnub.service";
+import {
+  addChannelsToPubnubChannelGroup,
+  removeChannelsFromPubnubChannelGroup,
+  subscribeToChannel, unsubscribeFromChannel
+} from "../pubnub/pubnub";
+import {ChannelGroupAdditionError, ChannelGroupRemovalError} from "../exception/response.exception";
 
 @Injectable()
 export class SubscribersService {
@@ -38,6 +45,52 @@ export class SubscribersService {
           payload,
           reEncryptionKey: properties.reEncryptionKey
         }).catch(e => this.logger.error(`error while publish updates to rabbit ${e.message}`));
+      }
+    }
+  }
+
+  async pushGrantToChannelGroup(update: GrantEntity) {
+    if(update) {
+      const {stream_id} = update;
+
+      const stream = await this.streamRepo.findOne(update.stream_id, {relations: ['grants']});
+      if (!stream) {
+        this.logger.error(`received update ${update.id} for unknown stream ${stream_id}`)
+        return
+      }
+
+      try {
+        let grantChannelArray = [];
+        grantChannelArray.push(CHANNEL_PREFIX + update.id);
+        const grantChannelGroup = `${stream.type}_${update.recipient_id}`;
+        await subscribeToChannel(grantChannelArray);
+        await addChannelsToPubnubChannelGroup(grantChannelArray, grantChannelGroup);
+      } catch (e) {
+        this.logger.error(`error while adding to the channel group ${e.message}`);
+        throw new ChannelGroupAdditionError();
+      }
+    }
+  }
+
+  async removeFromChannelGroup(update: GrantEntity) {
+    if(update) {
+      const {stream_id} = update;
+
+      const stream = await this.streamRepo.findOne(update.stream_id, {relations: ['grants']});
+      if (!stream) {
+        this.logger.error(`received update ${update.id} for unknown stream ${stream_id}`)
+        return
+      }
+
+      try {
+        let grantChannelArray = [];
+        grantChannelArray.push(CHANNEL_PREFIX + update.id);
+        const grantChannelGroup = `${stream.type}_${update.recipient_id}`;
+        await unsubscribeFromChannel(grantChannelArray);
+        await removeChannelsFromPubnubChannelGroup(grantChannelArray, grantChannelGroup);
+      } catch (e) {
+        this.logger.error(`error while adding to the channel group ${e.message}`);
+        throw new ChannelGroupRemovalError();
       }
     }
   }

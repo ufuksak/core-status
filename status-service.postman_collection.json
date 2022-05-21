@@ -1,7 +1,7 @@
 {
 	"info": {
-		"_postman_id": "ea0f8dc5-91ea-47a8-8dc3-eb81d4e66328",
-		"name": "status-service",
+		"_postman_id": "5e36db74-7fcc-4c70-9ce2-5bc22c8aa45b",
+		"name": "status-service Copy 4",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -562,22 +562,31 @@
 					"response": []
 				},
 				{
-					"name": "removeGrant",
+					"name": "updateGrantRange",
 					"request": {
 						"auth": {
 							"type": "bearer",
 							"bearer": [
 								{
 									"key": "token",
-									"value": "{{TOKEN}}",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJnbG9iYWxpZCI6ImpvaG5kb2UiLCJzdWIiOiI0NTAwMmY5OC00NjVhLTQxYmEtOWI3OS0wMzg2YjJhNjgyYTUiLCJjbGllbnRfaWQiOiI2YTMyNGExNy1jNWU0LTRkMDgtOGYwNS0wNjY3NWU0ZmUwODIiLCJzY29wZSI6InB1YmxpYyBzdGF0dXMubWFuYWdlIGtleXMubWFuYWdlIHN0YXR1cy5ncmFudHMuZGVsZXRlIHN0YXR1cy5ncmFudHMubWFuYWdlIHN0YXR1cy5ncmFudHMuY3JlYXRlLmhpc3RvcmljYWwgc3RhdHVzLmdyYW50cy5jcmVhdGUubGl2ZSIsImdyb3VwcyI6W10sImV4cCI6MTY1MjgyMTE5OCwiaWF0IjoxNjUyNzM0Nzk4LCJpc3MiOiJodHRwczovL2lzcy51ZXIifQ.rNp7p9quJ0L03ob1SSsCyPhxur1l5gaCEKvqv7phyIw",
 									"type": "string"
 								}
 							]
 						},
-						"method": "DELETE",
+						"method": "PUT",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n          \"fromDate\": \"2021-01-01T00:00:00.000Z\",\n          \"toDate\": \"2022-04-01T00:00:00.000Z\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
-							"raw": "{{STATUSDB}}/api/v1/status/grants/a5cf2871-8354-4f5a-b083-cb156963b5d7",
+							"raw": "{{STATUSDB}}/api/v1/status/grants/d34b740a-c469-4f4b-8c49-8caa1841b432",
 							"host": [
 								"{{STATUSDB}}"
 							],
@@ -586,7 +595,38 @@
 								"v1",
 								"status",
 								"grants",
-								"a5cf2871-8354-4f5a-b083-cb156963b5d7"
+								"d34b740a-c469-4f4b-8c49-8caa1841b432"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "removeGrant",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJnbG9iYWxpZCI6ImpvaG5kb2UiLCJzdWIiOiI0NTAwMmY5OC00NjVhLTQxYmEtOWI3OS0wMzg2YjJhNjgyYTUiLCJjbGllbnRfaWQiOiI2YTMyNGExNy1jNWU0LTRkMDgtOGYwNS0wNjY3NWU0ZmUwODIiLCJzY29wZSI6InB1YmxpYyBzdGF0dXMubWFuYWdlIGtleXMubWFuYWdlIHN0YXR1cy5ncmFudHMuZGVsZXRlIHN0YXR1cy5ncmFudHMubWFuYWdlIHN0YXR1cy5ncmFudHMuY3JlYXRlLmhpc3RvcmljYWwgc3RhdHVzLmdyYW50cy5jcmVhdGUubGl2ZSIsImdyb3VwcyI6W10sImV4cCI6MTY1MjgyMTE5OCwiaWF0IjoxNjUyNzM0Nzk4LCJpc3MiOiJodHRwczovL2lzcy51ZXIifQ.rNp7p9quJ0L03ob1SSsCyPhxur1l5gaCEKvqv7phyIw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{STATUSDB}}/api/v1/status/grants/387566c6-29e1-4b92-9a5e-93528236150a",
+							"host": [
+								"{{STATUSDB}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"status",
+								"grants",
+								"387566c6-29e1-4b92-9a5e-93528236150a"
 							]
 						}
 					},

@@ -3,7 +3,8 @@ import {
     ForbiddenException,
     HttpException,
     MethodNotAllowedException,
-    NotFoundException
+    NotFoundException,
+    InternalServerErrorException
 } from '@nestjs/common';
 
 export class ResponseException extends HttpException {
@@ -33,5 +34,21 @@ export class SingletonGrantExists extends ConflictException {
 export class GrantInvalidTokenScopeException extends ForbiddenException {
     constructor() {
         super('missing permission');
+    }
+}
+
+export class ChannelGroupAdditionError extends InternalServerErrorException {
+    constructor() {
+        super(
+            "channel could not be added in channel group for specified channel parameters"
+        );
+    }
+}
+
+export class ChannelGroupRemovalError extends InternalServerErrorException {
+    constructor() {
+        super(
+            "channel could not be removed from the channel group for specified channel parameters"
+        );
     }
 }
