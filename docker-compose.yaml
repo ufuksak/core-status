@@ -20,7 +20,9 @@ services:
       - "54320:5432"
 
   redis:
-    image: redislabs/redisearch:latest
+    image: redis:7.0.0
+    volumes:
+      - ./redis/kv.conf:/usr/local/etc/redis/redis.conf
     ports:
       - '6378:6379'
 
@@ -29,6 +31,10 @@ services:
     image: rabbitmq:3-management-alpine
     volumes:
       - /var/lib/rabbitmq
+    command: [
+      "bash", "-c",
+      "rabbitmq-plugins enable rabbitmq_consistent_hash_exchange; docker-entrypoint.sh rabbitmq-server"
+    ]
     ports:
       - 5672:5672
       - 15672:15672
