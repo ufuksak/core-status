@@ -52,3 +52,11 @@ export class ChannelGroupRemovalError extends InternalServerErrorException {
         );
     }
 }
+
+export class PushNotificationSendingError extends InternalServerErrorException {
+    constructor() {
+        super(
+            "notification could not be published to the channel for specified notification parameters"
+        );
+    }
+}

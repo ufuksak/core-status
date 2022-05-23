@@ -13,15 +13,18 @@ import {validationPipeOptions} from "../../src/products/config/validation-pipe.o
 import {Scopes} from "../../src/products/util/util";
 import {GrantEntity} from "../../src/products/entity/grant.entity";
 import {GrantDto, GrantType} from "../../src/products/dto/grant.model";
-import supertest = require("supertest");
 import {CHANNEL_PREFIX} from "../../worker/src/services/pubnub.service";
 import {
   addListener as transportInit,
+  getMessages,
   listPubnubChannelGroup,
   waitUntilSubscribed
 } from "../../src/products/pubnub/pubnub";
+import * as Pubnub from "pubnub";
 import {ListChannelsResponse} from "pubnub";
 import {Transport} from "../../src/products/pubnub/interfaces";
+import supertest = require("supertest");
+import {PushNotificationMessage} from "../../src/products/model/pushnotification";
 
 jest.setTimeout(3 * 60 * 1000);
 
@@ -190,11 +193,11 @@ describe('Pubnub (e2e)', () => {
         .expect(404);
   }
 
-  const prepareGrantEntities = async () => {
+  const prepareGrantEntities = async (count : number, grantType: GrantType) => {
     const {streamId, streamType} = await prepareAndTestStatusOperations();
     let grantChannelArray = [];
-    for (let i = 0; i < 3; i++) {
-      const {id} = await prepareGrantAndExpect({streamId, type: GrantType.range});
+    for (let i = 0; i < count; i++) {
+      const {id} = await prepareGrantAndExpect({streamId, type: grantType});
       grantChannelArray.push(CHANNEL_PREFIX + id);
     }
     const grantChannelGroup = `${streamType}_${recipient_id}`;
@@ -204,7 +207,7 @@ describe('Pubnub (e2e)', () => {
   describe('pubnub e2e', () => {
     it('e2e create channel group including multiple grant channels and list the channel group', async () => {
       // Arrange
-      let {grantChannelArray, grantChannelGroup} = await prepareGrantEntities();
+      let {grantChannelArray, grantChannelGroup} = await prepareGrantEntities(3, GrantType.range);
 
       // Act
       await waitUntilSubscribed(grantChannelArray[0], recipient_id);
@@ -216,7 +219,7 @@ describe('Pubnub (e2e)', () => {
 
     it('e2e create channel group and remove from the channel group and list the channel group channels', async () => {
       // Arrange
-      let {grantChannelArray, grantChannelGroup} = await prepareGrantEntities();
+      let {grantChannelArray, grantChannelGroup} = await prepareGrantEntities(3, GrantType.range);
       await deleteGrant(grantChannelArray[2].replace(CHANNEL_PREFIX, ''));
 
       // Act
@@ -225,6 +228,32 @@ describe('Pubnub (e2e)', () => {
 
       // Assert
       expect(channelList.channels).not.toContain(grantChannelArray[2]);
+    });
+    
+    it('e2e create notifications when latest grants verify the messages are delivered', async () => {
+      // Arrange
+      let {grantChannelArray} = await prepareGrantEntities(1, GrantType.latest);
+
+      // Act
+      await waitUntilSubscribed(grantChannelArray[0], recipient_id);
+      const messageResponse: Pubnub.FetchMessagesResponse = await getMessages(grantChannelArray[0]);
+      const response = JSON.parse(messageResponse.channels[grantChannelArray[0]][0].message);
+      let pubnubMessageResponse = (<PushNotificationMessage>response);
+
+      // Assert
+      expect(pubnubMessageResponse.pn_apns.aps.alert.body).toBe('Somebody shared his location with you.');
+    });
+
+    it('e2e should not create notifications when no latest grants verify no notifications are delivered', async () => {
+      // Arrange
+      let {grantChannelArray} = await prepareGrantEntities(1, GrantType.range);
+
+      // Act
+      await waitUntilSubscribed(grantChannelArray[0], recipient_id);
+      const messageResponse: Pubnub.FetchMessagesResponse = await getMessages(grantChannelArray[0]);
+
+      // Assert
+      expect(messageResponse.channels).toMatchObject({});
     });
   })
 

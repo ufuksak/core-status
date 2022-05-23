@@ -4,6 +4,7 @@ import * as Pubnub from 'pubnub'
 import {Logger} from "@nestjs/common";
 import PubNub = require("pubnub");
 import {ListChannelsResponse} from "pubnub";
+import {PubnubNotification} from "./notification";
 
 let client: Transport.Client | undefined
 const logger = new Logger('pubnub-core-status');
@@ -83,6 +84,68 @@ export async function unsubscribeFromChannel (channelAliases: string[]) {
     }
 
     await client.unsubscribe(params)
+}
+
+export async function pubnubPublish (grantChannel: string, payload: PubnubNotification) {
+    client = getClient()
+
+    const params: Pubnub.PublishParameters = {
+        message: JSON.stringify(
+            {
+                event: {
+                    type: 'Shared',
+                    stream: payload.streamId
+                },
+                pn_apns: {
+                    aps: {
+                        alert: {
+                            title: payload.title,
+                            body: payload.message
+                        }
+                    },
+                    data: {
+                        domain: payload.domain,
+                        type: payload.type,
+                        from: payload.from,
+                        attributes: payload.data
+                    }
+                },
+                pn_gcm: {
+                    data: {
+                        title: payload.title,
+                        body: payload.message
+                    },
+                    domain: payload.domain,
+                    type: payload.type,
+                    from: payload.from,
+                    attributes: payload.data
+                }
+            }
+        ),
+        channel : grantChannel,
+        storeInHistory: true,
+        ttl: 10
+    }
+
+    await client.publish(params,
+    function(status, response) {
+        if (status.error) {
+            logger.log("publishing failed w/ status: ", status);
+        } else {
+            logger.log("message published w/ server response: ", response);
+        }
+    });
+}
+
+export async function getMessages (grantChannel: string): Promise<Pubnub.FetchMessagesResponse> {
+    client = getClient()
+
+    const params: Pubnub.FetchMessagesParameters = {
+        channels: [grantChannel],
+        includeMeta: true,
+        count: 25
+    }
+    return await client.fetchMessages(params);
 }
 
 /* istanbul ignore next */

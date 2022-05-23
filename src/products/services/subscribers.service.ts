@@ -7,11 +7,16 @@ import {GrantType} from "../dto/grant.model";
 import {GrantEntity} from "../entity/grant.entity";
 import {CHANNEL_PREFIX} from "../../../worker/src/services/pubnub.service";
 import {
-  addChannelsToPubnubChannelGroup,
+  addChannelsToPubnubChannelGroup, pubnubPublish,
   removeChannelsFromPubnubChannelGroup,
   subscribeToChannel, unsubscribeFromChannel
 } from "../pubnub/pubnub";
-import {ChannelGroupAdditionError, ChannelGroupRemovalError} from "../exception/response.exception";
+import {
+  ChannelGroupAdditionError,
+  ChannelGroupRemovalError,
+  PushNotificationSendingError
+} from "../exception/response.exception";
+import {PubnubNotification} from "../pubnub/notification";
 
 @Injectable()
 export class SubscribersService {
@@ -49,7 +54,7 @@ export class SubscribersService {
     }
   }
 
-  async pushGrantToChannelGroup(update: GrantEntity) {
+  async pushGrantToChannelGroup(notification : PubnubNotification, update: GrantEntity) {
     if(update) {
       const {stream_id} = update;
 
@@ -59,15 +64,25 @@ export class SubscribersService {
         return
       }
 
+      const channelName = CHANNEL_PREFIX + update.id;
       try {
         let grantChannelArray = [];
-        grantChannelArray.push(CHANNEL_PREFIX + update.id);
+        grantChannelArray.push(channelName);
         const grantChannelGroup = `${stream.type}_${update.recipient_id}`;
         await subscribeToChannel(grantChannelArray);
         await addChannelsToPubnubChannelGroup(grantChannelArray, grantChannelGroup);
       } catch (e) {
         this.logger.error(`error while adding to the channel group ${e.message}`);
         throw new ChannelGroupAdditionError();
+      }
+      
+      try {
+        if (update.type === GrantType.latest) {
+          await pubnubPublish(channelName, notification);
+        }
+      } catch (e) {
+        this.logger.error(`error while creating push notifications for ${channelName} channel. ${e.message}`);
+        throw new PushNotificationSendingError();
       }
     }
   }
