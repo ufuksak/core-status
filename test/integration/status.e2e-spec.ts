@@ -18,7 +18,7 @@ import {GrantEntity} from "../../src/products/entity/grant.entity";
 import {GrantDto, GrantType} from "../../src/products/dto/grant.model";
 import supertest = require("supertest");
 import { AlgorithmType, Purpose } from "../../src/products/dto/keystore.byme.model";
-import { encryptPayload } from "../../src/products/util/pre";
+import { decryptPayload, encryptPayload } from "../../src/products/util/pre";
 import {addListener as transportInit} from "../../src/products/pubnub/pubnub";
 import {Transport} from "../../src/products/pubnub/interfaces";
 
@@ -937,7 +937,8 @@ describe('StatusModule (e2e)', () => {
     });
 
     it('e2e grant create', async () => {
-      const token = getAccessToken(allScopes, uuid());
+      const userId = uuid();
+      const token = getAccessToken(allScopes, userId);
 
       const keys = cryptosdk.PRE.generateKeyPair();
 
@@ -991,7 +992,7 @@ describe('StatusModule (e2e)', () => {
       };
 
       // Run your end-to-end test
-      const resp = await agent
+      const postResp = await agent
         .post('/api/v1/status/grants')
         .set('Accept', 'text/plain')
         .auth(token, authType)
@@ -999,7 +1000,15 @@ describe('StatusModule (e2e)', () => {
         .expect('Content-Type', "application/json; charset=utf-8")
         .expect(201);
 
-      expect(resp?.body?.data?.id).toHaveLength(uuidLength);
+      const grantOutput = {
+        ...grantData,
+        "owner_id": userId,
+        "updated_at": expect.any(String),
+        "created_at": expect.any(String)
+      };
+
+      // Check
+      expect(postResp?.body?.data.attributes).toEqual(grantOutput);
     });
 
     it('e2e stream create and get stream by range', async () => {
@@ -1018,7 +1027,7 @@ describe('StatusModule (e2e)', () => {
           userBKeysFromInternalStorage.public_key, userBKeysFromInternalStorage.private_key
         ).cipher,
         purpose: Purpose.status_sharing,
-        algorithm_type: AlgorithmType.rsa
+        algorithm_type: AlgorithmType.ec
       };
 
       await agent
@@ -1057,13 +1066,13 @@ describe('StatusModule (e2e)', () => {
 
       const createdStreamId = respStream?.body?.data?.id;
 
-      const payload = 'some payload';
+      const originalPayload = 'some payload';
 
       const statusUpdate = {
         id: uuid(),
         stream_id: createdStreamId,
         recorded_at: "2022-04-28T23:05:46.944Z",
-        payload: encryptPayload(payload, userAKeysFromInternalStorage.public_key),
+        payload: encryptPayload(originalPayload, userAKeysFromInternalStorage.public_key),
         marker: {
           started: true,
           frequency: '15m',
@@ -1129,10 +1138,22 @@ describe('StatusModule (e2e)', () => {
 
       const { data: statusUpdates } = body;
 
-      // Check
-      const matched = statusUpdates?.map(el => ({id: el.id, ...el.attributes}));
-      expect(matched.length).toEqual(1);
+      const decryptedMessage = decryptPayload(statusUpdates[0].attributes.payload, userBKeysFromInternalStorage.private_key);
 
+      const statusUpdateOutput = {
+        stream_id: statusUpdate.stream_id,
+        recorded_at: statusUpdate.recorded_at,
+        marker: {
+          ...statusUpdate.marker,
+          deleted: false,
+        },
+        payload: expect.any(String),
+        uploaded_at: expect.any(String),
+      };
+
+      // Check
+      expect(statusUpdates[0].attributes).toEqual(statusUpdateOutput);
+      expect(decryptedMessage).toEqual(originalPayload);
     });
   })
 

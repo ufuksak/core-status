@@ -69,7 +69,7 @@ export class StatusService {
 
       let reencrypted_payload = await this.cacheService.get(key);
 
-      if(reencrypted_payload){
+      if(!reencrypted_payload){
         const grant = grants.find(grant => (
           new Date(grant.fromDate) <= statusUpdate.recorded_at && new Date(grant.toDate) >= statusUpdate.recorded_at
         ));

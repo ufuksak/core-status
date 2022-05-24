@@ -20,7 +20,6 @@ export function reEncryptPayload(payload: string, reEncryptionKey: string) {
   return stringify(chunk);
 }
 
-
 export function encryptPayload(payload: string, public_key: string): string {
   const data = Buffer.from(payload, 'utf8');
   const chunk: cryptosdk.PRE.LockboxWithContent = cryptosdk.PRE.lockboxEncrypt(
