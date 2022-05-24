@@ -10,8 +10,10 @@ import {StatusPublisher} from "../../src/products/rabbit/status.publisher";
 import {StreamTypeService} from "../../src/products/services/stream_type.service";
 import {StreamTypeRepository} from "../../src/products/repositories/stream_type.repository";
 import {AlgorithmType, Purpose} from '../../src/products/dto/keystore.byme.model'
+import { GrantService } from '../../src/products/services/grant.service';
+import { CacheService } from '../../src/products/services/cache.service';
 
-describe('Status Service', () => {
+describe('Stream Service', () => {
     let streamService: StreamService;
     let keystoreService;
     let streamRepository;
@@ -47,6 +49,14 @@ describe('Status Service', () => {
               StreamService,
               StatusService,
               StreamTypeService,
+              {
+                provide: GrantService,
+                useValue: {}
+              },
+              {
+                provide: CacheService,
+                useValue: {}
+              },
               {
                 provide: KeystoreService,
                 useValue: keystoreService

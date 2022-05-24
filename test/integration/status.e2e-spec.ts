@@ -17,6 +17,8 @@ import {PUBLIC_SCOPE, Scopes} from "../../src/products/util/util";
 import {GrantEntity} from "../../src/products/entity/grant.entity";
 import {GrantDto, GrantType} from "../../src/products/dto/grant.model";
 import supertest = require("supertest");
+import { AlgorithmType, Purpose } from "../../src/products/dto/keystore.byme.model";
+import { encryptPayload } from "../../src/products/util/pre";
 import {addListener as transportInit} from "../../src/products/pubnub/pubnub";
 import {Transport} from "../../src/products/pubnub/interfaces";
 
@@ -934,32 +936,203 @@ describe('StatusModule (e2e)', () => {
       await uploadUpdate(respStream, masterKeys);
     });
 
+    it('e2e grant create', async () => {
+      const token = getAccessToken(allScopes, uuid());
+
+      const keys = cryptosdk.PRE.generateKeyPair();
+
+      const e2eStreamType = Object.assign({}, validStreamTypeCreateDto);
+
+      await agent.post('/api/v1/status/streams/types')
+        .auth(token, authType)
+        .send(e2eStreamType)
+        .expect(201);
+
+      const e2eStream = Object.assign({}, validStreamCreateDto);
+
+      e2eStream.encrypted_private_key = cryptosdk.PRE.encrypt(
+        keys.public_key, keys.private_key
+      ).cipher;
+
+      e2eStream.public_key = keys.public_key;
+
+      const respStream = await agent.post('/api/v1/status/streams')
+        .auth(token, authType)
+        .send(e2eStream)
+        .expect(201);
+
+      const createdStreamId = respStream?.body?.data?.id;
+      const gid_uuid = respStream?.body?.data?.attributes?.owner_id;
+
+      const restKeys = await agent
+        .post(`/api/v1/identity/keys/search`)
+        .auth(token, authType)
+        .send({ gid_uuid, purpose: Purpose.status_stream })
+        .expect('Content-Type', /json/)
+        .expect(201);
+
+      const keyPublic_key = restKeys?.body?.data?.attributes?.key_pairs[0].public_key;
+
+      const reEncryptionKey = cryptosdk.PRE.generateReEncryptionKey(
+        keys.private_key,
+        keyPublic_key
+      );
+
+      const grantData = {
+        "stream_id": createdStreamId,
+        "recipient_id": uuid(),
+        "properties": {
+          e2eKey: '',
+          reEncryptionKey
+        },
+        "fromDate": "2020-01-01T00:00:00.000Z",
+        "toDate": "2020-01-01T00:00:00.000Z",
+        "type": "range",
+      };
+
+      // Run your end-to-end test
+      const resp = await agent
+        .post('/api/v1/status/grants')
+        .set('Accept', 'text/plain')
+        .auth(token, authType)
+        .send(grantData)
+        .expect('Content-Type', "application/json; charset=utf-8")
+        .expect(201);
+
+      expect(resp?.body?.data?.id).toHaveLength(uuidLength);
+    });
+
     it('e2e stream create and get stream by range', async () => {
-      // Prepare
-      const {masterKeys, respStream} = await createStream();
-      const validUpdate = await uploadUpdate(respStream, masterKeys);
+      const userAid = uuid();
+      const userBid = uuid();
 
-      const from = new Date(validUpdate.status_updates[0].recorded_at).toISOString();
-      const to = new Date(validUpdate.status_updates[0].recorded_at).toISOString();
-      const fromTs = new Date(from).valueOf();
-      const toTs = new Date(to).valueOf();
+      const userAToken = getAccessToken(allScopes, userAid);
+      const userBToken = getAccessToken(allScopes, userBid);
 
-      const getByRange = async () => agent
-          .get('/api/v1/status/data/' + validUpdate.status_updates[0].stream_id)
-          .query({from: fromTs, to: toTs})
-          .auth(allMightToken, authType)
-          .expect(200);
+      const userAKeysFromInternalStorage = cryptosdk.PRE.generateKeyPair();
+      const userBKeysFromInternalStorage = cryptosdk.PRE.generateKeyPair();
+
+      const userBKeyPair = {
+        public_key: userBKeysFromInternalStorage.public_key,
+        encrypted_private_key: cryptosdk.PRE.encrypt(
+          userBKeysFromInternalStorage.public_key, userBKeysFromInternalStorage.private_key
+        ).cipher,
+        purpose: Purpose.status_sharing,
+        algorithm_type: AlgorithmType.rsa
+      };
+
+      await agent
+        .post('/api/v1/identity/me/keys')
+        .set('Accept', 'application/json')
+        .auth(userBToken, authType)
+        .send(userBKeyPair)
+        .expect('Content-Type', /json/)
+        .expect(201);
+
+      const e2eStreamType = {
+        granularity: "single",
+        stream_handling: "e2e",
+        approximated: true,
+        supported_grants: ["range"],
+        type: "test213233"
+      };
+
+      await agent.post('/api/v1/status/streams/types')
+        .auth(userAToken, authType)
+        .send(e2eStreamType)
+        .expect(201);
+
+      const e2eStream ={
+        public_key: userAKeysFromInternalStorage.public_key,
+        encrypted_private_key: cryptosdk.PRE.encrypt(
+          userAKeysFromInternalStorage.public_key, userAKeysFromInternalStorage.private_key
+        ).cipher,
+        stream_type: validStreamTypeCreateDto.type
+      };
+
+      const respStream = await agent.post('/api/v1/status/streams')
+        .auth(userAToken, authType)
+        .send(e2eStream)
+        .expect(201);
+
+      const createdStreamId = respStream?.body?.data?.id;
+
+      const payload = 'some payload';
+
+      const statusUpdate = {
+        id: uuid(),
+        stream_id: createdStreamId,
+        recorded_at: "2022-04-28T23:05:46.944Z",
+        payload: encryptPayload(payload, userAKeysFromInternalStorage.public_key),
+        marker: {
+          started: true,
+          frequency: '15m',
+          stopped: null
+        }
+      }
+
+      const saveStatusUpdates = {
+        status_updates: [
+          statusUpdate
+        ]
+      };
+
+      await agent.post('/api/v1/status')
+          .auth(userAToken, authType)
+          .send(saveStatusUpdates)
+          .expect(201);
+
+      const restKeys = await agent
+        .post(`/api/v1/identity/keys/search`)
+        .auth(userAToken, authType)
+        .send({ gid_uuid: userBid, purpose: Purpose.status_sharing })
+        .expect('Content-Type', /json/)
+        .expect(201);
+
+      const keyPublic_key = restKeys?.body?.data?.attributes?.key_pairs[0].public_key;
+
+      const reEncryptionKey = cryptosdk.PRE.generateReEncryptionKey(
+        userAKeysFromInternalStorage.private_key,
+        keyPublic_key
+      );
+
+      const fromDate = "2022-04-25T00:00:00.000Z";
+      const toDate = "2022-04-30T00:00:00.000Z";
+
+      const grantData = {
+        "stream_id": createdStreamId,
+        "recipient_id": userBid,
+        "properties": {
+          e2eKey: 'pre',
+          reEncryptionKey
+        },
+        fromDate,
+        toDate,
+        "type": "range",
+      };
+
+      // Run your end-to-end test
+      await agent
+        .post('/api/v1/status/grants')
+        .set('Accept', 'text/plain')
+        .auth(userAToken, authType)
+        .send(grantData)
+        .expect('Content-Type', "application/json; charset=utf-8")
+        .expect(201);
 
       // Act
-      const getByRangeResponseAfterCleaned = await getByRange();
+      const { body } = await agent
+        .post(`/api/v1/status/data/${createdStreamId}`)
+        .auth(userBToken, authType)
+        .send({ fromDate, toDate })
+        .expect(201);
+
+      const { data: statusUpdates } = body;
 
       // Check
-      const matched = getByRangeResponseAfterCleaned.body?.data?.map(el => ({id: el.id, ...el.attributes}));
-      const matchMarker = new UpdateMarker();
+      const matched = statusUpdates?.map(el => ({id: el.id, ...el.attributes}));
       expect(matched.length).toEqual(1);
-      expect(matched[0].id).toEqual(validUpdate.status_updates[0].id);
-      expect(matched[0].payload).toEqual(validUpdate.status_updates[0].payload);
-      expect(matched[0].marker).toMatchObject(matchMarker);
+
     });
   })
 

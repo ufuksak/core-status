@@ -1,7 +1,7 @@
 import {BadRequestException, Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {GrantEntity} from "../entity/grant.entity";
-import {GrantDto, GrantType, ModifyGrantRangeDto} from "../dto/grant.model";
+import {GrantDto, GrantType} from "../dto/grant.model";
 import {GrantRepository} from "../repositories/grant.repository";
 import {QueryOptions} from "../repositories/query.options";
 import {BaseService} from "./base.service";
@@ -15,6 +15,9 @@ import {
   SingletonGrantExists
 } from "../exception/response.exception";
 import {TokenData} from "@globalid/nest-auth";
+import { TimeRangeDto } from "../dto/time_range.model";
+import * as _ from "lodash";
+import { LessThanOrEqual, MoreThanOrEqual } from "typeorm";
 import {SubscribersService} from "./subscribers.service";
 
 @Injectable()
@@ -121,7 +124,7 @@ export class GrantService extends BaseService {
     return raw[0];
   }
 
-  async modifyRange(id: string, owner_id: string, range: ModifyGrantRangeDto): Promise<GrantEntity> {
+  async modifyRange(id: string, owner_id: string, range: TimeRangeDto): Promise<GrantEntity> {
     const grant = await this.get(id, owner_id);
 
     if (grant.type !== GrantType.range) {
@@ -134,5 +137,48 @@ export class GrantService extends BaseService {
     await this.repository.save(grant);
 
     return grant;
+  }
+
+  checkContinuousRange(grants: GrantEntity[], range: TimeRangeDto): void {
+    const sortedGrants = _.sortBy(grants, 'fromDate');
+    let continuousRange;
+
+    sortedGrants.forEach(grant => {
+      if (!continuousRange){
+        continuousRange = {
+          fromDate: new Date(grant.fromDate).getTime(),
+          toDate: new Date(grant.toDate).getTime()
+        }
+      }
+
+      const isContinuous = grant.fromDate <= continuousRange.toDate
+
+      if (!isContinuous) {
+        throw new Error("Range is not granted");
+      }
+
+      if (grant.toDate <= continuousRange.toDate){
+        return
+      }
+
+      continuousRange.toDate = new Date(grant.toDate).getTime();
+    })
+
+    const isContinuousRangeValid = continuousRange.fromDate <= new Date(range.fromDate).getTime() && continuousRange.toDate >= new Date(range.toDate).getTime()
+
+    if (!isContinuousRangeValid) {
+      throw new Error("Range is not granted");
+    }
+  }
+
+  async getByRange (recipient_id: string, stream_id: string, range: TimeRangeDto): Promise<GrantEntity[]> {
+    const where = {
+      recipient_id: recipient_id,
+      stream_id,
+      fromDate: LessThanOrEqual(range.toDate),
+      toDate: MoreThanOrEqual(range.fromDate),
+    }
+
+    return this.repository.find({ where });
   }
 }

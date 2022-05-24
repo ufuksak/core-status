@@ -17,6 +17,7 @@ import {UpdateEntity} from "../../../src/products/entity/update.entity";
 import {GrantEntity} from "../../../src/products/entity/grant.entity";
 import { KeystoreModule } from "../../../src/products/modules/keystore.module";
 import {UpdateWorkerDto} from "../../../src/products/dto/update-worker.dto";
+import { CacheModule } from "../../../src/products/modules/cache.module";
 import {GrantRepository} from "../../../src/products/repositories/grant.repository";
 
 export class Handlers {
@@ -38,6 +39,7 @@ export class Handlers {
 
 @Module({
   imports: [
+    CacheModule,
     KeystoreModule,
     StatusModule,
     TokenModule,

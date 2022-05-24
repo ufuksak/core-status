@@ -1,3 +1,5 @@
+import { IsEnum, IsNotEmpty, IsString } from "class-validator";
+
 export enum Purpose {
     'messaging' = 'messaging',
     'encryption' = 'encryption',
@@ -15,12 +17,19 @@ export enum AlgorithmType {
 }
 
 export class KeystoreByMeDto {
+  @IsString()
+  @IsNotEmpty()
+  public_key: string;
 
-    constructor(
-        public public_key: string,
-        public encrypted_private_key: string,
-        public purpose: Purpose,
-        public algorithm_type: AlgorithmType
-    ) {
-    }
+  @IsString()
+  @IsNotEmpty()
+  encrypted_private_key: string;
+
+  @IsEnum(Purpose)
+  @IsNotEmpty()
+  purpose: string;
+
+  @IsEnum(AlgorithmType)
+  @IsNotEmpty()
+  algorithm_type: string;
 }

@@ -18,6 +18,10 @@ import {
   SingleUpdateDeleteOptions
 } from "../dto/s3file.model";
 import {Between} from "typeorm";
+import { GrantService } from "./grant.service";
+import { TimeRangeDto } from "../dto/time_range.model";
+import { reEncryptPayload } from "../util/pre";
+import { CacheService } from "./cache.service";
 
 @Injectable()
 export class StatusService {
@@ -26,6 +30,8 @@ export class StatusService {
   constructor(
     @InjectRepository(StatusRepository) private readonly statusRepo: StatusRepository,
     @InjectRepository(StreamRepository) private readonly streamRepo: StreamRepository,
+    private readonly grantService: GrantService,
+    private readonly cacheService: CacheService,
   ) {
   }
 
@@ -39,14 +45,46 @@ export class StatusService {
     return this.filterStatusRange(options, where);
   }
 
-  async getUserStatusByStreamId(id: string, options: GetUserStatusesParams): Promise<UpdateEntity[]> {
+  async getUserStatusByStreamId(recipient_id: string, stream_id: string, range: TimeRangeDto): Promise<UpdateEntity[]> {
+    const grants = await this.grantService.getByRange(recipient_id, stream_id, range)
+
+    this.grantService.checkContinuousRange(grants, range);
+
     const where = {
       stream: {
-        id
-      }
+        id: stream_id
+      },
+      recorded_at: Between(range.fromDate, range.toDate)
     };
 
-    return this.filterStatusRange(options, where);
+    const statusUpdates = await this.statusRepo.find({
+      where,
+      order: {
+        uploaded_at: 'ASC'
+      }
+    });
+
+    return Promise.all(statusUpdates.map(async statusUpdate => {
+      const key = this.cacheService.buildStatusUpdateKey(recipient_id, stream_id, statusUpdate.id);
+
+      let reencrypted_payload = await this.cacheService.get(key);
+
+      if(reencrypted_payload){
+        const grant = grants.find(grant => (
+          new Date(grant.fromDate) <= statusUpdate.recorded_at && new Date(grant.toDate) >= statusUpdate.recorded_at
+        ));
+        const {properties} = grant;
+        const { reEncryptionKey } = properties
+
+        reencrypted_payload = reEncryptPayload(statusUpdate.payload, reEncryptionKey)
+
+        await this.cacheService.set(key, reencrypted_payload);
+      }
+
+      statusUpdate.payload = reencrypted_payload;
+
+      return statusUpdate;
+    }))
   }
 
   private filterStatusRange(options: GetUserStatusesParams, where: any) {

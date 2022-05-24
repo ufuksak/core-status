@@ -12,10 +12,8 @@ import waitForExpect from "wait-for-expect";
 import {CHANNEL_PREFIX} from "../../src/services/pubnub.service";
 import {StatusUpdateDto} from "../../../src/products/dto/status.model";
 import PubNub = require("pubnub");
+import { encryptPayload, decryptPayload } from "../../../src/products/util/pre";
 import * as cryptosdk from 'globalid-crypto-library';
-
-type LockboxWithContent = cryptosdk.PRE.LockboxWithContent;
-const util = cryptosdk.PRE.util;
 
 const dotenv = require('dotenv');
 dotenv.config();
@@ -113,12 +111,9 @@ const createDtos = () => {
     keyPairB.public_key
   );
 
-  const data = Buffer.from('{"example":"JSON"}', 'utf8');
-  const chunk: cryptosdk.PRE.LockboxWithContent = cryptosdk.PRE.lockboxEncrypt(
-    keyPairA.public_key,
-    data
-  );
-  const payload = util.bytesToHex(util.stringToBytes(JSON.stringify(chunk)));
+  const data = '{"example":"JSON"}';
+
+  const payload = encryptPayload(data, keyPairA.public_key);
 
   const grantDto = {
     stream_id: '',
@@ -199,15 +194,8 @@ describe('WorkerController (e2e)', () => {
       await waitForExpect(() => expect(recievedMessage.id).toEqual(updatesUUID));
 
       const {reencrypted_payload: reencryptedRaw} = recievedMessage as any;
-      const reecryptedBytes = util.hexToBytes(reencryptedRaw);
-      const reecryptedString = util.bytesToString(reecryptedBytes);
-      const reecrypted  = JSON.parse(reecryptedString) as LockboxWithContent;
 
-      const result: Buffer = cryptosdk.PRE.lockboxDecrypt(
-        keyPairB.private_key,
-        reecrypted.lockbox,
-        Buffer.from(reecrypted.content)
-      );
+      const result = decryptPayload(reencryptedRaw, keyPairB.private_key);
 
       expect(result).toEqual(data);
     });

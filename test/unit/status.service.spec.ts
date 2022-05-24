@@ -7,6 +7,8 @@ import {StatusPublisher} from "../../src/products/rabbit/status.publisher";
 import {StreamRepository} from "../../src/products/repositories/stream.repository";
 import {StreamTypeService} from "../../src/products/services/stream_type.service";
 import {StreamTypeRepository} from "../../src/products/repositories/stream_type.repository";
+import { GrantService } from '../../src/products/services/grant.service';
+import { CacheService } from '../../src/products/services/cache.service';
 
 
 const userId = uuid();
@@ -39,6 +41,14 @@ describe('StatusService', () => {
       providers: [
         StatusService,
         StreamTypeService,
+        {
+          provide: GrantService,
+          useValue: {}
+        },
+        {
+          provide: CacheService,
+          useValue: {}
+        },
         {
           provide: getRepositoryToken(StatusRepository),
           useFactory: jest.fn(() => ({

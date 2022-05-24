@@ -1,5 +1,6 @@
 import { Type } from "class-transformer";
-import { IsDateString, IsEnum, IsNotEmpty, IsString, IsUUID, ValidateNested } from "class-validator";
+import { IsEnum, IsNotEmpty, IsString, IsUUID, ValidateNested } from "class-validator";
+import { TimeRangeDto } from "./time_range.model";
 
 export enum GrantType {
   range = 'range',
@@ -15,17 +16,7 @@ export class GrantProperties {
   e2eKey: string;
 }
 
-export class ModifyGrantRangeDto {
-  @IsDateString()
-  @IsNotEmpty()
-  fromDate: string;
-
-  @IsDateString()
-  @IsNotEmpty()
-  toDate: string;
-}
-
-export class GrantDto extends ModifyGrantRangeDto {
+export class GrantDto extends TimeRangeDto {
   @IsEnum(GrantType)
   @IsNotEmpty()
   type: GrantType;

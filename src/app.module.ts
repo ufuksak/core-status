@@ -3,6 +3,7 @@ import {ProductsModule} from "./products/modules/products.module";
 import {TypeOrmModule} from "@nestjs/typeorm";
 import {UploadImageModule} from "./products/modules/uploadimage.module";
 import {ChannelModule} from "./products/modules/channel.module";
+import {CacheModule} from "./products/modules/cache.module";
 import {KeystoreModule} from "./products/modules/keystore.module";
 import {ContainerModule} from "./products/modules/container.module";
 import {AmqpModule} from "@globalid/nest-amqp";
@@ -15,6 +16,7 @@ import ormOptions from "./products/config/orm.options";
 
 @Module({
   imports: [
+    CacheModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

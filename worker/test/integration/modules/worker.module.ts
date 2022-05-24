@@ -5,9 +5,11 @@ import {CONFIG_VALIDATION_SCHEMA, configuration} from "../../../src/config/confi
 import {amqpOptions} from "../../../src/config/amqp.options";
 import {PreSubscriber} from "../../../src/subscribers/pre.subscriber";
 import {PubnubService} from "../../../src/services/pubnub.service";
+import {CacheModule} from "../../../../src/products/modules/cache.module";
 
 @Module({
   imports: [
+    CacheModule,
     ConfigModule.forRoot({
       validationSchema: CONFIG_VALIDATION_SCHEMA,
       isGlobal: true,
