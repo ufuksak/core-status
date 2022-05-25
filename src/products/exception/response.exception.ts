@@ -60,3 +60,11 @@ export class PushNotificationSendingError extends InternalServerErrorException {
         );
     }
 }
+
+export class RangeIsNotGrantedError extends InternalServerErrorException {
+    constructor() {
+        super(
+            "Range is not granted"
+        );
+    }
+}

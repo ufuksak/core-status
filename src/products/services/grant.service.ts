@@ -12,6 +12,7 @@ import {
   GrantInvalidTokenScopeException,
   GrantNotFoundException,
   GrantOperationNotAllowed,
+  RangeIsNotGrantedError,
   SingletonGrantExists
 } from "../exception/response.exception";
 import {TokenData} from "@globalid/nest-auth";
@@ -164,10 +165,14 @@ export class GrantService extends BaseService {
       continuousRange.toDate = new Date(grant.toDate).getTime();
     })
 
-    const isContinuousRangeValid = continuousRange.fromDate <= new Date(range.fromDate).getTime() && continuousRange.toDate >= new Date(range.toDate).getTime()
+    if (continuousRange) {
+      const isContinuousRangeValid = continuousRange.fromDate <= new Date(range.fromDate).getTime() && continuousRange.toDate >= new Date(range.toDate).getTime()
 
-    if (!isContinuousRangeValid) {
-      throw new Error("Range is not granted");
+      if (!isContinuousRangeValid) {
+        throw new RangeIsNotGrantedError();
+      }
+    } else {
+      throw new GrantNotFoundException();
     }
   }
 

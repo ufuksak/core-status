@@ -358,7 +358,7 @@ describe('StatusModule (e2e)', () => {
       });
     });
 
-    it('should not creare second latest grant for same recipient and stream', async () => {
+    it('should not create second latest grant for same recipient and stream', async () => {
       const {streamId} = await prepareAndTestStatusOperations();
       const latestType = GrantType.latest;
       const {id, recipientIdToApply} = await prepareGrantAndExpect({streamId, type: latestType});
@@ -1065,7 +1065,6 @@ describe('StatusModule (e2e)', () => {
         .expect(201);
 
       const createdStreamId = respStream?.body?.data?.id;
-
       const originalPayload = 'some payload';
 
       const statusUpdate = {
