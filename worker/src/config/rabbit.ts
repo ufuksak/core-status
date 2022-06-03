@@ -7,3 +7,6 @@ const RABBITMQ_HOST: string = <string>process.env.RABBITMQ_HOST
 const RABBITMQ_PORT: string = <string>process.env.RABBITMQ_PORT
 
 export const RABBIT_CONNECTION_URL: string = `amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@${RABBITMQ_HOST}:${RABBITMQ_PORT}`
+
+export const PRE_STATUS_UPDATE_EXCHANGE: string = 'pre-status-update-task';
+export const STATUS_UPDATE_EXCHANGE: string = 'status-update-task';

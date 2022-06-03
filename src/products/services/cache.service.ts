@@ -16,12 +16,31 @@ export class CacheService {
     return `status-update:${recipient_id}:${stream_id}:${update_id}`;
   }
 
-  get(key: KeyType): Promise<string> {
-    return this.redisService.connection.get(key)
+  builtGrantsPerStreamKey(stream_id: string): string {
+    return `stream-grants:${stream_id}`;
   }
 
-  set(key: KeyType, value: ValueType): Promise<string> {
-    return this.redisService.connection.set(key, value)
+  builtReEncryptionPerGrantKey(grant_id: string): string {
+    return `grant-reencryption-key:${grant_id}`;
+  }
+
+  async get(key: KeyType): Promise<ValueType> {
+    const value = await this.redisService.connection.get(key)
+
+    try {
+      return JSON.parse(value)
+    } catch (e) {
+      return value
+    }
+  }
+
+  async set(key: KeyType, value: ValueType) {
+    // convert value to json string if possible
+    if (typeof value === 'object') {
+      value = JSON.stringify(value);
+    }
+
+    await this.redisService.connection.set(key, value)
   }
 
 }

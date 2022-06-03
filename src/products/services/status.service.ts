@@ -67,7 +67,7 @@ export class StatusService {
     return Promise.all(statusUpdates.map(async statusUpdate => {
       const key = this.cacheService.buildStatusUpdateKey(recipient_id, stream_id, statusUpdate.id);
 
-      let reencrypted_payload = await this.cacheService.get(key);
+      let reencrypted_payload = await this.cacheService.get(key) as string;
 
       if(!reencrypted_payload){
         const grant = grants.find(grant => (
