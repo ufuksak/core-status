@@ -4,11 +4,11 @@ import * as sinon from 'sinon'
 import {expect} from './setup'
 import {GrantService} from '../../src/products/services/grant.service';
 import {GrantRepository} from '../../src/products/repositories/grant.repository';
-import {GrantDto, GrantType, ModifyGrantRangeDto} from '../../src/products/dto/grant.model';
+import {GrantDto, GrantType} from '../../src/products/dto/grant.model';
 import {TokenData} from '@globalid/nest-auth';
 import {StreamService} from '../../src/products/services/stream.service';
 import {BadRequestException} from '@nestjs/common';
-import {GrantEntity} from 'src/products/entity/grant.entity';
+import {GrantEntity} from '../../src/products/entity/grant.entity';
 import {
   GrantInvalidTokenScopeException,
   GrantNotFoundException,
@@ -17,6 +17,7 @@ import {
 } from "../../src/products/exception/response.exception";
 import {FindOneOptions} from 'typeorm';
 import {Scopes} from "../../src/products/util/util";
+import { TimeRangeDto } from '../../src/products/dto/time_range.model';
 import {SubscribersService} from "../../src/products/services/subscribers.service";
 
 const validScopesToken = {
@@ -417,7 +418,7 @@ describe('Grant Service', () => {
 
       const fromDate = new Date("2020-01-01T00:00:00.000Z").toISOString();
       const toDate = new Date("2020-01-01T00:00:00.000Z").toISOString();
-      const rangeToApply: ModifyGrantRangeDto = { fromDate, toDate };
+      const rangeToApply: TimeRangeDto = { fromDate, toDate };
       grantRepository.findOne = sinon.spy((id: string, options: FindOneOptions<GrantEntity>) => grantEntity);
       grantRepository.save = sinon.spy((entity: GrantEntity) => {});
 
@@ -448,7 +449,7 @@ describe('Grant Service', () => {
 
       const fromDate = new Date("2020-01-01T00:00:00.000Z").toISOString();
       const toDate = new Date("2020-01-01T00:00:00.000Z").toISOString();
-      const rangeToApply: ModifyGrantRangeDto = { fromDate, toDate };
+      const rangeToApply: TimeRangeDto = { fromDate, toDate };
       grantRepository.findOne = sinon.spy((id: string, options: FindOneOptions<GrantEntity>) => grantEntity);
       grantRepository.save = sinon.spy((entity: GrantEntity) => {});
 

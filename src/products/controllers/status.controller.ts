@@ -24,10 +24,11 @@ import {
     UUUIDParam, SingleSelectOptions
 } from "../dto/s3file.model";
 import {GrantService} from "../services/grant.service";
-import {GrantDto, ModifyGrantRangeDto} from "../dto/grant.model";
+import {GrantDto} from "../dto/grant.model";
 import {GrantEntity} from "../entity/grant.entity";
 import { queryParams } from "../repositories/query.options";
 import {UpdateEntity} from "../entity/update.entity";
+import { TimeRangeDto } from "../dto/time_range.model";
 
 
 @Controller('/api/v1/status')
@@ -96,13 +97,13 @@ export class StatusController {
         return this.streamService.getAll();
     }
 
-    @Get('/data/:stream_id')
+    @Post('/data/:stream_id')
     @TokenProtected()
     async getStreamByDateRange(
         @ScopedTokenDataParam(STATUS_MANAGE_SCOPE) tokenData: TokenData,
-        @Query() params: GetUserStatusesParams,
+        @Body() body: TimeRangeDto,
         @Param() param: SingleSelectOptions): Promise<UpdateEntity[]> {
-        return this.statusService.getUserStatusByStreamId(param.stream_id, params);
+        return this.statusService.getUserStatusByStreamId(tokenData.uuid, param.stream_id, body);
     }
 
     @TokenProtected()
@@ -147,7 +148,7 @@ export class StatusController {
     @TokenProtected()
     @Get('/grants/:id')
     getGrant(@ScopedTokenDataParam(GRANTS_MANAGE_SCOPE) tokenData: TokenData,
-             @Param() {id}: UUUIDParam)  : Promise<GrantEntity> {
+            @Param() {id}: UUUIDParam)  : Promise<GrantEntity> {
         return this.grantService.get(id, tokenData.uuid);
     }
 
@@ -162,7 +163,7 @@ export class StatusController {
     @Put('/grants/:id')
     modifyGrantRange(@ScopedTokenDataParam(GRANTS_MANAGE_RANGE_SCOPE) tokenData: TokenData,
       @Param('id', new ParseUUIDPipe({version: '4'})) id: string,
-      @Body() body: ModifyGrantRangeDto): Promise<GrantEntity> {
+      @Body() body: TimeRangeDto): Promise<GrantEntity> {
         return this.grantService.modifyRange(id, tokenData.uuid, body);
     }
 

@@ -5,6 +5,7 @@ import {PickType} from "@nestjs/mapped-types";
 import Pubnub = require("pubnub");
 
 export const CHANNEL_PREFIX = 'grant_';
+
 export class PREMessage extends PickType(UpdateWorkerDto,
   ['id', 'user_id', 'stream_id', 'grant_id', 'recipient_id', 'recorded_at'] as const
 ) {

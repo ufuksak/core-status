@@ -1,27 +1,31 @@
-import {BadRequestException, Injectable} from "@nestjs/common";
-import {InjectRepository} from "@nestjs/typeorm";
-import {GrantEntity} from "../entity/grant.entity";
-import {GrantDto, GrantType, ModifyGrantRangeDto} from "../dto/grant.model";
-import {GrantRepository} from "../repositories/grant.repository";
-import {QueryOptions} from "../repositories/query.options";
-import {BaseService} from "./base.service";
-import {StreamService} from "./stream.service";
-import {Scopes} from "../util/util";
+import { BadRequestException, Injectable } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { GrantEntity } from "../entity/grant.entity";
+import { GrantDto, GrantType } from "../dto/grant.model";
+import { GrantRepository } from "../repositories/grant.repository";
+import { QueryOptions } from "../repositories/query.options";
+import { BaseService } from "./base.service";
+import { StreamService } from "./stream.service";
+import { Scopes } from "../util/util";
 import {
   ChannelGroupRemovalError,
   GrantInvalidTokenScopeException,
   GrantNotFoundException,
   GrantOperationNotAllowed,
-  SingletonGrantExists
+  RangeIsNotGrantedError,
+  SingletonGrantExists,
 } from "../exception/response.exception";
-import {TokenData} from "@globalid/nest-auth";
-import {SubscribersService} from "./subscribers.service";
+import { TokenData } from "@globalid/nest-auth";
+import { TimeRangeDto } from "../dto/time_range.model";
+import * as _ from "lodash";
+import { LessThanOrEqual, MoreThanOrEqual } from "typeorm";
+import { SubscribersService } from "./subscribers.service";
 
 @Injectable()
 export class GrantService extends BaseService {
-
   constructor(
-    @InjectRepository(GrantRepository) public readonly repository: GrantRepository,
+    @InjectRepository(GrantRepository)
+    public readonly repository: GrantRepository,
     private streamService: StreamService,
     private readonly subscribersService: SubscribersService
   ) {
@@ -29,7 +33,7 @@ export class GrantService extends BaseService {
   }
 
   async get(id: string, owner_id: string) {
-    const grant = await this.repository.findOne(id, {where: {owner_id}});
+    const grant = await this.repository.findOne(id, { where: { owner_id } });
 
     if (!grant) {
       throw new GrantNotFoundException();
@@ -38,14 +42,19 @@ export class GrantService extends BaseService {
     return grant;
   }
 
-  private async avoidExistingSingletonGrant(stream_id, owner_id, recipient_id, scopes: string[]) {
+  private async avoidExistingSingletonGrant(
+    stream_id,
+    owner_id,
+    recipient_id,
+    scopes: string[]
+  ) {
     const maybeExists = await this.repository.find({
       where: {
         stream_id,
         owner_id,
         recipient_id,
-        type: GrantType.latest
-      }
+        type: GrantType.latest,
+      },
     });
 
     if (maybeExists.length) {
@@ -54,26 +63,38 @@ export class GrantService extends BaseService {
   }
 
   async save(uuid: string, grantData: GrantDto, scopes: string[]) {
-    const {stream_id, type} = grantData;
+    const { stream_id, type } = grantData;
 
-    const isHistorical = (type === GrantType.all || type === GrantType.range);
-    if (isHistorical && !scopes.includes(Scopes.status_grants_create_historical)) {
+    const isHistorical = type === GrantType.all || type === GrantType.range;
+    if (
+      isHistorical &&
+      !scopes.includes(Scopes.status_grants_create_historical)
+    ) {
       throw new GrantInvalidTokenScopeException();
     }
 
-    const singletonGrantTypes = [GrantType.all, GrantType.latest]
+    const singletonGrantTypes = [GrantType.all, GrantType.latest];
     if (singletonGrantTypes.includes(type)) {
       if (!scopes.includes(Scopes.status_grants_create_live)) {
         throw new GrantInvalidTokenScopeException();
       }
-      await this.avoidExistingSingletonGrant(stream_id, uuid, grantData.recipient_id, scopes);
+      await this.avoidExistingSingletonGrant(
+        stream_id,
+        uuid,
+        grantData.recipient_id,
+        scopes
+      );
     }
 
     const stream = await this.streamService.getById(stream_id, {
       relations: ["streamType"],
     });
 
-    if (!stream || uuid !== stream.owner_id || !stream.streamType.supported_grants.includes(type)) {
+    if (
+      !stream ||
+      uuid !== stream.owner_id ||
+      !stream.streamType.supported_grants.includes(type)
+    ) {
       throw new BadRequestException();
     }
 
@@ -83,9 +104,9 @@ export class GrantService extends BaseService {
   }
 
   async getMy(tokenData: TokenData, options: QueryOptions) {
-    const grants = await this.find(options) as GrantEntity[];
+    const grants = (await this.find(options)) as GrantEntity[];
 
-    return grants.map(grant => {
+    return grants.map((grant) => {
       if (!tokenData.scopes.includes(Scopes.status_grants_manage)) {
         delete grant.properties;
       }
@@ -107,12 +128,12 @@ export class GrantService extends BaseService {
       throw new ChannelGroupRemovalError();
     }
 
-    const {raw} = await this.repository
+    const { raw } = await this.repository
       .createQueryBuilder()
       .delete()
-      .where('id = :id AND owner_id = :owner_id', {id, owner_id})
-      .returning('*')
-      .execute()
+      .where("id = :id AND owner_id = :owner_id", { id, owner_id })
+      .returning("*")
+      .execute();
 
     if (raw.length === 0) {
       throw new GrantNotFoundException();
@@ -121,7 +142,11 @@ export class GrantService extends BaseService {
     return raw[0];
   }
 
-  async modifyRange(id: string, owner_id: string, range: ModifyGrantRangeDto): Promise<GrantEntity> {
+  async modifyRange(
+    id: string,
+    owner_id: string,
+    range: TimeRangeDto
+  ): Promise<GrantEntity> {
     const grant = await this.get(id, owner_id);
 
     if (grant.type !== GrantType.range) {
@@ -134,5 +159,58 @@ export class GrantService extends BaseService {
     await this.repository.save(grant);
 
     return grant;
+  }
+
+  checkContinuousRange(grants: GrantEntity[], range: TimeRangeDto): void {
+    const sortedGrants = _.sortBy(grants, "fromDate");
+    let continuousRange;
+
+    sortedGrants.forEach((grant) => {
+      if (!continuousRange) {
+        continuousRange = {
+          fromDate: new Date(grant.fromDate).getTime(),
+          toDate: new Date(grant.toDate).getTime(),
+        };
+      }
+
+      const isContinuous = grant.fromDate <= continuousRange.toDate;
+
+      if (!isContinuous) {
+        throw new Error("Range is not granted");
+      }
+
+      if (grant.toDate <= continuousRange.toDate) {
+        return;
+      }
+
+      continuousRange.toDate = new Date(grant.toDate).getTime();
+    });
+
+    if (continuousRange) {
+      const isContinuousRangeValid =
+        continuousRange.fromDate <= new Date(range.fromDate).getTime() &&
+        continuousRange.toDate >= new Date(range.toDate).getTime();
+
+      if (!isContinuousRangeValid) {
+        throw new RangeIsNotGrantedError();
+      }
+    } else {
+      throw new GrantNotFoundException();
+    }
+  }
+
+  async getByRange(
+    recipient_id: string,
+    stream_id: string,
+    range: TimeRangeDto
+  ): Promise<GrantEntity[]> {
+    const where = {
+      recipient_id: recipient_id,
+      stream_id,
+      fromDate: LessThanOrEqual(range.toDate),
+      toDate: MoreThanOrEqual(range.fromDate),
+    };
+
+    return this.repository.find({ where });
   }
 }

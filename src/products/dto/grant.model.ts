@@ -1,10 +1,17 @@
 import { Type } from "class-transformer";
-import { IsDateString, IsEnum, IsNotEmpty, IsString, IsUUID, ValidateNested } from "class-validator";
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsString,
+  IsUUID,
+  ValidateNested,
+} from "class-validator";
+import { TimeRangeDto } from "./time_range.model";
 
 export enum GrantType {
-  range = 'range',
-  all = 'all',
-  latest = 'latest'
+  range = "range",
+  all = "all",
+  latest = "latest",
 }
 
 export class GrantProperties {
@@ -15,17 +22,7 @@ export class GrantProperties {
   e2eKey: string;
 }
 
-export class ModifyGrantRangeDto {
-  @IsDateString()
-  @IsNotEmpty()
-  fromDate: string;
-
-  @IsDateString()
-  @IsNotEmpty()
-  toDate: string;
-}
-
-export class GrantDto extends ModifyGrantRangeDto {
+export class GrantDto extends TimeRangeDto {
   @IsEnum(GrantType)
   @IsNotEmpty()
   type: GrantType;
@@ -34,12 +31,12 @@ export class GrantDto extends ModifyGrantRangeDto {
   @Type(() => GrantProperties)
   properties: GrantProperties;
 
-  @IsUUID('4')
+  @IsUUID("4")
   recipient_id: string;
 
   owner_id: string;
 
-  @IsUUID('4')
+  @IsUUID("4")
   @IsNotEmpty()
   stream_id: string;
 }

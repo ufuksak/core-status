@@ -17,7 +17,8 @@ import {KeystoreService} from "../../src/products/services/keystore";
 import {ConfigModule} from '@nestjs/config';
 import {CONFIG_VALIDATION_SCHEMA, configuration} from "../../src/products/config/config";
 import {GrantService} from '../../src/products/services/grant.service';
-import {GrantDto, ModifyGrantRangeDto} from '../../src/products/dto/grant.model';
+import {GrantDto} from '../../src/products/dto/grant.model';
+import { TimeRangeDto } from '../../src/products/dto/time_range.model';
 
 describe('Status Controller', () => {
   let statusController: StatusController;
@@ -180,7 +181,7 @@ describe('Status Controller', () => {
       const fromDate = new Date("2020-01-02T00:00:00.000Z").toISOString();
       const toDate = new Date("2020-01-03T00:00:00.000Z").toISOString();
 
-      grantService.modifyRange = jest.fn(async (id: string, owner_id: string, range: ModifyGrantRangeDto) => ({
+      grantService.modifyRange = jest.fn(async (id: string, owner_id: string, range: TimeRangeDto) => ({
         ...body,
         ...range
       }));
@@ -189,7 +190,7 @@ describe('Status Controller', () => {
         client_id: uuid(),
       } as TokenData;
 
-      const rangeToApply: ModifyGrantRangeDto = {
+      const rangeToApply: TimeRangeDto = {
         fromDate,
         toDate
       };
