@@ -21,17 +21,18 @@ export class JsonApiTransformer implements NestInterceptor {
             }
 
             dataResponse = isArray(data) ? data.map(item => buildData(item)) : buildData(data);
+            const result = { data: dataResponse };
+
             if (isArray(dataResponse)) {
                 count = dataResponse.length;
                 total = dataResponse.length;
-            }
-            return {
-                meta: {
+                result['meta'] = {
                     count: count,
                     total: total,
-                },
-                data: dataResponse
+                };
             }
+
+            return result;
         }));
     }
 }
