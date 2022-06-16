@@ -24,6 +24,7 @@ const update = {
     frequency: '15m'
   },
   stream: null,
+  user_id: uuid(),
   uploaded_at: new Date(),
   recorded_at: new Date(),
 } as UpdateEntity;
@@ -140,9 +141,7 @@ describe('SubscribersService', () => {
       // Prepare
       streamRepo.findOne = sinon.spy(() => streamWithAllGrant);
       publisher.publishStatusUpdate = sinon.spy(async () => null);
-      const grants = streamWithAllGrant.grants.filter(el => el.type === GrantType.all);
-      const {id, recorded_at, payload, stream_id} = update;
-      const {id: grant_id, owner_id: user_id, recipient_id, properties} = grants[0];
+      const {id, recorded_at, payload, stream_id, user_id} = update;
 
       // Act
       await service.pushToWorker(update);
@@ -151,9 +150,7 @@ describe('SubscribersService', () => {
       expect(streamRepo.findOne.calledOnce).to.be.true;
       expect(publisher.publishStatusUpdate.calledOnce).to.be.false;
       expect(publisher.publishStatusUpdate.args[0][0]).to.deep.equal({
-        id, recorded_at: recorded_at.toISOString(), payload,
-        grant_id, user_id, recipient_id, stream_id,
-        reEncryptionKey: properties.reEncryptionKey
+        id, recorded_at: recorded_at.toISOString(), payload, user_id, stream_id
       });
     });
 
@@ -161,9 +158,7 @@ describe('SubscribersService', () => {
       // Prepare
       streamRepo.findOne = sinon.spy(() => streamWithLatestGrant);
       publisher.publishStatusUpdate = sinon.spy(async () => null);
-      const grants = streamWithLatestGrant.grants.filter(el => el.type === GrantType.latest);
-      const {id, recorded_at, payload, stream_id} = update;
-      const {id: grant_id, owner_id: user_id, recipient_id, properties} = grants[0];
+      const {id, recorded_at, payload, stream_id, user_id} = update;
 
       // Act
       await service.pushToWorker(update);
@@ -172,9 +167,7 @@ describe('SubscribersService', () => {
       expect(streamRepo.findOne.calledOnce).to.be.true;
       expect(publisher.publishStatusUpdate.calledOnce).to.be.false;
       expect(publisher.publishStatusUpdate.args[0][0]).to.deep.equal({
-        id, recorded_at: recorded_at.toISOString(), payload,
-        grant_id, user_id, recipient_id, stream_id,
-        reEncryptionKey: properties.reEncryptionKey
+        id, recorded_at: recorded_at.toISOString(), payload, stream_id, user_id
       });
     });
   })

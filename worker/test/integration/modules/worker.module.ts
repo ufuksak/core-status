@@ -6,6 +6,7 @@ import {amqpOptions} from "../../../src/config/amqp.options";
 import {PreSubscriber} from "../../../src/subscribers/pre.subscriber";
 import {PubnubService} from "../../../src/services/pubnub.service";
 import {CacheModule} from "../../../../src/products/modules/cache.module";
+import {GrantSubscriber} from "../../../src/subscribers/grant.subscriber";
 
 @Module({
   imports: [
@@ -17,7 +18,7 @@ import {CacheModule} from "../../../../src/products/modules/cache.module";
     }),
     AmqpModule.forConfig(amqpOptions),
   ],
-  controllers: [PreSubscriber],
+  controllers: [PreSubscriber, GrantSubscriber],
   providers: [PubnubService],
 })
 export class AppTestModule {}

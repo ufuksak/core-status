@@ -44,6 +44,7 @@ describe('Grant Subscriber', () => {
         const firstGrantId = uuid();
         const secondGrantId = uuid();
         const streamId = uuid();
+        const recipient_id = uuid();
         const firstReEncryptionKey = 'firstReEncryptionKey';
         const secondReEncryptionKey = 'secondReEncryptionKey';
 
@@ -51,13 +52,13 @@ describe('Grant Subscriber', () => {
           id: uuid(),
           user_id: uuid(),
           stream_id: streamId,
-          recipient_id: uuid(),
+          recipient_id,
           recorded_at: '2022-04-28T23:05:46.944Z',
           payload: 'encrypted payload',
         }
 
         const cacheMap = {
-          [`stream_key: ${streamId}`]: [firstGrantId, secondGrantId],
+          [`stream_key: ${streamId}`]: [{id: firstGrantId, recipient_id}, {id: secondGrantId, recipient_id}],
           [`grant_key: ${firstGrantId}`]: firstReEncryptionKey,
           [`grant_key: ${secondGrantId}`]: secondReEncryptionKey,
         }
@@ -65,7 +66,7 @@ describe('Grant Subscriber', () => {
         cacheService.builtGrantsPerStreamKey = sinon.spy((key) => `stream_key: ${key}`);
         cacheService.builtReEncryptionPerGrantKey = sinon.spy((key) => `grant_key: ${key}`);
         cacheService.get = sinon.spy((key) => (cacheMap[key]));
-
+        cacheService.smembers = sinon.spy((key) => (cacheMap[key]))
         await grantSubscriber.handleStatusUpdateEvent(statusUpdate);
 
         expect(cacheService.builtGrantsPerStreamKey.calledOnce).toBeTruthy();
@@ -75,10 +76,9 @@ describe('Grant Subscriber', () => {
         expect(cacheService.builtReEncryptionPerGrantKey.args[0][0]).toEqual(firstGrantId);
         expect(cacheService.builtReEncryptionPerGrantKey.args[1][0]).toEqual(secondGrantId);
 
-        expect(cacheService.get.callCount).toEqual(3);
-        expect(cacheService.get.args[0][0]).toEqual(`stream_key: ${streamId}`);
-        expect(cacheService.get.args[1][0]).toEqual(`grant_key: ${firstGrantId}`);
-        expect(cacheService.get.args[2][0]).toEqual(`grant_key: ${secondGrantId}`);
+        expect(cacheService.get.callCount).toEqual(2);
+        expect(cacheService.get.args[0][0]).toEqual(`grant_key: ${firstGrantId}`);
+        expect(cacheService.get.args[1][0]).toEqual(`grant_key: ${secondGrantId}`);
 
         expect(sender.callCount).toEqual(2);
         expect(sender.args[0][0]).toEqual({ ...statusUpdate, grant_id: firstGrantId, reEncryptionKey: firstReEncryptionKey });

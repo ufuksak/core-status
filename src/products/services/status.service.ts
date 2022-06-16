@@ -137,7 +137,10 @@ export class StatusService {
         const result = await this.statusRepo
           .createQueryBuilder()
           .insert()
-          .values(status)
+          .values({
+            ...status,
+            user_id: owner_id
+          })
           .execute();
 
         results.push(...result.generatedMaps?.map((generatedColumns, index) => ({

@@ -1,14 +1,15 @@
 import {Injectable, Logger} from "@nestjs/common";
 import {ConfigService} from "@nestjs/config";
-import {UpdateWorkerDto} from "../../../src/products/dto/update-worker.dto";
 import {PickType} from "@nestjs/mapped-types";
+import {StatusUpdateDto} from "../dto/status-update.dto";
 import Pubnub = require("pubnub");
 
 export const CHANNEL_PREFIX = 'grant_';
 
-export class PREMessage extends PickType(UpdateWorkerDto,
-  ['id', 'user_id', 'stream_id', 'grant_id', 'recipient_id', 'recorded_at'] as const
+export class PREMessage extends PickType(StatusUpdateDto,
+  ['id', 'stream_id', 'recorded_at'] as const
 ) {
+  recipient_id: string
   reencrypted_payload: string
 };
 

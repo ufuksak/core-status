@@ -301,6 +301,7 @@ describe('StatusModule (e2e)', () => {
         },
         payload: expect.any(String),
         uploaded_at: expect.any(String),
+        user_id: expect.any(String),
       };
 
       // Check
