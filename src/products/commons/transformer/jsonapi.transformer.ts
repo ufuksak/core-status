@@ -11,21 +11,7 @@ export class JsonApiTransformer implements NestInterceptor {
             let dataResponse, count: number = 1, total: number = 1;
 
             const buildData = (vdata) => {
-                let tipe, id, attributes;
-
-                if (!vdata) {
-                    return [];
-                }
-
-                tipe = Boolean(vdata) ? `${vdata.constructor.name.toLowerCase()}s` : 'unknown';
-                id = vdata.id ? vdata.id : '';
-                attributes = vdata;
-                delete attributes.id;
-                return {
-                    type: tipe,
-                    id: id,
-                    attributes: attributes
-                }
+                return vdata || {};
             };
 
             dataResponse = data || [];
@@ -44,8 +30,7 @@ export class JsonApiTransformer implements NestInterceptor {
                     count: count,
                     total: total,
                 },
-                data: dataResponse,
-                links: {}
+                data: dataResponse
             }
         }));
     }
