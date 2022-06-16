@@ -22,7 +22,7 @@ services:
   redis:
     image: redis:7.0.0
     volumes:
-      - ./redis/kv.conf:/usr/local/etc/redis/redis.conf
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
     ports:
       - '6378:6379'
 
@@ -123,168 +123,168 @@ services:
       MYSQL_USER: test
       MYSQL_PASSWORD: test
 
-#  messaging-service:
-#    image: messaging-legacy-core
-#    ports:
-#      - "9836:9836"
-#    depends_on:
-#      - postgres
-#      - redis
-#      - localstack
-#    environment:
-#      NAMESPACE: messaging-service-test
-#      NODE_ENV: development
-#      PUBNUB_SUBSCRIBE_KEY: 'sub-c-252ec7e2-7ca4-11e9-89f1-56e8a30b5f0e'
-#      PUBNUB_PUBLISH_KEY: 'pub-c-5cffb7ac-5697-44e4-bfc4-dcad6bfae55d'
-#      MESSAGING_TRANSPORT_SERVICE_URL: http://messaging-transport-service:9840
-#      SERVER_PORT: 9836
-#      DATABASE_CONNECTION_URL: 'postgresql://user_messaging:e5YGE3cQ2ysqHesT@postgres:5432/test_messaging'
-#      #      PUBNUB_SUBSCRIBE_KEY: 'sub-c-252ec7e2-7ca4-11e9-89f1-56e8a30b5f0e'
-#      #      PUBNUB_PUBLISH_KEY: 'pub-c-937068cd-2e67-4c0e-a1eb-3c108d85f9e7'
-#      AWS_CLOUDFRONT_ACCESS_KEY_ID: 'aws-id'
-#      AWS_CLOUDFRONT_PRIVATE_KEY: 'aws-private-key'
-#      DEFAULT_CLIENT_ID: '4cf2c57b-ab68-4415-9b1d-9876df5d307f'
-#      AWS_CLOUDFRONT_DOMAIN: 'http://my.cloudfront.com/'
-#      AWS_REGION: 'eu-west-1'
-#      DISABLE_DDTRACE: 1
-#      SQS_ENDPOINT: 'http://localstack:4566'
-#      SNS_ENDPOINT: 'http://localstack:4566'
-#      DEEPLINK_BASE_URL: 'https://link.dev.global.id'
-#      AWS_CHIME_SERVICE_URL: 'https://service.chime.aws.amazon.com/console'
-#      AWS_CHIME_KEY_ID: 'aws_chime_key_id'
-#      AWS_CHIME_SECRET_KEY: 'aws_chime_secret_key'
-#      AWS_ACCESS_KEY_ID: invalid
-#      AWS_SECRET_ACCESS_KEY: invalid
-#      JWT_PUBLIC_KEY: 'sigsecret'
-#      JWT_ISSUER: 'https://iss.uer'
-#      SVC_URL_CONTACTS: 'http://contacts:8095'
-#      SVC_URL_GROUP: 'http://group-service:9125'
-#      SVC_URL_IDENTITY_NAMESPACE: 'http://identity-namespace-service:9992'
-#      SVC_URL_KEYSTORE: 'http://keystore-service:9123'
-#      SVC_URL_UPLOAD: 'http://upload:8080'
-#      SVC_URL_MESSAGING_FILE: 'http://localhost'
-#      REDIS_HOST: 'redis'
-#      REDIS_PORT: 6379
-#      JWT_AUTH_DISABLED: 1
-#
-#  contacts:
-#    image: contacts
-#    ports:
-#      - "8095:8080"
-#    environment:
-#      NAMESPACE: core
-#      NODE_ENV: development
-#      HOSTNAME: http://localhost:9836
-#      DATABASE_CONNECTION_URL: postgres://user_messaging:e5YGE3cQ2ysqHesT@postgres:5432/contacts?debug=false&charset=utf8
-#      OBFUSCATED_SALT: a_nice_testing_salty
-#      AWS_REGION: 'us-east-1'
-#      SQS_ENDPOINT: 'http://localstack:4566'
-#      SNS_ENDPOINT: 'http://localstack:4566'
-#      JWT_PUBLIC_KEY: 'sigsecret'
-#      JWT_ISSUER: 'https://iss.uer'
-#      AWS_SECRET_ACCESS_KEY: 'invalid'
-#      AWS_ACCESS_KEY_ID: 'invalid'
-#      DISABLE_DDTRACE: 1
-#
-#  messaging-transport-service:
-#    image: messaging-transport
-#    ports:
-#      - "9840:9840"
-#    environment:
-#      NAMESPACE: messaging-transport-service-test
-#      NODE_ENV: development
-#      SERVER_PORT: 9840
-#      PUBNUB_PUBLISH_KEY: 'pub-c-5cffb7ac-5697-44e4-bfc4-dcad6bfae55d'
-#      PUBNUB_SUBSCRIBE_KEY: 'sub-c-c8ad602c-7c09-11e9-81d5-56c3556875f9'
-#      AWS_REGION: 'us-east-1'
-#      SQS_ENDPOINT: 'http://localstack:4566'
-#      SNS_ENDPOINT: 'http://localstack:4566'
-#      JWT_PUBLIC_KEY: 'sigsecret'
-#      JWT_ISSUER: 'https://iss.uer'
-#      AWS_SECRET_ACCESS_KEY: 'invalid'
-#      AWS_ACCESS_KEY_ID: 'invalid'
-#      DISABLE_DDTRACE: 1
-#
-#  identity:
-#    image: identity-namespace-service
-#    ports:
-#      - '9992:9992'
-#    depends_on:
-#      - postgres
-#      - redis
-#      - localstack
-#      - hydra
-#    environment:
-#      - DATABASE_CONNECTION_URL=postgres://user_messaging:e5YGE3cQ2ysqHesT@postgres:5432/identity
-#      - DATABASE_LOGGING=0
-#      - NAMESPACE=DEV
-#      - NODE_ENV=test
-#      - LOGGER_SILENCE=0
-#      - OBFUSCATED_SALT='full_part_salt'
-#      - SDK_CUSTOM_DOMAIN_ALLOW_INSECURE=true
-#      - SDK_CUSTOM_API_DOMAIN=http://localhost:6473
-#      - SNS_ENDPOINT=http://localstack:4566
-#      - SQS_ENDPOINT=http://localstack:4566
-#      - AWS_REGION=us-east-1
-#      - AWS_ACCESS_KEY_ID=test
-#      - AWS_SECRET_ACCESS_KEY=test
-#      - S3_BUCKET_USER_IMAGES=global.id
-#      - REDIS_HOST=redis
-#      - REDIS_PORT=6379
-#      - LOCALID_PASSWORD_RESET_ATTEMPTS_TIME_EXPIRATION_MINUTES=60
-#      - LOCALID_PASSWORD_RESET_ATTEMPTS_TIME_PERIOD_MINUTES=60
-#      - LOCALID_PASSWORD_RESET_MAX_ATTEMPTS=3
-#      - LOCALID_RESET_CODE_MAX_ATTEMPTS=3
-#      - UPDATE_IDENTITY_REQUEST_TIMEOUT_MINUTES=10
-#      - MAX_ACCOUNT_LIMIT=50
-#      - RESTORE_TIMEOUT_MINUTES=60
-#      - ATTEMPTS_LIMIT=5
-#      - ATTEMPTS_TIME_LIMIT=24
-#      - GLOBALID_USER_IMAGES_BASE_URL=https://dev-userimages.global.id
-#      - IDENTITY_IMAGE_MAX_SIZE=500kb
-#      - IMG_VALIDATION_API_AUTH_TOKEN=awerawer
-#      - IMG_VALIDATION_API_URL=http://localhost:8082
-#      - NOTIFICATION_BASE_URL=http://localhost
-#      - ENC_KEY_PASSPHRASE=944d3e784dea03504d237422df5f7d75
-#      - STATS_HOST=localhost
-#      - STATS_PORT=8125
-#      - CONTACTS_SERVICE_BASE_URL=http://localhost
-#      - UPGRADE_TIMEOUT_MINUTES=1440
-#      - ATTESTATION_BASE_URL=https://localhost:90
-#      - PROFILE_IMAGE_MATCH_ATTEMPT_FOLDER=profilematch
-#      - ADMIN_WHITELIST=0227613-bd14-4f14-bf1f-36b9f6ce4d12,9e013e9d-9325-4d80-9e95-9a20967620f7
-#      - UNLOCK_CODE_SECRET=unlock_salt
-#      - HYDRA_API_URL=http://hydra:4444
-#      - HYDRA_ADMIN_API_URL=http://hydra:4445
-#      - PASSWORD_LOGIN_ATTEMPT_FAIL_TIME_PERIOD_MINUTES=5
-#      - PASSWORD_LOGIN_ATTEMPT_MAX_FAILED=5
-#      - PASSWORD_LOGIN_ATTEMPT_LOCK_TIME_MINUTES=60
-#      - ISSUE_TOKEN_ATTEMPT_LIMIT=3
-#      - ISSUE_TOKEN_ATTEMPT_LOCK_TIME_HOURS=2
-#      - ISSUE_TOKEN_ATTEMPT_EXPIRATION_MINUTES=3
-#      - DEFAULT_CLIENT_ID=4cf2c57b-ab68-4415-9b1d-9876df5d307f
-#      - DEFAULT_CLIENT_SECRET=cea90b037d245abf127a304d93fced79
-#      - DEFAULT_CLIENT_REDIRECT_URI=https://some-url
-#      - DEFAULT_PUBLIC_CLIENT_ID=70507bae-7063-4eaf-a522-0998d5f5319b
-#      - WHITELISTED_CLIENTS=client_uuid,client2_uuid
-#      - GROUP_IDENTITY_IMAGE_MAX_SIZE=2mb
-#      - BRANCH_IO_URL=http://fake.branch.io
-#      - BRANCH_IO_KEY=BRANCH_IO_KEY
-#      - BRANCH_IO_SECRET=BRANCH_IO_SECRET
-#      - GID_APP_URL=https://link.dev.global.id/
-#      - CAPTCHA_PASSTHROUGH_VALUE=some_captcha_value
-#      - HCAPTCHA_URL=https://localhost
-#      - HCAPTCHA_SECRET_KEY=blah
-#      - IP_QUALITY_TOKEN='some-token'
-#      - SVC_URL_CONTACTS='http://localhost'
-#      - SVC_URL_ATTESTATIONS='http://localhost'
-#      - SVC_URL_USER_NOTIFICATION='http://localhost'
-#      - CORE_API_URL='http://localhost'
-#      - IP_QUALITY_STRICTNESS='a'
-#      - TWILIO_PASSWORD_RESET_SID='a'
-#      - JWT_PUBLIC_KEY='sigsecret'
-#      - JWT_ISSUER='https://iss.uer'
-#      - DISABLE_DDTRACE=1
+  messaging-service:
+    image: messaging-legacy-core
+    ports:
+      - "9836:9836"
+    depends_on:
+      - postgres
+      - redis
+      - localstack
+    environment:
+      NAMESPACE: messaging-service-test
+      NODE_ENV: development
+      PUBNUB_SUBSCRIBE_KEY: 'sub-c-252ec7e2-7ca4-11e9-89f1-56e8a30b5f0e'
+      PUBNUB_PUBLISH_KEY: 'pub-c-5cffb7ac-5697-44e4-bfc4-dcad6bfae55d'
+      MESSAGING_TRANSPORT_SERVICE_URL: http://messaging-transport-service:9840
+      SERVER_PORT: 9836
+      DATABASE_CONNECTION_URL: 'postgresql://user_messaging:e5YGE3cQ2ysqHesT@postgres:5432/test_messaging'
+      #      PUBNUB_SUBSCRIBE_KEY: 'sub-c-252ec7e2-7ca4-11e9-89f1-56e8a30b5f0e'
+      #      PUBNUB_PUBLISH_KEY: 'pub-c-937068cd-2e67-4c0e-a1eb-3c108d85f9e7'
+      AWS_CLOUDFRONT_ACCESS_KEY_ID: 'aws-id'
+      AWS_CLOUDFRONT_PRIVATE_KEY: 'aws-private-key'
+      DEFAULT_CLIENT_ID: '4cf2c57b-ab68-4415-9b1d-9876df5d307f'
+      AWS_CLOUDFRONT_DOMAIN: 'http://my.cloudfront.com/'
+      AWS_REGION: 'eu-west-1'
+      DISABLE_DDTRACE: 1
+      SQS_ENDPOINT: 'http://localstack:4566'
+      SNS_ENDPOINT: 'http://localstack:4566'
+      DEEPLINK_BASE_URL: 'https://link.dev.global.id'
+      AWS_CHIME_SERVICE_URL: 'https://service.chime.aws.amazon.com/console'
+      AWS_CHIME_KEY_ID: 'aws_chime_key_id'
+      AWS_CHIME_SECRET_KEY: 'aws_chime_secret_key'
+      AWS_ACCESS_KEY_ID: invalid
+      AWS_SECRET_ACCESS_KEY: invalid
+      JWT_PUBLIC_KEY: 'sigsecret'
+      JWT_ISSUER: 'https://iss.uer'
+      SVC_URL_CONTACTS: 'http://contacts:8095'
+      SVC_URL_GROUP: 'http://group-service:9125'
+      SVC_URL_IDENTITY_NAMESPACE: 'http://identity-namespace-service:9992'
+      SVC_URL_KEYSTORE: 'http://keystore-service:9123'
+      SVC_URL_UPLOAD: 'http://upload:8080'
+      SVC_URL_MESSAGING_FILE: 'http://localhost'
+      REDIS_HOST: 'redis'
+      REDIS_PORT: 6379
+      JWT_AUTH_DISABLED: 1
+
+  contacts:
+    image: contacts
+    ports:
+      - "8095:8080"
+    environment:
+      NAMESPACE: core
+      NODE_ENV: development
+      HOSTNAME: http://localhost:9836
+      DATABASE_CONNECTION_URL: postgres://user_messaging:e5YGE3cQ2ysqHesT@postgres:5432/contacts?debug=false&charset=utf8
+      OBFUSCATED_SALT: a_nice_testing_salty
+      AWS_REGION: 'us-east-1'
+      SQS_ENDPOINT: 'http://localstack:4566'
+      SNS_ENDPOINT: 'http://localstack:4566'
+      JWT_PUBLIC_KEY: 'sigsecret'
+      JWT_ISSUER: 'https://iss.uer'
+      AWS_SECRET_ACCESS_KEY: 'invalid'
+      AWS_ACCESS_KEY_ID: 'invalid'
+      DISABLE_DDTRACE: 1
+
+  messaging-transport-service:
+    image: messaging-transport
+    ports:
+      - "9840:9840"
+    environment:
+      NAMESPACE: messaging-transport-service-test
+      NODE_ENV: development
+      SERVER_PORT: 9840
+      PUBNUB_PUBLISH_KEY: 'pub-c-5cffb7ac-5697-44e4-bfc4-dcad6bfae55d'
+      PUBNUB_SUBSCRIBE_KEY: 'sub-c-c8ad602c-7c09-11e9-81d5-56c3556875f9'
+      AWS_REGION: 'us-east-1'
+      SQS_ENDPOINT: 'http://localstack:4566'
+      SNS_ENDPOINT: 'http://localstack:4566'
+      JWT_PUBLIC_KEY: 'sigsecret'
+      JWT_ISSUER: 'https://iss.uer'
+      AWS_SECRET_ACCESS_KEY: 'invalid'
+      AWS_ACCESS_KEY_ID: 'invalid'
+      DISABLE_DDTRACE: 1
+
+  identity:
+    image: identity-namespace-service
+    ports:
+      - '9992:9992'
+    depends_on:
+      - postgres
+      - redis
+      - localstack
+      - hydra
+    environment:
+      - DATABASE_CONNECTION_URL=postgres://user_messaging:e5YGE3cQ2ysqHesT@postgres:5432/identity
+      - DATABASE_LOGGING=0
+      - NAMESPACE=DEV
+      - NODE_ENV=test
+      - LOGGER_SILENCE=0
+      - OBFUSCATED_SALT='full_part_salt'
+      - SDK_CUSTOM_DOMAIN_ALLOW_INSECURE=true
+      - SDK_CUSTOM_API_DOMAIN=http://localhost:6473
+      - SNS_ENDPOINT=http://localstack:4566
+      - SQS_ENDPOINT=http://localstack:4566
+      - AWS_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - S3_BUCKET_USER_IMAGES=global.id
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - LOCALID_PASSWORD_RESET_ATTEMPTS_TIME_EXPIRATION_MINUTES=60
+      - LOCALID_PASSWORD_RESET_ATTEMPTS_TIME_PERIOD_MINUTES=60
+      - LOCALID_PASSWORD_RESET_MAX_ATTEMPTS=3
+      - LOCALID_RESET_CODE_MAX_ATTEMPTS=3
+      - UPDATE_IDENTITY_REQUEST_TIMEOUT_MINUTES=10
+      - MAX_ACCOUNT_LIMIT=50
+      - RESTORE_TIMEOUT_MINUTES=60
+      - ATTEMPTS_LIMIT=5
+      - ATTEMPTS_TIME_LIMIT=24
+      - GLOBALID_USER_IMAGES_BASE_URL=https://dev-userimages.global.id
+      - IDENTITY_IMAGE_MAX_SIZE=500kb
+      - IMG_VALIDATION_API_AUTH_TOKEN=awerawer
+      - IMG_VALIDATION_API_URL=http://localhost:8082
+      - NOTIFICATION_BASE_URL=http://localhost
+      - ENC_KEY_PASSPHRASE=944d3e784dea03504d237422df5f7d75
+      - STATS_HOST=localhost
+      - STATS_PORT=8125
+      - CONTACTS_SERVICE_BASE_URL=http://localhost
+      - UPGRADE_TIMEOUT_MINUTES=1440
+      - ATTESTATION_BASE_URL=https://localhost:90
+      - PROFILE_IMAGE_MATCH_ATTEMPT_FOLDER=profilematch
+      - ADMIN_WHITELIST=0227613-bd14-4f14-bf1f-36b9f6ce4d12,9e013e9d-9325-4d80-9e95-9a20967620f7
+      - UNLOCK_CODE_SECRET=unlock_salt
+      - HYDRA_API_URL=http://hydra:4444
+      - HYDRA_ADMIN_API_URL=http://hydra:4445
+      - PASSWORD_LOGIN_ATTEMPT_FAIL_TIME_PERIOD_MINUTES=5
+      - PASSWORD_LOGIN_ATTEMPT_MAX_FAILED=5
+      - PASSWORD_LOGIN_ATTEMPT_LOCK_TIME_MINUTES=60
+      - ISSUE_TOKEN_ATTEMPT_LIMIT=3
+      - ISSUE_TOKEN_ATTEMPT_LOCK_TIME_HOURS=2
+      - ISSUE_TOKEN_ATTEMPT_EXPIRATION_MINUTES=3
+      - DEFAULT_CLIENT_ID=4cf2c57b-ab68-4415-9b1d-9876df5d307f
+      - DEFAULT_CLIENT_SECRET=cea90b037d245abf127a304d93fced79
+      - DEFAULT_CLIENT_REDIRECT_URI=https://some-url
+      - DEFAULT_PUBLIC_CLIENT_ID=70507bae-7063-4eaf-a522-0998d5f5319b
+      - WHITELISTED_CLIENTS=client_uuid,client2_uuid
+      - GROUP_IDENTITY_IMAGE_MAX_SIZE=2mb
+      - BRANCH_IO_URL=http://fake.branch.io
+      - BRANCH_IO_KEY=BRANCH_IO_KEY
+      - BRANCH_IO_SECRET=BRANCH_IO_SECRET
+      - GID_APP_URL=https://link.dev.global.id/
+      - CAPTCHA_PASSTHROUGH_VALUE=some_captcha_value
+      - HCAPTCHA_URL=https://localhost
+      - HCAPTCHA_SECRET_KEY=blah
+      - IP_QUALITY_TOKEN='some-token'
+      - SVC_URL_CONTACTS='http://localhost'
+      - SVC_URL_ATTESTATIONS='http://localhost'
+      - SVC_URL_USER_NOTIFICATION='http://localhost'
+      - CORE_API_URL='http://localhost'
+      - IP_QUALITY_STRICTNESS='a'
+      - TWILIO_PASSWORD_RESET_SID='a'
+      - JWT_PUBLIC_KEY='sigsecret'
+      - JWT_ISSUER='https://iss.uer'
+      - DISABLE_DDTRACE=1
 
   keystore:
     restart: always
