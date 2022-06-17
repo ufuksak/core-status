@@ -21,7 +21,8 @@ import {DeviceModelEntity} from "../../../src/products/entity/device_model.entit
 import {StreamEntity} from "../../../src/products/entity/stream.entity";
 import {StreamTypeEntity} from "../../../src/products/entity/stream_type.entity";
 import {GrantEntity} from "../../../src/products/entity/grant.entity";
-import { TokenModule } from '@globalid/nest-auth';
+import {TokenModule} from '@globalid/nest-auth';
+import {StreamRepository} from "../../../src/products/repositories/stream.repository";
 
 
 @Module({
@@ -43,11 +44,11 @@ import { TokenModule } from '@globalid/nest-auth';
                 TimezoneEntity,
                 UserActionEntity,
                 StatusRepository,
-                UploadRepository,
                 Container,
                 StreamEntity,
                 StreamTypeEntity,
-                GrantEntity
+                GrantEntity,
+                StreamRepository
             ]
         }),
         AmqpModule.forConfig({

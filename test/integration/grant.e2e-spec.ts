@@ -184,7 +184,7 @@ describe('Grant Ranges (e2e)', () => {
         const {userBid, userAToken, userBToken, userAKeysFromInternalStorage} = await prepareUserKeys();
         const {streamId} = await prepareAndTestStatusOperations(userAToken,
             userAKeysFromInternalStorage.public_key, cryptosdk.PRE.encrypt(
-                userAKeysFromInternalStorage.public_key, userAKeysFromInternalStorage.private_key
+              'aes-256-cbc', 'sha256', userAKeysFromInternalStorage.public_key, userAKeysFromInternalStorage.private_key
             ).cipher);
         let grantChannelArray = [];
 
@@ -246,7 +246,7 @@ describe('Grant Ranges (e2e)', () => {
         const userBKeyPair = {
             public_key: userBKeysFromInternalStorage.public_key,
             encrypted_private_key: cryptosdk.PRE.encrypt(
-                userBKeysFromInternalStorage.public_key, userBKeysFromInternalStorage.private_key
+              'aes-256-cbc', 'sha256', userBKeysFromInternalStorage.public_key, userBKeysFromInternalStorage.private_key
             ).cipher,
             purpose: Purpose.status_sharing,
             algorithm_type: AlgorithmType.ec

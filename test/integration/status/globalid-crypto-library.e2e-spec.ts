@@ -56,7 +56,7 @@ describe('StatusModule (e2e)', () => {
 
 
       e2eStream.encrypted_private_key = cryptosdk.PRE.encrypt(
-          masterKeys.public_key, masterKeys.private_key
+        'aes-256-cbc', 'sha256', masterKeys.public_key, masterKeys.private_key
       ).cipher;
 
       e2eStream.public_key = masterKeys.public_key;
@@ -73,7 +73,7 @@ describe('StatusModule (e2e)', () => {
       const payload = 'some payload';
       const validUpdate = Object.assign({}, statusUpdateTemplate);
       validUpdate.status_updates[0].stream_id = createdStreamId;
-      validUpdate.status_updates[0].payload = cryptosdk.PRE.encrypt(masterKeys.public_key, payload).cipher;
+      validUpdate.status_updates[0].payload = cryptosdk.PRE.encrypt('aes-256-cbc', 'sha256', masterKeys.public_key, payload).cipher;
       await agent.post('/api/v1/status')
           .auth(allMightToken, authType)
           .send(validUpdate)
@@ -104,7 +104,7 @@ describe('StatusModule (e2e)', () => {
       const e2eStream = Object.assign({}, validStreamCreateDto);
 
       e2eStream.encrypted_private_key = cryptosdk.PRE.encrypt(
-        keys.public_key, keys.private_key
+        'aes-256-cbc', 'sha256', keys.public_key, keys.private_key
       ).cipher;
 
       e2eStream.public_key = keys.public_key;
@@ -177,7 +177,7 @@ describe('StatusModule (e2e)', () => {
       const userBKeyPair = {
         public_key: userBKeysFromInternalStorage.public_key,
         encrypted_private_key: cryptosdk.PRE.encrypt(
-          userBKeysFromInternalStorage.public_key, userBKeysFromInternalStorage.private_key
+          'aes-256-cbc', 'sha256', userBKeysFromInternalStorage.public_key, userBKeysFromInternalStorage.private_key
         ).cipher,
         purpose: Purpose.status_sharing,
         algorithm_type: AlgorithmType.ec
@@ -207,7 +207,7 @@ describe('StatusModule (e2e)', () => {
       const e2eStream ={
         public_key: userAKeysFromInternalStorage.public_key,
         encrypted_private_key: cryptosdk.PRE.encrypt(
-          userAKeysFromInternalStorage.public_key, userAKeysFromInternalStorage.private_key
+          'aes-256-cbc', 'sha256', userAKeysFromInternalStorage.public_key, userAKeysFromInternalStorage.private_key
         ).cipher,
         stream_type: validStreamTypeCreateDto.type
       };

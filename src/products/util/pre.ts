@@ -23,7 +23,7 @@ export function reEncryptPayload(payload: string, reEncryptionKey: string) {
 export function encryptPayload(payload: string, public_key: string): string {
   const data = Buffer.from(payload, 'utf8');
   const chunk: cryptosdk.PRE.LockboxWithContent = cryptosdk.PRE.lockboxEncrypt(
-
+    'aes-256-cbc', 'sha256',
     public_key,
     data
   );
@@ -35,6 +35,7 @@ export function decryptPayload(payload: string, private_key: string): string {
   const chunk = parse(payload);
 
   const result: Buffer = cryptosdk.PRE.lockboxDecrypt(
+    'aes-256-cbc', 'sha256',
     private_key,
     chunk.lockbox,
     Buffer.from(chunk.content)
