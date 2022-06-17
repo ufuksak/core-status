@@ -41,7 +41,8 @@ describe('StatusModule (e2e)', () => {
         "supported_grants": allGrants,
         "type": streamType,
         "updated_at": expect.any(String),
-        "created_at": expect.any(String)
+        "created_at": expect.any(String),
+        "id": expect.any(String)
       };
 
       // Run your end-to-end test
@@ -53,7 +54,7 @@ describe('StatusModule (e2e)', () => {
         .expect('Content-Type', /json/)
         .expect(200);
 
-      expect(resp?.body?.data?.[0]['attributes'])
+      expect(resp?.body?.data?.[0])
         .toEqual(streamTypeOutput)
     });
   });

@@ -33,7 +33,7 @@ describe('StatusModule (e2e)', () => {
         await prepareAndTestStatusOperations(agent);
 
       const getAllResponseLoaded = await getAllStatuses(agent);
-      const matched = getAllResponseLoaded.body?.data?.map(el => ({id: el.id, ...el.attributes}));
+      const matched = getAllResponseLoaded.body?.data;
       const reallyToBeDeleted = matched[0];
       const reallyToBeDeletedId = reallyToBeDeleted.id;
 
@@ -58,16 +58,13 @@ describe('StatusModule (e2e)', () => {
         .send({ stream_id: streamId }).expect(200);
 
       const getStatusesResponseAfterCleaned = await getAllStatuses(agent);
-      const matchedAfterDeleted = getStatusesResponseAfterCleaned.body?.data?.map(el => ({
-        id: el.id,
-        ...el.attributes
-      }));
+      const matchedAfterDeleted = getStatusesResponseAfterCleaned.body?.data;
 
       // Check
       expect(deleteFailedResponse?.body?.data?.id).toEqual(randomUUID);
-      expect(deleteFailedResponse?.body?.data?.attributes?.comment).toEqual('update not found');
+      expect(deleteFailedResponse?.body?.data?.comment).toEqual('update not found');
       expect(deleteResponse?.body?.data?.id).toEqual(reallyToBeDeletedId);
-      expect(deleteResponse?.body?.data?.attributes?.comment).toEqual('deleted');
+      expect(deleteResponse?.body?.data?.comment).toEqual('deleted');
 
 
       expect(matchedAfterDeleted).toEqual(
@@ -93,7 +90,7 @@ describe('StatusModule (e2e)', () => {
       ids.push(randomUUID);
 
       const getAllResponseLoaded = await getAllStatuses(agent);
-      const matched = getAllResponseLoaded.body?.data?.map(el => ({id: el.id, ...el.attributes}));
+      const matched = getAllResponseLoaded.body?.data;
 
       // Act
       const deletedManyResponse = await agent
@@ -104,25 +101,26 @@ describe('StatusModule (e2e)', () => {
       // Check
       const expectedResults = [
         {
-          comment: "deleted"
+          comment: "deleted",
+          id: expect.any(String)
         },
         {
-          comment: "deleted"
+          comment: "deleted",
+          id: expect.any(String)
         },
         {
-          comment: "deleted"
+          comment: "deleted",
+          id: expect.any(String)
         },
         {
-          comment: "update not found"
+          comment: "update not found",
+          id: expect.any(String)
         }
       ];
-      const actualResults = deletedManyResponse.body.data.map(el => el.attributes);
+      const actualResults = deletedManyResponse.body.data;
 
       const getStatusesResponseAfterCleaned = await getAllStatuses(agent);
-      const matchedAfterDeleted = getStatusesResponseAfterCleaned.body?.data?.map(el => ({
-        id: el.id,
-        ...el.attributes
-      }));
+      const matchedAfterDeleted = getStatusesResponseAfterCleaned.body?.data;
 
       const matchedDeleted = matched.map(el => {
         const result = {...el};
@@ -173,7 +171,7 @@ describe('StatusModule (e2e)', () => {
 
       const getByRangeResponseLoaded = await getByRange();
 
-      const matched = getByRangeResponseLoaded.body?.data?.map(el => ({id: el.id, ...el.attributes}));
+      const matched = getByRangeResponseLoaded.body?.data;
 
       const matchMarker = new UpdateMarker();
       expect(matched.length).toEqual(2);
@@ -188,10 +186,7 @@ describe('StatusModule (e2e)', () => {
         .expect(200);
 
       const getByRangeResponseAfterCleaned = await getByRange();
-      const matchedAfterDeleted = getByRangeResponseAfterCleaned.body?.data?.map(el => ({
-        id: el.id,
-        ...el.attributes
-      }));
+      const matchedAfterDeleted = getByRangeResponseAfterCleaned.body?.data;
 
       const matchedDeleted = matched.map(el => {
         const result = {...el};

@@ -100,7 +100,8 @@ describe('Grant Ranges (e2e)', () => {
             supported_grants: allGrants,
             type: streamType,
             updated_at: expect.any(String),
-            created_at: expect.any(String)
+            created_at: expect.any(String),
+            id: expect.any(String)
         };
 
         const streamTypeData = {
@@ -118,7 +119,7 @@ describe('Grant Ranges (e2e)', () => {
             .send(streamTypeData)
             .expect(201);
 
-        expect(resp?.body?.data?.attributes).toEqual(streamTypeOutput);
+        expect(resp?.body?.data).toEqual(streamTypeOutput);
     }
 
     const createStreamAndExpect = async (token: string, public_key: string, encrypted_private_key: string) => {
@@ -217,7 +218,7 @@ describe('Grant Ranges (e2e)', () => {
             .expect('Content-Type', /json/)
             .expect(201);
 
-        const keyPublic_key = restKeys?.body?.data?.attributes?.key_pairs[0].public_key;
+        const keyPublic_key = restKeys?.body?.data?.key_pairs[0].public_key;
 
         const reEncryptionKey = cryptosdk.PRE.generateReEncryptionKey(
             userAKeysFromInternalStorage.private_key,
@@ -298,7 +299,7 @@ describe('Grant Ranges (e2e)', () => {
             // Assert
             const { data: statusUpdates } = body;
             expect(statusUpdates).not.toBeNull();
-            expect(statusUpdates[0].attributes.stream_id).toEqual(streamId);
+            expect(statusUpdates[0].stream_id).toEqual(streamId);
         });
 
         it('e2e should create stream latest type grant different date range, get stream latest no records', async () => {

@@ -109,6 +109,7 @@ describe("Pubnub (e2e)", () => {
       type: streamType,
       updated_at: expect.any(String),
       created_at: expect.any(String),
+      id: expect.any(String)
     };
 
     const streamTypeData = {
@@ -127,7 +128,7 @@ describe("Pubnub (e2e)", () => {
       .send(streamTypeData)
       .expect(201);
 
-    expect(resp?.body?.data?.attributes).toEqual(streamTypeOutput);
+    expect(resp?.body?.data).toEqual(streamTypeOutput);
   };
 
   const createStreamAndExpect = async () => {

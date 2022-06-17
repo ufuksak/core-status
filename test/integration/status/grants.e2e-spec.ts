@@ -266,7 +266,7 @@ describe('StatusModule (e2e)', () => {
         .send({ fromDate, toDate })
         .expect('Content-Type', /json/)
         .expect(200)
-        .then(resp => ({id: resp?.body?.data?.id, ...resp?.body?.data?.attributes}));
+        .then(resp => ({id: resp?.body?.data?.id, ...resp?.body?.data}));
 
       expect(grant.fromDate).toEqual(fromDate);
       expect(grant.toDate).toEqual(toDate);

@@ -10,7 +10,8 @@ export default async function createStreamTypeAndExpect(agent: any, supportedGra
     supported_grants,
     "type": streamType,
     "updated_at": expect.any(String),
-    "created_at": expect.any(String)
+    "created_at": expect.any(String),
+    "id": expect.any(String)
   };
 
   const streamTypeData = {
@@ -18,7 +19,7 @@ export default async function createStreamTypeAndExpect(agent: any, supportedGra
     stream_handling: 'lockbox',
     approximated: true,
     supported_grants,
-    type: streamType,
+    type: streamType
   };
 
   // Run your end-to-end test
@@ -29,5 +30,5 @@ export default async function createStreamTypeAndExpect(agent: any, supportedGra
     .send(streamTypeData)
     .expect(201);
 
-  expect(resp?.body?.data?.attributes).toEqual(streamTypeOutput);
+  expect(resp?.body?.data).toEqual(streamTypeOutput);
 }

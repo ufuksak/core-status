@@ -17,7 +17,7 @@
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "tools:jwt": "ts-node ./test/prepare-jwt.ts",
     "test": "jest --runInBand --config=./test/jest.json",
-    "test:watch": "jest --watch --config=./test/jest.json",
+    "test:watch": "jest --watch --runInBand --config=./test/jest.json",
     "test:cov": "jest --coverage --config=./test/jest.json",
     "test:worker": "jest --runInBand --config=./worker/test/jest.json",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand --config=./test/jest.json",

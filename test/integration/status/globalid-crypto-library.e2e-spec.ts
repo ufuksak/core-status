@@ -115,7 +115,7 @@ describe('StatusModule (e2e)', () => {
         .expect(201);
 
       const createdStreamId = respStream?.body?.data?.id;
-      const gid_uuid = respStream?.body?.data?.attributes?.owner_id;
+      const gid_uuid = respStream?.body?.data?.owner_id;
 
       const restKeys = await agent
         .post(`/api/v1/identity/keys/search`)
@@ -124,7 +124,7 @@ describe('StatusModule (e2e)', () => {
         .expect('Content-Type', /json/)
         .expect(201);
 
-      const keyPublic_key = restKeys?.body?.data?.attributes?.key_pairs[0].public_key;
+      const keyPublic_key = restKeys?.body?.data?.key_pairs[0].public_key;
 
       const reEncryptionKey = cryptosdk.PRE.generateReEncryptionKey(
         keys.private_key,
@@ -156,11 +156,12 @@ describe('StatusModule (e2e)', () => {
         ...grantData,
         "owner_id": userId,
         "updated_at": expect.any(String),
-        "created_at": expect.any(String)
+        "created_at":expect.any(String),
+        "id": expect.any(String)
       };
 
       // Check
-      expect(postResp?.body?.data.attributes).toEqual(grantOutput);
+      expect(postResp?.body?.data).toEqual(grantOutput);
     });
 
     it('e2e stream create and get stream by range', async () => {
@@ -250,7 +251,7 @@ describe('StatusModule (e2e)', () => {
         .expect('Content-Type', /json/)
         .expect(201);
 
-      const keyPublic_key = restKeys?.body?.data?.attributes?.key_pairs[0].public_key;
+      const keyPublic_key = restKeys?.body?.data?.key_pairs[0].public_key;
 
       const reEncryptionKey = cryptosdk.PRE.generateReEncryptionKey(
         userAKeysFromInternalStorage.private_key,
@@ -290,7 +291,7 @@ describe('StatusModule (e2e)', () => {
 
       const { data: statusUpdates } = body;
 
-      const decryptedMessage = decryptPayload(statusUpdates[0].attributes.payload, userBKeysFromInternalStorage.private_key);
+      const decryptedMessage = decryptPayload(statusUpdates[0].payload, userBKeysFromInternalStorage.private_key);
 
       const statusUpdateOutput = {
         stream_id: statusUpdate.stream_id,
@@ -301,10 +302,11 @@ describe('StatusModule (e2e)', () => {
         },
         payload: expect.any(String),
         uploaded_at: expect.any(String),
+        id: expect.any(String)
       };
 
       // Check
-      expect(statusUpdates[0].attributes).toEqual(statusUpdateOutput);
+      expect(statusUpdates[0]).toEqual(statusUpdateOutput);
       expect(decryptedMessage).toEqual(originalPayload);
     });
   })

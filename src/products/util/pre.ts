@@ -23,6 +23,7 @@ export function reEncryptPayload(payload: string, reEncryptionKey: string) {
 export function encryptPayload(payload: string, public_key: string): string {
   const data = Buffer.from(payload, 'utf8');
   const chunk: cryptosdk.PRE.LockboxWithContent = cryptosdk.PRE.lockboxEncrypt(
+
     public_key,
     data
   );
