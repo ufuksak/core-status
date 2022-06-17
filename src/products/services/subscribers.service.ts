@@ -23,6 +23,7 @@ import {
   PushNotificationSendingError,
 } from "../exception/response.exception";
 import { PubnubNotification } from "../pubnub/notification";
+import {CacheService} from "./cache.service";
 
 @Injectable()
 export class SubscribersService {
@@ -34,46 +35,16 @@ export class SubscribersService {
   ) {}
 
   async pushToWorker(update: UpdateEntity) {
-    const { stream_id } = update;
+    const { id, user_id, stream_id, recorded_at, payload } = update;
 
-    const stream = await this.streamRepo.findOne(stream_id, {
-      relations: ["grants", "streamType"],
-    });
-    if (!stream) {
-      this.logger.error(
-        `received update ${update.id} for unknown stream ${stream_id}`
-      );
-      return;
-    }
-
-    const { id, recorded_at, payload } = update;
-
-    for (const grant of stream.grants) {
-      if (grant.type === GrantType.all || grant.type === GrantType.latest) {
-        const {
-          id: grant_id,
-          owner_id: user_id,
-          recipient_id,
-          properties,
-        } = grant;
-        await this.statusPublisher
-          .publishStatusUpdate({
-            id,
-            stream_id,
-            grant_id,
-            user_id,
-            recipient_id,
-            recorded_at: new Date(recorded_at).toISOString(),
-            payload,
-            reEncryptionKey: properties.reEncryptionKey,
-          })
-          .catch((e) =>
-            this.logger.error(
-              `error while publish updates to rabbit ${e.message}`
-            )
-          );
-      }
-    }
+    await this.statusPublisher
+      .publishStatusUpdate({
+        id,
+        user_id,
+        stream_id,
+        recorded_at: new Date(recorded_at).toISOString(),
+        payload,
+      })
   }
 
   async pushGrantToChannelGroup(

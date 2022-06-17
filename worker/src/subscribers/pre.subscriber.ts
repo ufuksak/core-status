@@ -1,9 +1,9 @@
 import {Controller, Logger} from '@nestjs/common'
 import {MessageHandler} from '@globalid/nest-amqp'
-import {UpdateWorkerDto} from "../../../src/products/dto/update-worker.dto";
 import {PubnubService} from "../services/pubnub.service";
-import { reEncryptPayload } from "../../../src/products/util/pre";
-import { CacheService } from '../../../src/products/services/cache.service';
+import {reEncryptPayload} from "../../../src/products/util/pre";
+import {CacheService} from '../../../src/products/services/cache.service';
+import {PreStatusUpdateDto} from "../dto/pre-status-update.dto";
 
 @Controller()
 export class PreSubscriber {
@@ -15,8 +15,8 @@ export class PreSubscriber {
   ) {}
 
   @MessageHandler({})
-  async handlePREEvent(update: UpdateWorkerDto): Promise<void> {
-    const {grant_id, payload, recipient_id, stream_id, id, user_id, recorded_at, reEncryptionKey} = update;
+  async handlePREEvent(update: PreStatusUpdateDto): Promise<void> {
+    const {payload, recipient_id, stream_id, id, recorded_at, grant_id, reEncryptionKey} = update;
       const occupants = await this.pubnub.checkListeners(grant_id);
 
       const isRecipientListening = occupants.some(occupant => occupant.uuid === recipient_id);
@@ -36,8 +36,6 @@ export class PreSubscriber {
           id,
           recipient_id,
           stream_id,
-          grant_id,
-          user_id,
           recorded_at,
           reencrypted_payload
         })

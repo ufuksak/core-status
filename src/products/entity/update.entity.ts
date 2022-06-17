@@ -11,6 +11,9 @@ export class UpdateEntity {
   id: string;
 
   @PrimaryColumn('uuid')
+  user_id: string;
+
+  @PrimaryColumn('uuid')
   stream_id: string;
 
   @Column({type: 'text', nullable: true})

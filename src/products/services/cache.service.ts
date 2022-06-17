@@ -24,6 +24,16 @@ export class CacheService {
     return `grant-reencryption-key:${grant_id}`;
   }
 
+  async smembers(key: KeyType): Promise<ValueType> {
+    const value = await this.redisService.connection.smembers(key)
+
+    try {
+      return value.map(el => JSON.parse(el));
+    } catch (e) {
+      return value
+    }
+  }
+
   async get(key: KeyType): Promise<ValueType> {
     const value = await this.redisService.connection.get(key)
 
@@ -32,6 +42,11 @@ export class CacheService {
     } catch (e) {
       return value
     }
+  }
+
+  async sadd(key: KeyType, value: ValueType) {
+
+    await this.redisService.connection.sadd(key, value)
   }
 
   async set(key: KeyType, value: ValueType) {
@@ -43,4 +58,7 @@ export class CacheService {
     await this.redisService.connection.set(key, value)
   }
 
+  async remove(key: KeyType) {
+    await this.redisService.connection.remove(key);
+  }
 }

@@ -191,7 +191,7 @@ describe('WorkerController (e2e)', () => {
       await prepareStatus(statusUpdateDto, defaultPostArgs);
 
       // Check
-      await waitForExpect(() => expect(recievedMessage.id).toEqual(updatesUUID));
+      await waitForExpect(() => expect(recievedMessage.id).toEqual(updatesUUID), 10000);
 
       const {reencrypted_payload: reencryptedRaw} = recievedMessage as any;
 
