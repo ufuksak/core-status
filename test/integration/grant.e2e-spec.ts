@@ -16,7 +16,7 @@ import {GrantDto, GrantType} from "../../src/products/dto/grant.model";
 import {CHANNEL_PREFIX} from "../../worker/src/services/pubnub.service";
 import {addListener as transportInit} from "../../src/products/pubnub/pubnub";
 import {Transport} from "../../src/products/pubnub/interfaces";
-import * as cryptosdk from 'globalid-crypto-library';
+import * as cryptosdk from '@articice/globalid-crypto-library-pre';
 import {v4 as uuid} from 'uuid';
 import {AlgorithmType, Purpose} from "../../src/products/dto/keystore.byme.model";
 import supertest = require("supertest");
@@ -184,7 +184,7 @@ describe('Grant Ranges (e2e)', () => {
         const {userBid, userAToken, userBToken, userAKeysFromInternalStorage} = await prepareUserKeys();
         const {streamId} = await prepareAndTestStatusOperations(userAToken,
             userAKeysFromInternalStorage.public_key, cryptosdk.PRE.encrypt(
-              'aes-256-cbc', 'sha256', userAKeysFromInternalStorage.public_key, userAKeysFromInternalStorage.private_key
+              userAKeysFromInternalStorage.public_key, userAKeysFromInternalStorage.private_key
             ).cipher);
         let grantChannelArray = [];
 
@@ -246,7 +246,7 @@ describe('Grant Ranges (e2e)', () => {
         const userBKeyPair = {
             public_key: userBKeysFromInternalStorage.public_key,
             encrypted_private_key: cryptosdk.PRE.encrypt(
-              'aes-256-cbc', 'sha256', userBKeysFromInternalStorage.public_key, userBKeysFromInternalStorage.private_key
+              userBKeysFromInternalStorage.public_key, userBKeysFromInternalStorage.private_key
             ).cipher,
             purpose: Purpose.status_sharing,
             algorithm_type: AlgorithmType.ec

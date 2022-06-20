@@ -13,7 +13,7 @@ import {CHANNEL_PREFIX} from "../../src/services/pubnub.service";
 import {StatusUpdateDto} from "../../../src/products/dto/status.model";
 import PubNub = require("pubnub");
 import { encryptPayload, decryptPayload } from "../../../src/products/util/pre";
-import * as cryptosdk from 'globalid-crypto-library';
+import * as cryptosdk from '@articice/globalid-crypto-library-pre';
 
 const dotenv = require('dotenv');
 dotenv.config();

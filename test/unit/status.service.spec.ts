@@ -11,7 +11,7 @@ import { GrantService } from '../../src/products/services/grant.service';
 import { CacheService } from '../../src/products/services/cache.service';
 import * as sinon from 'sinon';
 import * as utils from '../../src/products/util/pre';
-import * as cryptosdk from 'globalid-crypto-library';
+import * as cryptosdk from '@articice/globalid-crypto-library-pre';
 
 
 const userId = uuid();

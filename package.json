@@ -50,7 +50,7 @@
     "date-fns": "^2.28.0",
     "dotenv": "^16.0.0",
     "lodash": "^4.17.21",
-    "globalid-crypto-library": "github:articice/globalid-crypto-library#built/CPSD-10_PRE_wrapper_recryptjs",
+    "@articice/globalid-crypto-library-pre": "^5.0.0",
     "micro-kit-atlas": "^9.11.9",
     "pg": "^8.7.3",
     "pubnub": "^5.0.1",
