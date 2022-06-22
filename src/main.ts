@@ -9,6 +9,7 @@ import { useContainer } from "class-validator";
 import { validationPipeOptions } from "./products/config/validation-pipe.options";
 import { addListener as transportInit } from "./products/pubnub/pubnub";
 import { TRANSPORT_CONFIG } from "./products/config/config";
+import {DocumentBuilder, SwaggerModule} from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -19,6 +20,16 @@ async function bootstrap() {
   await new S3ConfigProvider().createBucket();
   const configService = app.get(ConfigService);
   transportInit(TRANSPORT_CONFIG);
+
+  const options = new DocumentBuilder()
+      .setTitle('Core Status')
+      .setDescription('Core Status API')
+      .setVersion('1.0.0')
+      .build();
+
+  const document = SwaggerModule.createDocument(app, options);
+  SwaggerModule.setup('api', app, document);
+
   await app.listen(configService.get("CORE_STATUS_PORT"));
 }
 
